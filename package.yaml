@@ -1,0 +1,80 @@
+name:                openapi3-code-generator
+version:             0.1.0.0
+#github:              "githubuser/openapi3-code-generator"
+#license:             BSD3
+author:              "Remo Dörig & Joel Fisch"
+#maintainer:          "example@example.com"
+copyright:           "2020 Remo Dörig & Joel Fisch"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/openapi3-code-generator#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- template-haskell
+- yaml
+- aeson
+- text
+- containers
+- http-conduit
+- http-client
+- http-types
+- bytestring
+- lens
+- split
+- unordered-containers
+- scientific
+- mtl
+- transformers
+- time
+- options
+- vector
+- hashmap
+
+library:
+  source-dirs: src
+
+executables:
+  openapi3-code-generator-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    dependencies:
+    - openapi3-code-generator
+    - directory
+    - filepath
+
+tests:
+  openapi3-code-generator-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    dependencies:
+    - openapi3-code-generator
+    - hspec
+    - genvalidity
+    - genvalidity-text
+    - genvalidity-hspec
+    - validity
+    - validity-text
+    - QuickCheck

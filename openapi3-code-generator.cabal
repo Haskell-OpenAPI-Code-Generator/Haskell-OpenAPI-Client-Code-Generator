@@ -1,0 +1,147 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 57043f1fef5cb43ce404a6784afc96c9bf8a654ba89ef54f57e55f7ca722675f
+
+name:           openapi3-code-generator
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/openapi3-code-generator#readme>
+author:         Remo Dörig & Joel Fisch
+maintainer:     Remo Dörig & Joel Fisch
+copyright:      2020 Remo Dörig & Joel Fisch
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+library
+  exposed-modules:
+      OpenAPI.Common
+      OpenAPI.Generate
+      OpenAPI.Generate.Doc
+      OpenAPI.Generate.Flags
+      OpenAPI.Generate.Internal.Model
+      OpenAPI.Generate.Internal.Operation
+      OpenAPI.Generate.Internal.Util
+      OpenAPI.Generate.Model
+      OpenAPI.Generate.Monad
+      OpenAPI.Generate.Operation
+      OpenAPI.Generate.Reference
+      OpenAPI.Generate.Response
+      OpenAPI.Generate.SecurityScheme
+      OpenAPI.Generate.Types
+      OpenAPI.Generate.Types.Doc
+      OpenAPI.Generate.Types.Referencable
+      OpenAPI.Generate.Types.Schema
+      OpenAPI.Generate.Util
+  other-modules:
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , hashmap
+    , http-client
+    , http-conduit
+    , http-types
+    , lens
+    , mtl
+    , options
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
+
+executable openapi3-code-generator-exe
+  main-is: Main.hs
+  other-modules:
+      Embed
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , directory
+    , filepath
+    , hashmap
+    , http-client
+    , http-conduit
+    , http-types
+    , lens
+    , mtl
+    , openapi3-code-generator
+    , options
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
+
+test-suite openapi3-code-generator-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      OpenAPI.Generate.DocSpec
+      OpenAPI.Generate.Internal.ModelSpec
+      OpenAPI.Generate.MonadSpec
+      OpenAPI.Generate.OperationGetOperationDescriptionSpec
+      OpenAPI.Generate.OperationTHSpec
+      OpenAPI.Generate.ReferenceSpec
+      OpenAPI.Generate.UtilSpec
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
+  build-depends:
+      QuickCheck
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , genvalidity
+    , genvalidity-hspec
+    , genvalidity-text
+    , hashmap
+    , hspec
+    , http-client
+    , http-conduit
+    , http-types
+    , lens
+    , mtl
+    , openapi3-code-generator
+    , options
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , validity
+    , validity-text
+    , vector
+    , yaml
+  default-language: Haskell2010
