@@ -4,8 +4,14 @@
    pre-commit-check = nix-pre-commit-hooks.run {
      src = ./.;
      hooks = {
-       ormolu.enable = true;
-       hlint.enable = true;
+       ormolu = {
+         enable = true;
+         excludes = [".circleci/golden"];
+       };
+       hlint = {
+         enable = true;
+         excludes = [".circleci/golden"];
+       };
      };
    };
  }

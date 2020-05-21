@@ -1,0 +1,56 @@
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: joelfisch/stack-with-prebuilt-deps:latest
+  working_directory: ~/project
+
+jobs:
+  lint:
+    docker:
+      - image: joelfisch/hlint:latest
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Lint
+          command: ./.circleci/lint_generator
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Unit tests
+          command: ./.circleci/test_generator
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: ./.circleci/build_generator
+      - persist_to_workspace:
+          root: ~/project
+          paths: .
+
+  golden:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Golden tests
+          command: ./.circleci/test_golden
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - lint
+      - test
+      - build
+      - golden:
+          requires:
+            - build

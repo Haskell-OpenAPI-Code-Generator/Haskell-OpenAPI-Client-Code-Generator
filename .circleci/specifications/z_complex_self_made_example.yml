@@ -1,0 +1,206 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: dev-platform@stripe.com
+    name: Stripe Dev Platform Team
+    url: https://stripe.com
+  description: The Stripe REST API. Please see https://stripe.com/docs/api for more
+    details.
+  termsOfService: https://stripe.com/us/terms/
+  title: Stripe API
+  version: 2020-03-02
+  x-stripeSpecFilename: spec3
+servers:
+- url: https://api.stripe.com/
+security:
+- basicAuth: []
+- bearerAuth: []
+paths:
+  /pets:
+    patch:
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                age:
+                  type: integer
+                nickname:
+                  type: string
+              required:
+                - age
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Cat'
+                - $ref: '#/components/schemas/Dog'
+      responses:
+        '200':
+          description: Updated
+  /pets/{petId}:
+    get:
+      summary: Info for a specific pet
+      operationId: showPetById
+      parameters:
+        - $ref: '#/components/parameters/PetParameters'
+      responses:
+        default:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+components:
+  schemas:
+    PetByAge:
+      type: object
+      properties:
+        first_relative:
+          allOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/PetByType'
+            - type: string
+        another_relative:
+          oneOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/PetByType'
+            - type: string
+            - type: array
+              items:
+                type: string
+            - type: object
+              properties:
+                pet_type:
+                  type: string
+                hunts:
+                  type: boolean
+        relative:
+          anyOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/PetByType'
+            - type: string
+        age:
+          type: integer
+        nickname:
+          type: string
+      required:
+        - age
+
+    PetByType:
+      type: object
+      properties:
+        pet_type:
+          type: string
+          enum: [Cat, Dog]
+        hunts:
+          type: boolean
+      required:
+        - pet_type
+    Dog:
+      type: object
+      properties:
+        integer:
+          type: integer
+        int32:
+          type: integer
+          format: int32
+        int64:
+          type: integer
+          format: int64
+        number:
+          type: number
+        float:
+          type: number
+          format: float
+        double:
+          type: number
+          format: double
+        strDateTime:
+          type: string
+          format: date-time
+        strDate:
+          type: string
+          format: date
+        str:
+          type: string
+          maxLength: 244
+          minLength: 100
+        byte:
+          type: string
+          format: byte
+        binary:
+          type: string
+          format: binary
+        tags:
+          type: array
+          items:
+            type: string
+        bark:
+          type: boolean
+        pet_type:
+          not:
+            type: integer
+        breed:
+          type: string
+          enum: [Dingo, Husky, Retriever, Shepherd]
+        secondFather:
+          schema:
+            oneOf:
+             - $ref: '#/components/schemas/Cat'
+             - $ref: '#/components/schemas/Dog'
+        father:
+          schema:
+            oneOf:
+             - $ref: '#/components/schemas/Cat'
+             - $ref: '#/components/schemas/Dog'
+             - type: string
+               nullable: true
+               maxLength: 255
+    Cat:
+      type: object
+      properties:
+        another_relative:
+          oneOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/PetByType'
+            - type: string
+        relative:
+          anyOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/PetByType'
+            - type: string
+        hunts:
+          type: boolean
+        age:
+          type: integer
+        ananyoftype:
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/PetByAge'
+              - $ref: '#/components/schemas/PetByType'
+    Mischling:
+      allOf: # Combines the main `Pet` schema with `Cat`-specific properties
+        - $ref: '#/components/schemas/Dog'
+        - $ref: '#/components/schemas/PetByAge'
+        - type: object
+          # all other properties specific to a `Cat`
+          properties:
+            huntssecond:
+              type: boolean
+            ageThird:
+              type: integer
+    Test:
+      type: string
+    Test2:
+      type: array
+      items:
+        type: string
+  parameters:
+    PetParameters:
+      name: petId
+      in: path
+      required: true
+      description: The id of the pet to retrieve
+      schema:
+        type: string
