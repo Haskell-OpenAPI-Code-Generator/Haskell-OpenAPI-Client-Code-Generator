@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 50e1662068cb8e0b4c4d7512c4c302754b762868e5f1cc062552b80cd05ce5fa
+-- hash: d59c5b53e1007d7d46b8970ab3c1f54c81800028f7c2b4e81e6373be23f5c5c4
 
 name:           openapi3-code-generator
 version:        0.1.0.0
@@ -25,24 +25,24 @@ library
       OpenAPI.Generate
       OpenAPI.Generate.Doc
       OpenAPI.Generate.Flags
-      OpenAPI.Generate.Internal.Model
       OpenAPI.Generate.Internal.Operation
       OpenAPI.Generate.Internal.Util
       OpenAPI.Generate.Model
+      OpenAPI.Generate.ModelDependencies
       OpenAPI.Generate.Monad
       OpenAPI.Generate.Operation
       OpenAPI.Generate.Reference
       OpenAPI.Generate.Response
       OpenAPI.Generate.SecurityScheme
       OpenAPI.Generate.Types
-      OpenAPI.Generate.Types.Doc
+      OpenAPI.Generate.Types.ExternalDocumentation
       OpenAPI.Generate.Types.Referencable
       OpenAPI.Generate.Types.Schema
-      OpenAPI.Generate.Util
   other-modules:
       Paths_openapi3_code_generator
   hs-source-dirs:
       src
+  ghc-options: -Wall -Werror
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -52,7 +52,6 @@ library
     , http-client
     , http-conduit
     , http-types
-    , lens
     , mtl
     , options
     , scientific
@@ -85,7 +84,6 @@ executable openapi3-code-generator-exe
     , http-client
     , http-conduit
     , http-types
-    , lens
     , mtl
     , openapi3-code-generator
     , options
@@ -105,12 +103,12 @@ test-suite openapi3-code-generator-test
   main-is: Spec.hs
   other-modules:
       OpenAPI.Generate.DocSpec
-      OpenAPI.Generate.Internal.ModelSpec
+      OpenAPI.Generate.Internal.UtilSpec
+      OpenAPI.Generate.ModelDependenciesSpec
       OpenAPI.Generate.MonadSpec
       OpenAPI.Generate.OperationGetOperationDescriptionSpec
       OpenAPI.Generate.OperationTHSpec
       OpenAPI.Generate.ReferenceSpec
-      OpenAPI.Generate.UtilSpec
       Paths_openapi3_code_generator
   hs-source-dirs:
       test
@@ -129,7 +127,6 @@ test-suite openapi3-code-generator-test
     , http-client
     , http-conduit
     , http-types
-    , lens
     , mtl
     , openapi3-code-generator
     , options

@@ -1,35 +1,48 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module OpenAPI.Generate.Internal.Operation where
+-- | Helpers for the generation of the operation functions
+module OpenAPI.Generate.Internal.Operation
+  ( getResponseObject,
+    getResponseSchema,
+    defineOperationFunction,
+    getParameterDescription,
+    getParameterType,
+    getParametersTypeForSignature,
+    getParametersTypeForSignatureWithMonadTransformer,
+    getOperationName,
+    getOperationDescription,
+    getParametersFromOperationConcrete,
+    getBodySchemaFromOperation,
+    generateParameterizedRequestPath,
+    generateQueryParams,
+  )
+where
 
 import Control.Monad
 import qualified Control.Monad.Reader as MR
 import qualified Data.ByteString.Char8 as B8
-import Data.Char
-import qualified Data.List as DL
+import qualified Data.Char as Char
 import qualified Data.List.Split as Split
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
+import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
-import Language.Haskell.TH.Syntax
 import qualified Network.HTTP.Simple as HS
 import qualified Network.HTTP.Types as HT
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
-import OpenAPI.Generate.Flags
+import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
-import qualified OpenAPI.Generate.Util as Util
 
 -- | wrapper for ambigious usage
 getParametersFromOperationReference :: OAT.OperationObject -> [OAT.Referencable OAT.ParameterObject]
@@ -80,7 +93,7 @@ getSchemaFromParameterOuter _ = error "not yet implemented"
 getSchemaFromParameter :: OAT.ParameterObject -> OAS.SchemaObject
 getSchemaFromParameter = getSchemaFromParameterOuter . getSchemaFromParameterInner
 
-getNameFromParameter :: OAT.ParameterObject -> T.Text
+getNameFromParameter :: OAT.ParameterObject -> Text
 getNameFromParameter = OAT.name
 
 -- | Gets the Type definition dependent on the number of parameters/types
@@ -115,13 +128,24 @@ createFunctionType =
 getParameterName :: OAT.ParameterObject -> OAM.Generator Name
 getParameterName parameter = haskellifyNameM False $ getNameFromParameter parameter
 
-getParameterType :: Flags -> OAT.ParameterObject -> Q Type
+-- | Get the type of a parameter depending on its schema type and the configuration options ('OAF.Flags').
+-- If the parameter is not required, a 'Maybe' type is produced.
+getParameterType :: OAF.Flags -> OAT.ParameterObject -> Q Type
 getParameterType flags parameter =
-  let paramType = varT $ getSchemaType flags (getSchemaFromParameter parameter)
+  let paramType = varT $ Model.getSchemaType flags (getSchemaFromParameter parameter)
    in ( if getRequiredFromParameter parameter
           then paramType
           else [t|Maybe $(paramType)|]
       )
+
+-- | Get a description of a parameter object (the name and if available the description from the specification)
+getParameterDescription :: OAT.ParameterObject -> OAM.Generator Text
+getParameterDescription parameter = do
+  schema <- Model.resolveSchemaReferenceWithoutWarning $ OAT.schema (OAT.schema (parameter :: OAT.ParameterObject) :: OAT.ParameterObjectSchema)
+  let name = OAT.name (parameter :: OAT.ParameterObject)
+      description = maybe "" (": " <>) $ OAT.description (parameter :: OAT.ParameterObject)
+      constraints = joinWith ", " $ Model.getConstraintDescriptionsOfSchema schema
+  pure $ Doc.escapeText $ name <> description <> (if T.null constraints then "" else " | Constraints: " <> constraints)
 
 -- | Defines the body of an Operation function
 --   The Operation function calls an generall HTTP function
@@ -134,19 +158,17 @@ defineOperationFunction ::
   -- | The parameters
   [OAT.ParameterObject] ->
   -- | The request path. It may contain placeholders in the form /my/{var}/path/
-  T.Text ->
+  Text ->
   -- | HTTP Method (POST,GET,etc.)
-  T.Text ->
+  Text ->
   -- | Schema of body
   Maybe.Maybe (OAT.Schema, OC.RequestBodyEncoding) ->
-  -- | The operation object
-  OAT.OperationObject ->
   -- | An expression used to transform the response from 'B8.ByteString' to the required response type.
   -- Note that the response is nested within a HTTP monad and an 'Either'.
   Q Exp ->
   -- | Function body definition in TH
   OAM.Generator (Q Doc)
-defineOperationFunction useExplicitConfiguration fnName params requestPath method bodySchema operation responseTransformerExp = do
+defineOperationFunction useExplicitConfiguration fnName params requestPath method bodySchema responseTransformerExp = do
   paramVarNames <- mapM getParameterName params
   let configArg = mkName "config"
       paraPattern = varP <$> paramVarNames
@@ -193,6 +215,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
               )
           |]
 
+-- | Extracts the request body schema from an operation and the encoding which should be used on the body data.
 getBodySchemaFromOperation :: OAT.OperationObject -> OAM.Generator (Maybe (OAT.Schema, OC.RequestBodyEncoding))
 getBodySchemaFromOperation operation = do
   requestBody <- getRequestBodyObject operation
@@ -200,7 +223,7 @@ getBodySchemaFromOperation operation = do
     Just body -> getRequestBodySchema body
     Nothing -> pure Nothing
 
-getRequestBodyContent :: OAT.RequestBodyObject -> Map.Map T.Text OAT.MediaTypeObject
+getRequestBodyContent :: OAT.RequestBodyObject -> Map.Map Text OAT.MediaTypeObject
 getRequestBodyContent = OAT.content
 
 getSchemaFromMedia :: OAT.MediaTypeObject -> Maybe OAT.Schema
@@ -231,6 +254,9 @@ getRequestBodyObject operation =
       when (Maybe.isNothing p) $ OAM.logWarning $ "Reference " <> ref <> " to RequestBody could not be found and therefore will be skipped."
       pure p
 
+-- | Extracts the response 'OAT.Schema' from a 'OAT.ResponseObject'.
+--
+-- A warning is logged if the response does not contain one of the supported media types.
 getResponseSchema :: OAT.ResponseObject -> OAM.Generator (Maybe OAT.Schema)
 getResponseSchema response = do
   let contentMap = OAT.content (response :: OAT.ResponseObject)
@@ -238,11 +264,14 @@ getResponseSchema response = do
   when (Maybe.isNothing schema && not (Map.null contentMap)) $ OAM.logWarning "Only content type application/json is supported for response bodies."
   pure schema
 
+-- | Resolve a possibly referenced response to a concrete value.
+--
+-- A warning is logged if the reference is not found.
 getResponseObject :: OAT.Referencable OAT.ResponseObject -> OAM.Generator (Maybe OAT.ResponseObject)
 getResponseObject (OAT.Concrete p) = pure $ Just p
 getResponseObject (OAT.Reference ref) = do
   p <- OAM.getResponseReferenceM ref
-  when (Maybe.isNothing p) $ OAM.logWarning $ "Reference " <> ref <> " to Response could not be found and therefore will be skipped."
+  when (Maybe.isNothing p) $ OAM.logWarning $ "Reference " <> ref <> " to response could not be found and therefore will be skipped."
   pure p
 
 -- | Generates query params in the form of [(Text,ByteString)]
@@ -263,7 +292,7 @@ generateQueryParams _ = [|[]|]
 --   "my/{var}/path" -> "my" ++ myVar ++ "/path"
 --
 --   If the placeholder is at the end or at the beginning an empty string gets appended
-generateParameterizedRequestPath :: [(Name, OAT.ParameterObject)] -> T.Text -> Q Exp
+generateParameterizedRequestPath :: [(Name, OAT.ParameterObject)] -> Text -> Q Exp
 generateParameterizedRequestPath ((paramName, param) : xs) path =
   foldr1 (foldingFn paramName) partExpressiones
   where
@@ -273,12 +302,22 @@ generateParameterizedRequestPath ((paramName, param) : xs) path =
     foldingFn var a b = [|$(a) ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $(varE var)) ++ $(b)|]
 generateParameterizedRequestPath _ path = litE (stringL $ T.unpack path)
 
-getOperationDescription :: OAT.OperationObject -> T.Text
+-- | Extracts a description from an 'OAT.OperationObject'.
+-- If available, the description is used, the summary otherwise.
+-- If neither is available, an empty description is used.
+getOperationDescription :: OAT.OperationObject -> Text
 getOperationDescription operation =
-  Maybe.fromMaybe "No summary provided" $ OAT.summary (operation :: OAT.OperationObject)
+  Maybe.fromMaybe "" $ Maybe.listToMaybe $
+    Maybe.catMaybes
+      [ OAT.description (operation :: OAT.OperationObject),
+        OAT.summary (operation :: OAT.OperationObject)
+      ]
 
-getOperationName :: T.Text -> T.Text -> OAT.OperationObject -> OAM.Generator Name
+-- | Constructs the name of an operation.
+-- If an 'OAT.operationId' is available, this is the primary choice.
+-- If it is not available, the id is constructed based on the request path and method.
+getOperationName :: Text -> Text -> OAT.OperationObject -> OAM.Generator Name
 getOperationName requestPath method operation =
   let operationId = OAT.operationId operation
-      textName = Maybe.fromMaybe (T.map toLower method <> requestPath) operationId
+      textName = Maybe.fromMaybe (T.map Char.toLower method <> requestPath) operationId
    in haskellifyNameM False textName

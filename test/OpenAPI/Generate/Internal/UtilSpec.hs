@@ -1,6 +1,6 @@
-module OpenAPI.Generate.UtilSpec where
+module OpenAPI.Generate.Internal.UtilSpec where
 
-import OpenAPI.Generate.Util
+import OpenAPI.Generate.Internal.Util
 import Test.Hspec
 import Test.Validity
 

@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 -- | This module specifies the data types from the OpenAPI specification 3.0.3 Schema
 --
@@ -10,48 +11,45 @@
 -- All names in this module correspond to the respective OpenAPI types
 module OpenAPI.Generate.Types.Schema where
 
-import Control.Applicative
-import Data.Map as Map
-import Data.Maybe (mapMaybe)
-import Data.Scientific
+import qualified Data.Map as Map
+import qualified Data.Scientific as Scientific
 import Data.Set as Set
 import qualified Data.Text as T
-import Data.Word
+import Data.Text (Text)
 import Data.Yaml
 import GHC.Generics
-import OpenAPI.Generate.Types.Doc
-import OpenAPI.Generate.Types.Referencable (Referencable)
-import Text.Read (readMaybe)
+import OpenAPI.Generate.Types.ExternalDocumentation
+import OpenAPI.Generate.Types.Referencable
 
 type Schema = Referencable SchemaObject
 
 data SchemaObject
   = SchemaObject
       { type' :: SchemaType,
-        title :: Maybe T.Text,
+        title :: Maybe Text,
         multipleOf :: Maybe Integer,
         maximum :: Maybe Float,
-        exclusiveMaximum :: Maybe Float,
+        exclusiveMaximum :: Bool,
         minimum :: Maybe Float,
-        exclusiveMinimum :: Maybe Float,
+        exclusiveMinimum :: Bool,
         maxLength :: Maybe Word,
         minLength :: Maybe Word,
-        pattern' :: Maybe T.Text,
+        pattern' :: Maybe Text,
         maxItems :: Maybe Word,
         minItems :: Maybe Word,
-        uniqueItems :: Maybe Bool,
+        uniqueItems :: Bool,
         maxProperties :: Maybe Word,
         minProperties :: Maybe Word,
-        required :: Set T.Text,
+        required :: Set Text,
         enum :: Set Value,
         allOf :: Set Schema,
         oneOf :: Set Schema,
         anyOf :: Set Schema,
         not :: Maybe Schema,
-        properties :: Map T.Text Schema,
+        properties :: Map.Map Text Schema,
         additionalProperties :: AdditionalProperties,
-        description :: Maybe T.Text,
-        format :: Maybe T.Text,
+        description :: Maybe Text,
+        format :: Maybe Text,
         -- default would have the same value type as restricted by
         -- the schema. Stripe only uses Text default values
         default' :: Maybe ConcreteValue,
@@ -62,7 +60,7 @@ data SchemaObject
         xml :: Maybe XMLObject,
         externalDocs :: Maybe ExternalDocumentationObject,
         -- not correct
-        example :: Maybe T.Text,
+        example :: Maybe Text,
         deprecated :: Bool,
         items :: Maybe Schema
       }
@@ -75,15 +73,15 @@ instance FromJSON SchemaObject where
       <*> o .:? "title"
       <*> o .:? "multipleOf"
       <*> o .:? "maximum"
-      <*> o .:? "exclusiveMaximum"
+      <*> o .:? "exclusiveMaximum" .!= False
       <*> o .:? "minimum"
-      <*> o .:? "exclusiveMinimum"
+      <*> o .:? "exclusiveMinimum" .!= False
       <*> o .:? "maxLength"
       <*> o .:? "minLength"
       <*> o .:? "pattern"
       <*> o .:? "maxItems"
       <*> o .:? "minItems"
-      <*> o .:? "uniqueItems"
+      <*> o .:? "uniqueItems" .!= False
       <*> o .:? "maxProperties"
       <*> o .:? "minProperties"
       <*> o .:? "required" .!= Set.empty
@@ -128,8 +126,8 @@ instance FromJSON SchemaType where
 
 data DiscriminatorObject
   = DiscriminatorObject
-      { propertyName :: T.Text,
-        mapping :: Map T.Text T.Text
+      { propertyName :: Text,
+        mapping :: Map.Map Text Text
       }
   deriving (Show, Eq, Ord, Generic)
 
@@ -143,20 +141,20 @@ instance Ord Value where
   (Number a) `compare` (Number b) = compare a b
   (Bool a) `compare` (Bool b) = compare a b
   Null `compare` Null = EQ
-  (Object a) `compare` _ = GT
-  _ `compare` (Object a) = LT
-  (Array a) `compare` _ = GT
-  _ `compare` (Array a) = LT
-  (String a) `compare` _ = GT
-  _ `compare` (String a) = LT
-  (Number a) `compare` _ = GT
-  _ `compare` (Number a) = LT
-  (Bool a) `compare` _ = GT
-  _ `compare` (Bool a) = LT
+  (Object _) `compare` _ = GT
+  _ `compare` (Object _) = LT
+  (Array _) `compare` _ = GT
+  _ `compare` (Array _) = LT
+  (String _) `compare` _ = GT
+  _ `compare` (String _) = LT
+  (Number _) `compare` _ = GT
+  _ `compare` (Number _) = LT
+  (Bool _) `compare` _ = GT
+  _ `compare` (Bool _) = LT
 
 data ConcreteValue
-  = StringDefaultValue T.Text
-  | NumericDefaultValue Scientific
+  = StringDefaultValue Text
+  | NumericDefaultValue Scientific.Scientific
   | BoolDefaultValue Bool
   deriving (Show, Eq, Ord, Generic)
 
@@ -164,7 +162,7 @@ instance FromJSON ConcreteValue where
   parseJSON v@(String _) = StringDefaultValue <$> parseJSON v
   parseJSON v@(Number _) = NumericDefaultValue <$> parseJSON v
   parseJSON v@(Bool _) = BoolDefaultValue <$> parseJSON v
-  parseJSON x = fail "only text and numeric values are supported for a default value as of now"
+  parseJSON _ = fail "only text and numeric values are supported for a default value as of now"
 
 data AdditionalProperties
   = NoAdditionalProperties
@@ -179,9 +177,9 @@ instance FromJSON AdditionalProperties where
 
 data XMLObject
   = XMLObject
-      { name :: T.Text,
-        namespace :: Maybe T.Text,
-        prefix :: Maybe T.Text,
+      { name :: Text,
+        namespace :: Maybe Text,
+        prefix :: Maybe Text,
         attribute :: Bool,
         wrapped :: Bool
       }

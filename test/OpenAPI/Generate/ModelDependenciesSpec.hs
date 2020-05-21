@@ -1,14 +1,14 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module OpenAPI.Generate.Internal.ModelSpec where
+module OpenAPI.Generate.ModelDependenciesSpec where
 
 import Data.Bifunctor
 import Data.List
 import qualified Data.Set as Set
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
-import OpenAPI.Generate.Internal.Model
+import OpenAPI.Generate.ModelDependencies
 import Test.Hspec
 
 spec :: Spec

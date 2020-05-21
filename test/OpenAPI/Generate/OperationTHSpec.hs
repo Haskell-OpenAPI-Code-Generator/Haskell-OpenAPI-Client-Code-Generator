@@ -1,19 +1,13 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-
-{- HLINT ignore "Use list literal" -}
-{- HLINT ignore "Redundant bracket" -}
-{- HLINT ignore "Redundant do" -}
-{- HLINT ignore "Redundant $" -}
 
 module OpenAPI.Generate.OperationTHSpec where
 
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.Map as Map
-import Data.Maybe
+import qualified Data.Maybe as Maybe
 import Data.Text as T
 import Data.Yaml
 import Language.Haskell.TH
@@ -27,12 +21,12 @@ import Test.Hspec
 
 spec :: Spec
 spec =
-  let singleTestTH desc should is = do
+  let singleTestTH desc should is =
         it desc $ do
           expected <- runQ should
           res <- runQ is
           expected `shouldBe` res
-      schemaObject = fromJust $ decodeThrow "{}" :: OAS.SchemaObject
+      schemaObject = Maybe.fromJust $ decodeThrow "{}" :: OAS.SchemaObject
       testParameterSchema = OAT.SimpleParameterObjectSchema Nothing False False (OAT.Concrete schemaObject) Nothing Map.empty
       testParameter = OAT.ParameterObject "testName" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testParameterOtherName = OAT.ParameterObject "testName2" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
@@ -41,7 +35,7 @@ spec =
       monadName = mkName "m"
       securitySchemeName = mkName "s"
    in do
-        describe "generateQueryParams" $ do
+        describe "generateQueryParams" $
           singleTestTH
             "should generate empty list"
             (generateQueryParams [])

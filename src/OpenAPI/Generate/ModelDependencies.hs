@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 
-module OpenAPI.Generate.Internal.Model
+-- | Functionality to split models into multiple modules according to their dependencies
+module OpenAPI.Generate.ModelDependencies
   ( getModelModulesFromModelsWithDependencies,
     ModuleDefinition,
     Models,
@@ -10,8 +11,7 @@ module OpenAPI.Generate.Internal.Model
   )
 where
 
-import qualified Data.Bifunctor as Bif
-import qualified Data.List as List
+import Data.List
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Text (Text)
@@ -20,7 +20,7 @@ import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified OpenAPI.Generate.Doc as Doc
 import OpenAPI.Generate.Internal.Util
 
--- | A module definition with a name as a string list with the different module levels (e. g. ["OpenAPI", "Generate"] for OpenAPI.Generate)
+-- | A module definition with a name as a string list with the different module levels (e. g. [\"OpenAPI\", \"Generate\"] for "OpenAPI.Generate")
 -- and the 'Doc' representing the module content
 type ModuleDefinition = ([String], Doc)
 
@@ -40,7 +40,7 @@ cyclicTypesModule :: String
 cyclicTypesModule = "CyclicTypes"
 
 -- | Analyzes the dependencies of the provided models and splits them into modules.
--- All modules with cyclic dependencies (between each other or to itself) are put in a module named by 'cyclicTypesModule'.
+-- All models with cyclic dependencies (between each other or to itself) are put in a module named by @cyclicTypesModule@.
 getModelModulesFromModelsWithDependencies :: String -> [ModelWithDependencies] -> Q [ModuleDefinition]
 getModelModulesFromModelsWithDependencies mainModuleName = createModelModules mainModuleName . extractCyclicModuleDependentModels
 
@@ -57,13 +57,26 @@ createModelModules mainModuleName (models, cyclicModuleContentQ) = do
               mainModuleName
               (prependTypesModule modelName)
               (prependTypesModule <$> Set.toList dependencies)
+              ("Contains the types generated from the schema " <> T.unpack modelName)
               <$> doc
       )
       models
   let modelModuleNames = fmap (joinWithPoint . fst) modules
   pure $
-    ([typesModule], Doc.createModuleHeaderWithReexports (prependMainModule typesModule) $ fmap prependMainModule (cyclicTypesModule : modelModuleNames))
-      : ([cyclicTypesModule], Doc.addModelModuleHeader mainModuleName cyclicTypesModule modelModuleNames cyclicModuleContent)
+    ( [typesModule],
+      Doc.createModuleHeaderWithReexports
+        (prependMainModule typesModule)
+        (fmap prependMainModule (cyclicTypesModule : modelModuleNames))
+        "Rexports all type modules (used in the operation modules)."
+    )
+      : ( [cyclicTypesModule],
+          Doc.addModelModuleHeader
+            mainModuleName
+            cyclicTypesModule
+            modelModuleNames
+            "Contains all types with cyclic dependencies (between each other or to itself)"
+            cyclicModuleContent
+        )
       : modules
 
 extractCyclicModuleDependentModels :: [ModelWithDependencies] -> ([ModelWithDependencies], Q Doc)
@@ -74,7 +87,7 @@ extractCyclicModuleDependentModels models =
 extractUnidirectionallyDependentModels :: ([ModelWithDependencies], [ModelWithDependencies]) -> ([ModelWithDependencies], [ModelWithDependencies])
 extractUnidirectionallyDependentModels (rest, extractedModels) =
   let extractedModelNames = Set.fromList $ fmap fst extractedModels
-      (newExtractedModels, notExtractedModels) = List.partition ((`Set.isSubsetOf` extractedModelNames) . snd . snd) rest
+      (newExtractedModels, notExtractedModels) = partition ((`Set.isSubsetOf` extractedModelNames) . snd . snd) rest
    in if null newExtractedModels
         then (rest, extractedModels)
         else extractUnidirectionallyDependentModels (notExtractedModels, extractedModels <> newExtractedModels)

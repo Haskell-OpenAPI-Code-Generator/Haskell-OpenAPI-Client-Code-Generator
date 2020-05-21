@@ -35,23 +35,31 @@ spec =
             servers = []
           }
       testOperation2 =
-        OAT.OperationObject
-          { tags = [],
-            summary = Just "my description",
-            description = Nothing,
-            externalDocs = Nothing,
-            operationId = Nothing,
-            parameters = [],
-            requestBody = Nothing,
-            responses = emptyResponseObject,
-            deprecated = False,
-            security = [],
-            servers = []
-          }
+        testOperation
+          { summary = Just "my summary"
+          } ::
+          OAT.OperationObject
+      testOperation3 =
+        testOperation
+          { description = Just "my description"
+          } ::
+          OAT.OperationObject
+      testOperation4 =
+        testOperation
+          { summary = Just "my summary",
+            description = Just "my description"
+          } ::
+          OAT.OperationObject
    in describe "getOperationDesciption" $ do
         it
-          "should return a indicator for empty value"
-          (getOperationDescription testOperation `shouldBe` "No summary provided")
+          "should return an empty string"
+          (getOperationDescription testOperation `shouldBe` "")
         it
           "should return description"
-          (getOperationDescription testOperation2 `shouldBe` "my description")
+          (getOperationDescription testOperation2 `shouldBe` "my summary")
+        it
+          "should return summary"
+          (getOperationDescription testOperation3 `shouldBe` "my description")
+        it
+          "should return description"
+          (getOperationDescription testOperation4 `shouldBe` "my description")

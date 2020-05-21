@@ -8,51 +8,51 @@ module OpenAPI.Generate.SecurityScheme
   )
 where
 
-import Data.Bifunctor
-import qualified Data.ByteString.Char8 as B8
-import qualified Data.Map as Map
-import Data.Maybe
+import qualified Data.Bifunctor as BF
+import qualified Data.Maybe as Maybe
 import Data.Text (Text)
-import qualified Data.Text as T
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified Network.HTTP.Client as HC
 import qualified Network.HTTP.Simple as HS
-import qualified OpenAPI.Common as OAC
+import qualified OpenAPI.Common as OC
+import qualified OpenAPI.Generate.Doc as Doc
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.Types as OAT
 
 -- | Defines the security schemes which are configured in the OpenAPI specification
 --
 -- Generates warnings if unsupported schemes are defined in the specification
-defineSupportedSecuritySchemes :: [(Text, OAT.SecuritySchemeObject)] -> OAM.Generator (Q Doc)
-defineSupportedSecuritySchemes securitySchemes = OAM.nested "securitySchemes" $ do
-  let securitySchemeDefinitions = fmap (second defineSecurityScheme) securitySchemes
+defineSupportedSecuritySchemes :: Text -> [(Text, OAT.SecuritySchemeObject)] -> OAM.Generator (Q Doc)
+defineSupportedSecuritySchemes moduleName securitySchemes = OAM.nested "securitySchemes" $ do
+  let securitySchemeDefinitions = fmap (BF.second $ defineSecurityScheme moduleName) securitySchemes
   mapM_
     ( \(name, _) ->
         OAM.nested name
           $ OAM.logWarning
           $ "The security scheme '" <> name <> "' is not supported (currently only http-basic and http-bearer are supported)."
     )
-    $ filter (isNothing . snd) securitySchemeDefinitions
-  pure $ fmap vcat $ mapM (fmap ($$ text "") . snd) $ mapMaybe sequence securitySchemeDefinitions
+    $ filter (Maybe.isNothing . snd) securitySchemeDefinitions
+  pure $ fmap vcat $ mapM (fmap ($$ text "") . snd) $ Maybe.mapMaybe sequence securitySchemeDefinitions
 
 -- | Defines the security scheme for one 'OAT.SecuritySchemeObject'
-defineSecurityScheme :: OAT.SecuritySchemeObject -> Maybe (Q Doc)
-defineSecurityScheme (OAT.HttpSecuritySchemeObject scheme) = case OAT.scheme scheme of
-  "basic" -> Just basicAuthenticationScheme
-  "bearer" -> Just bearerAuthenticationScheme
-  _ -> Nothing
-defineSecurityScheme _ = Nothing
+defineSecurityScheme :: Text -> OAT.SecuritySchemeObject -> Maybe (Q Doc)
+defineSecurityScheme moduleName (OAT.HttpSecuritySchemeObject scheme) =
+  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.description (scheme :: OAT.HttpSecurityScheme)
+   in case OAT.scheme scheme of
+        "basic" -> Just $ basicAuthenticationScheme moduleName description
+        "bearer" -> Just $ bearerAuthenticationScheme moduleName description
+        _ -> Nothing
+defineSecurityScheme _ _ = Nothing
 
--- | The name used in the instance declaration (referencing 'OAC.authenticateRequest').
+-- | The name used in the instance declaration (referencing 'OC.authenticateRequest').
 -- It is necessary because it is not possible to fully qualify the name in the instance declaration.
 authenticateRequestName :: Name
 authenticateRequestName = mkName "authenticateRequest"
 
 -- | BasicAuthentication scheme with simple username and password
-basicAuthenticationScheme :: Q Doc
-basicAuthenticationScheme =
+basicAuthenticationScheme :: Text -> Text -> Q Doc
+basicAuthenticationScheme moduleName description =
   let dataName = mkName "BasicAuthenticationSecurityScheme"
       usernameName = mkName "basicAuthenticationSecuritySchemeUsername"
       passwordName = mkName "basicAuthenticationSecuritySchemePassword"
@@ -65,15 +65,15 @@ basicAuthenticationScheme =
           Nothing
           [ recC
               dataName
-              [ varBangType usernameName $ bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''T.Text,
-                varBangType passwordName $ bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''T.Text
+              [ varBangType usernameName $ bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''Text,
+                varBangType passwordName $ bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''Text
               ]
           ]
           [derivClause Nothing [conT ''Show, conT ''Ord, conT ''Eq]]
       instanceDefinition =
         instanceD
           (cxt [])
-          (appT (conT ''OAC.SecurityScheme) (conT dataName))
+          (appT (conT ''OC.SecurityScheme) (conT dataName))
           [ funD
               authenticateRequestName
               [ clause
@@ -81,18 +81,40 @@ basicAuthenticationScheme =
                   ( normalB
                       [|
                         HC.applyBasicAuth
-                          (OAC.textToByte $ $(varE usernameName) $(varE paramName))
-                          (OAC.textToByte $ $(varE passwordName) $(varE paramName))
+                          (OC.textToByte $ $(varE usernameName) $(varE paramName))
+                          (OC.textToByte $ $(varE passwordName) $(varE paramName))
                         |]
                   )
                   []
               ]
           ]
-   in vcat <$> sequence [($$ text "") . ppr <$> dataDefinition, ppr <$> instanceDefinition]
+   in vcat
+        <$> sequence
+          [ ($$ text "")
+              . ( Doc.generateHaddockComment
+                    [ "Use this security scheme to use basic authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
+                      "",
+                      description,
+                      "",
+                      "@",
+                      "'" <> moduleName <> ".Configuration.defaultConfiguration'",
+                      "  { _securityScheme =",
+                      "      'BasicAuthenticationSecurityScheme'",
+                      "        { 'basicAuthenticationSecuritySchemeUsername' = \"user\",",
+                      "          'basicAuthenticationSecuritySchemePassword' = \"pw\"",
+                      "        }",
+                      "  }",
+                      "@"
+                    ]
+                    $$
+                )
+              . ppr <$> dataDefinition,
+            ppr <$> instanceDefinition
+          ]
 
 -- | BearerAuthentication scheme with a bearer token
-bearerAuthenticationScheme :: Q Doc
-bearerAuthenticationScheme =
+bearerAuthenticationScheme :: Text -> Text -> Q Doc
+bearerAuthenticationScheme moduleName description =
   let dataName = mkName "BearerAuthenticationSecurityScheme"
       tokenName = mkName "token"
       dataDefinition =
@@ -103,23 +125,42 @@ bearerAuthenticationScheme =
           Nothing
           [ normalC
               dataName
-              [bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''T.Text]
+              [bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''Text]
           ]
           [derivClause Nothing [conT ''Show, conT ''Ord, conT ''Eq]]
       instanceDefinition =
         instanceD
           (cxt [])
-          (appT (conT ''OAC.SecurityScheme) (conT dataName))
+          (appT (conT ''OC.SecurityScheme) (conT dataName))
           [ funD
               authenticateRequestName
               [ clause
                   [conP dataName [varP tokenName]]
                   ( normalB
                       [|
-                        HS.addRequestHeader "Authorization" $ OAC.textToByte $ "Bearer " <> $(varE tokenName)
+                        HS.addRequestHeader "Authorization" $ OC.textToByte $ "Bearer " <> $(varE tokenName)
                         |]
                   )
                   []
               ]
           ]
-   in vcat <$> sequence [($$ text "") . ppr <$> dataDefinition, ppr <$> instanceDefinition]
+   in vcat
+        <$> sequence
+          [ ($$ text "")
+              . ( Doc.generateHaddockComment
+                    [ "Use this security scheme to use bearer authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
+                      "",
+                      description,
+                      "",
+                      "@",
+                      "'" <> moduleName <> ".Configuration.defaultConfiguration'",
+                      "  { _securityScheme = 'BearerAuthenticationSecurityScheme' \"token\"",
+                      "  }",
+                      "@"
+                    ]
+                    $$
+                )
+              . ppr
+              <$> dataDefinition,
+            ppr <$> instanceDefinition
+          ]

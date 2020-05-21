@@ -4,16 +4,16 @@
 module Main where
 
 import Control.Monad
-import Data.Bifunctor
+import qualified Data.Bifunctor as BF
 import qualified Data.Text as T
 import Embed
 import Language.Haskell.TH
 import OpenAPI.Generate
-import OpenAPI.Generate.Doc
-import OpenAPI.Generate.Flags
+import qualified OpenAPI.Generate.Doc as Doc
+import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Monad as OAM
-import OpenAPI.Generate.Reference
+import qualified OpenAPI.Generate.Reference as Ref
 import Options
 import System.Directory
 import System.Exit
@@ -56,7 +56,6 @@ stackProjectFiles packageName moduleName modulesToExport =
                "    , http-client",
                "    , http-types",
                "    , bytestring",
-               "    , lens",
                "    , aeson",
                "    , unordered-containers",
                "    , vector",
@@ -77,7 +76,11 @@ stackProjectFiles packageName moduleName modulesToExport =
   ]
 
 replaceOpenAPI :: String -> String -> String
-replaceOpenAPI moduleName contents = T.unpack $ T.replace (T.pack "OpenAPI.Common") (T.pack $ moduleName ++ ".Common") (T.pack contents)
+replaceOpenAPI moduleName contents =
+  T.unpack
+    $ T.replace (T.pack "OpenAPI.Common") (T.pack $ moduleName ++ ".Common")
+    $ T.replace (T.pack "OpenAPI.Configuration") (T.pack $ moduleName ++ ".Configuration")
+    $ T.pack contents
 
 permitProceed :: FilePath -> Bool -> IO Bool
 permitProceed outputDirectory force = do
@@ -105,25 +108,25 @@ main :: IO ()
 main = runCommand $ \opts args -> case args of
   [path] -> do
     spec <- decodeOpenApi path
-    let env = OAM.createEnvironment opts $ buildReferenceMap spec
+    let env = OAM.createEnvironment opts $ Ref.buildReferenceMap spec
         logMessages = mapM_ (putStrLn . T.unpack) . OAM.transformGeneratorLogs
-        moduleName = optModuleName opts
-        (operationsQ, logs) = OAM.runGenerator env $ defineOperations (optModuleName opts) spec
+        moduleName = OAF.optModuleName opts
+        (operationsQ, logs) = OAM.runGenerator env $ defineOperations (OAF.optModuleName opts) spec
     logMessages logs
     operationModules <- runQ operationsQ
-    serverInfo <- runQ $ defineServerInformation moduleName spec
-    let (modelsQ, logsModels) = OAM.runGenerator env $ defineModelsFromSpec moduleName spec
+    configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
+    let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec
     logMessages logsModels
     modelModules <- runQ modelsQ
     let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
     logMessages logs'
     securitySchemes' <- runQ securitySchemesQ
-    let outputDirectory = optOutputDir opts
+    let outputDirectory = OAF.optOutputDir opts
         showAndReplace = replaceOpenAPI moduleName . show
         modules =
-          fmap (bimap ("Operations" :) showAndReplace) operationModules
-            <> fmap (second showAndReplace) modelModules
-            <> [ (["Configuration"], showAndReplace serverInfo),
+          fmap (BF.bimap ("Operations" :) showAndReplace) operationModules
+            <> fmap (BF.second showAndReplace) modelModules
+            <> [ (["Configuration"], showAndReplace configurationInfo),
                  (["SecuritySchemes"], showAndReplace securitySchemes'),
                  (["Common"], replaceOpenAPI moduleName $(embedFile "src/OpenAPI/Common.hs"))
                ]
@@ -135,9 +138,9 @@ main = runCommand $ \opts args -> case args of
             )
             modules
         mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
-        mainModuleContent = show $ createModuleHeaderWithReexports moduleName modulesToExport
-        filesToCreate = (mainFile, mainModuleContent) : (first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
-    if optDryRun opts
+        mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
+        filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+    if OAF.optDryRun opts
       then
         mapM_
           ( \(file, content) -> do
@@ -148,7 +151,7 @@ main = runCommand $ \opts args -> case args of
           )
           filesToCreate
       else do
-        proceed <- permitProceed outputDirectory (optForce opts)
+        proceed <- permitProceed outputDirectory (OAF.optForce opts)
         if proceed
           then do
             _ <- tryIOError (removeDirectoryRecursive outputDirectory)
@@ -157,12 +160,12 @@ main = runCommand $ \opts args -> case args of
             createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
             createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
             mapM_ (uncurry writeFile) filesToCreate
-            when (optGenerateStackProject opts) $
+            when (OAF.optGenerateStackProject opts) $
               mapM_
                 ( uncurry writeFile
-                    . first (outputDirectory </>)
+                    . BF.first (outputDirectory </>)
                 )
-                (stackProjectFiles (optPackageName opts) moduleName modulesToExport)
+                (stackProjectFiles (OAF.optPackageName opts) moduleName modulesToExport)
             putStrLn "finished"
           else putStrLn "aborted"
   _ -> die "Failed to generate code because no OpenAPI specification was provided. Pass the location of the OpenAPI specification as CLI argument. Run the CLI with --help to see further options."

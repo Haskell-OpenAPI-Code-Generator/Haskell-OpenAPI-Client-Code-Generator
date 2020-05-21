@@ -9,7 +9,7 @@ import Data.List
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import Data.Validity.Text ()
-import OpenAPI.Generate.Flags
+import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Monad
 import OpenAPI.Generate.Reference
 import OpenAPI.Generate.Types as OAT
@@ -18,7 +18,7 @@ import Test.Validity
 
 spec :: Spec
 spec = do
-  let run = runGenerator (createEnvironment defaultFlags Map.empty)
+  let run = runGenerator (createEnvironment OAF.defaultFlags Map.empty)
   describe "nested" $ do
     it "should nest path correct with simple example" $ do
       let (currentPath', _) = run $ nested "a" $ nested "b" $ nested "c" $ asks currentPath
@@ -58,7 +58,7 @@ spec = do
         b = OAT.RequestBodyObject Map.empty Nothing False
         runWithEnv =
           runGenerator
-            $ createEnvironment defaultFlags
+            $ createEnvironment OAF.defaultFlags
             $ Map.fromList
               [ ("#/components/examples/example1", ExampleReference e),
                 ("#/components/requestBodies/body1", RequestBodyReference b)

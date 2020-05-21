@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
@@ -10,7 +10,6 @@ module OpenAPI.Generate.Response
   )
 where
 
-import qualified Control.Applicative as A
 import qualified Data.Aeson as Aeson
 import qualified Data.Either as Either
 import qualified Data.Map as Map
@@ -52,28 +51,46 @@ getResponseDefinitions operation appendToOperationName = do
       responseName = createName ""
       responseReferenceCases = getStatusCodeResponseCases responsesObject <> getRangeResponseCases responsesObject
   responseCases <- resolveResponseReferences responseReferenceCases
+  let responseDescriptions = getResponseDescription . (\(_, _, r) -> r) <$> responseCases
   schemas <- generateResponseCaseDefinitions createBodyName responseCases
   pure $ (responseName,createResponseTransformerFn createName schemas,) $
     vcat
       <$> sequence
-        [ ppr
-            <$> dataD
-              (cxt [])
-              responseName
-              []
-              Nothing
-              ( fmap
-                  ( \(suffix, _, maybeSchema) ->
-                      normalC
-                        (createName suffix)
-                        ( case maybeSchema of
-                            Just (type', _) -> [bangType (bang noSourceUnpackedness noSourceStrictness) type']
-                            Nothing -> []
-                        )
-                  )
-                  ((errorSuffix, [||const True||], Just ([t|String|], (Doc.emptyDoc, Set.empty))) : schemas)
+        [ pure $
+            Doc.generateHaddockComment
+              [ "Represents a response of the operation '" <> appendToOperationName "" <> "'.",
+                "",
+                "The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), '"
+                  <> createResponseNameAsText convertToCamelCase appendToOperationName (responseSuffix <> errorSuffix)
+                  <> "' is used."
+              ],
+          ( `Doc.sideBySide`
+              (text "" $$ Doc.sideComments ("Means either no matching case available or a parse error" : responseDescriptions))
+          )
+            . Doc.breakOnTokensWithReplacement
+              ( \case
+                  "=" -> "=\n  "
+                  token -> "\n  " <> token
               )
-              [derivClause Nothing [conT ''Show, conT ''Eq]],
+              ["=", "deriving", "|"]
+            . ppr
+              <$> dataD
+                (cxt [])
+                responseName
+                []
+                Nothing
+                ( fmap
+                    ( \(suffix, _, maybeSchema) ->
+                        normalC
+                          (createName suffix)
+                          ( case maybeSchema of
+                              Just (type', _) -> [bangType (bang noSourceUnpackedness noSourceStrictness) type']
+                              Nothing -> []
+                          )
+                    )
+                    ((errorSuffix, [||const True||], Just ([t|String|], (Doc.emptyDoc, Set.empty))) : schemas)
+                )
+                [derivClause Nothing [conT ''Show, conT ''Eq]],
           printSchemaDefinitions schemas
         ]
 
@@ -82,11 +99,11 @@ getResponseDefinitions operation appendToOperationName = do
 -- Third: Reference or concrete response object
 type ResponseReferenceCase = (Text, TExpQ (HT.Status -> Bool), OAT.Referencable OAT.ResponseObject)
 
--- | Same as 'ResponseReferenceCase' but with resolved reference
+-- | Same as @ResponseReferenceCase@ but with resolved reference
 type ResponseCase = (Text, TExpQ (HT.Status -> Bool), OAT.ResponseObject)
 
--- | Same as 'ResponseReferenceCase' but with type definition
-type ResponseCaseDefinition = (Text, TExpQ (HT.Status -> Bool), Maybe Model.NamedTypeDef)
+-- | Same as @ResponseReferenceCase@ but with type definition
+type ResponseCaseDefinition = (Text, TExpQ (HT.Status -> Bool), Maybe Model.TypeWithDeclaration)
 
 -- | Suffix used for the error case
 errorSuffix :: Text
@@ -168,3 +185,6 @@ createResponseTransformerFn createName schemas =
             <> [normalGE [|otherwise|] [|Left "Missing default response type"|]]
       transformLambda = lamE [varP responseArgName, varP bodyName] ifCases
    in [|fmap (fmap (\response -> fmap (Either.either $(varE $ createName errorSuffix) id . $transformLambda response) response))|]
+
+getResponseDescription :: OAT.ResponseObject -> Text
+getResponseDescription response = Doc.escapeText $ OAT.description (response :: OAT.ResponseObject)

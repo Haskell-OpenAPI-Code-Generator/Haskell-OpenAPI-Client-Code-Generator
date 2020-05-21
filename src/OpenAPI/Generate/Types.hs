@@ -11,7 +11,7 @@
 --
 -- All names in this module correspond to the respective OpenAPI types
 module OpenAPI.Generate.Types
-  ( module OpenAPI.Generate.Types.Doc,
+  ( module OpenAPI.Generate.Types.ExternalDocumentation,
     module OpenAPI.Generate.Types.Referencable,
     module OpenAPI.Generate.Types.Schema,
     module OpenAPI.Generate.Types,
@@ -20,12 +20,12 @@ where
 
 import qualified Data.HashMap.Strict as HMap
 import qualified Data.Map as Map
-import Data.Maybe (mapMaybe)
+import qualified Data.Maybe as Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
 import GHC.Generics
-import OpenAPI.Generate.Types.Doc
+import OpenAPI.Generate.Types.ExternalDocumentation
 import OpenAPI.Generate.Types.Referencable
 import OpenAPI.Generate.Types.Schema (Schema)
 import Text.Read (readMaybe)
@@ -254,7 +254,7 @@ instance FromJSON ResponsesObject where
         parseJSON
         ( Map.fromList
             . filter (\(code, _) -> code >= 100 && code < 600)
-            . mapMaybe
+            . Maybe.mapMaybe
               ( \(code, response) -> fmap (,response) . readMaybe . T.unpack $ code
               )
             $ HMap.toList o
@@ -357,15 +357,15 @@ instance FromJSON ParameterObjectSchema where
     maybeSchema <- o .:? "schema"
     maybeContent <- o .:? "content"
     case (maybeSchema, maybeContent) of
-      (Just schema, Nothing) ->
+      (Just schema', Nothing) ->
         SimpleParameterObjectSchema
           <$> o .:? "style"
             <*> o .:? "explode" .!= True
             <*> o .:? "allowReserved" .!= False
-            <*> pure schema
+            <*> pure schema'
             <*> o .:? "example"
             <*> o .:? "examples" .!= Map.empty
-      (Nothing, Just content) -> pure $ ComplexParameterObjectSchema content
+      (Nothing, Just content') -> pure $ ComplexParameterObjectSchema content'
       (Just _, Just _) -> fail "ParameterObject (http://spec.openapis.org/oas/v3.0.3#parameter-object) only allows one of the properties schema and content."
       (Nothing, Nothing) -> fail "ParameterObject (http://spec.openapis.org/oas/v3.0.3#parameter-object) requires one of the properties schema and content to be present."
 
