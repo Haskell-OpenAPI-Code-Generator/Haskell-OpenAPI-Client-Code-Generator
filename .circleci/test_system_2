@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -e
+
+specifications=(
+  stripe-api.yml,stripe
+  official-petstore.yaml,official-petstore
+  petstore-running-example.yaml,petstore-running-example
+)
+outDir=openapi
+
+[[ -d /root/.stack/snapshots/x86_64-linux/d2f1d79601122b1003c68e260f770c1d32d5fe7a028973b8192e738556d0b8b3 ]] && cp -Rn /root/.stack/snapshots/x86_64-linux/d2f1d79601122b1003c68e260f770c1d32d5fe7a028973b8192e738556d0b8b3 /root/.stack/snapshots/x86_64-linux/711b0e993dd52035c0641daec2c20681935ad613e80e3462008d52395107852b || true
+GENERATOR_EXE=$(stack path --local-install-root)/bin/openapi3-code-generator-exe
+cd .circleci/testing/level2
+
+set +e
+let errors=0
+
+testingDir=$(pwd)
+
+continueOnFailure () {
+  exitCode=$?
+  if [[ $exitCode -ne 0 ]]; then
+    let errors=errors+1
+    printf "\n\n=======================================\n"
+    echo "Exit code $exitCode received from step $1, skipping the following steps for specification file '$2'."
+    printf "=======================================\n\n"
+    continue
+  fi
+}
+
+for i in "${specifications[@]}"; do
+  cd $testingDir
+  IFS=","
+  set $i
+  specification=$1
+  cd $2
+  rm -rf $outDir level2-base
+  cp -R ../level2-base .
+  printf "\n\nRun package integration test for $specification\n"
+  echo "-------------------------"
+  if [[ $specification == "stripe-api.yml" ]]; then 
+    $GENERATOR_EXE "../../../specifications/$specification" --output-dir=$outDir --force --property-type-suffix="'" --convert-to-camel-case
+  else
+    $GENERATOR_EXE "../../../specifications/$specification" --output-dir=$outDir --force 
+  fi
+  continueOnFailure "code generation" "$specification"
+  stack test --fast
+  continueOnFailure "test" "$specification"
+  printf "\n-------------------------\n\n"
+done
+
+exit $errors

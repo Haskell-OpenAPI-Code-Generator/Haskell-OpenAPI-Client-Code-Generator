@@ -1,4 +1,4 @@
 set -e
-cp -Rn /root/.stack/snapshots/x86_64-linux/d2f1d79601122b1003c68e260f770c1d32d5fe7a028973b8192e738556d0b8b3 /root/.stack/snapshots/x86_64-linux/711b0e993dd52035c0641daec2c20681935ad613e80e3462008d52395107852b
+[[ -d /root/.stack/snapshots/x86_64-linux/d2f1d79601122b1003c68e260f770c1d32d5fe7a028973b8192e738556d0b8b3 ]] && cp -Rn /root/.stack/snapshots/x86_64-linux/d2f1d79601122b1003c68e260f770c1d32d5fe7a028973b8192e738556d0b8b3 /root/.stack/snapshots/x86_64-linux/711b0e993dd52035c0641daec2c20681935ad613e80e3462008d52395107852b || true
 stack test --coverage
 stack hpc report --all --destdir coverage-output

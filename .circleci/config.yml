@@ -44,6 +44,33 @@ jobs:
           name: Golden tests
           command: ./.circleci/test_golden
 
+  system1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 1
+          command: ./.circleci/test_system_1
+
+  system2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 2
+          command: ./.circleci/test_system_2
+
+  system3:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 3
+          command: ./.circleci/test_system_3
+
 workflows:
   version: 2
   all:
@@ -52,5 +79,14 @@ workflows:
       - test
       - build
       - golden:
+          requires:
+            - build
+      - system1:
+          requires:
+            - build
+      - system2:
+          requires:
+            - build
+      - system3:
           requires:
             - build

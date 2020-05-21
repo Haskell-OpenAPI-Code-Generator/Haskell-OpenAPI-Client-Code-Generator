@@ -1,0 +1,28 @@
+name: petstore-running-example
+version: 0.1.0.0
+
+dependencies:
+  - base >= 4.7 && < 5
+  - http-client
+  - http-conduit
+  - bytestring
+  - openapi
+  - mtl
+  - transformers
+  - level2-base
+
+library:
+  source-dirs: src
+
+tests:
+  petstore-running-example-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - petstore-running-example
+      - hspec
+      - http-types

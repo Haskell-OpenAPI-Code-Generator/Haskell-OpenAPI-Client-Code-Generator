@@ -1,0 +1,1534 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Google Standard Payments Service API",
+        "description": "This service describes the Google Standard Payment protocol.",
+        "version": "v1"
+    },
+    "paths": {
+        "/v1/echo": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "Echo",
+                "description": "Echos back the `client_message` that is passed in.\n\nThe purpose of this method is to test basic connectivity between the\npayment integrator and Google.\n\nThis method may be called by Google multiple times per minute with valid\nor invalid parameters in order to test that security constraints are being\nheld properly. Google also calls this method ad-hoc at the integrator's\ndirection as well as at Google's direction. Google will never call this\nfaster than once every 10s, and never more than 30 times in a 15 minute\nwindow.\n\nExamples of security constraint tests are (but not limited to):\n<ul>\n  <li> Test to ensure payment integrator's endpoint doesn't negotiate\nto weak cipher suites.\n  <li> Test to ensure payment integrator's endpoint doesn't negotiate\nto anything but TLS 1.2\n  <li> Test to ensure payment integrator's endpoint doesn't support HTTP.\n  <li> Test to ensure payment integrator's endpoint mandates at least one\nknown PGP signing key.\n  <li> Test to ensure payment integrator's endpoint supports multiple\nPGP key signatures, both known and unknown, both expired and active.\n  <li> Test to ensure payment integrator only support strict JSON parsing.\n</ul>\n\n\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"ZWNobyB0cmFuc2FjdGlvbg\",\n    \"requestTimestamp\": \"1481899949606\"\n  },\n  \"clientMessage\": \"Echo message\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"clientMessage\": \"Echo message\",\n  \"serverMessage\": \"Echo server message\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EchoRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EchoResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/associateAccount": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "AssociateAccount",
+                "description": "Associates the customer's account with the payment processor to the\nGoogle instrument being added.\n\nAccount association happens after the integrator has authenticated the\nuser. Association occurs via a server-to-server call that contains the\n`requestId` for the associated authentication flow\n(`authenticationRequestId`), an `associationId` and a `googlePaymentToken`\n(GPT). The payment processor should associate the `associationId` and the\n`googlePaymentToken` to the customer's  account for authentication. The\nGPT is used to initiate payments. The `associationId` is used\nduring re-authentication calls to identify the account for authentication.\n\nIf Google sends an `associationId` or a `googlePaymentToken` that the\nintegrator has already seen during a different association, then it\nthrows an error.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"cmVxdWVzdDE\",\n    \"requestTimestamp\": \"1481899949606\"\n },\n \"googlePaymentToken\": \"ZXhhbXBsZSB1bmlxdWUgcGF5bWVudCB0b2tlbiB2YWx1ZQ==\",\n \"authenticationRequestId\": \"bnAxdWTydDX==\",\n \"associationId\": \"LmddbXBsZSByZWZlcmVuY2UgdG9rZW4gdmFsdWU=\",\n \"provideUserInformation\": true\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n  {\n  \"responseHeader\": {\n    \"requestTimestamp\": \"1481899949611\"\n  },\n  \"paymentIntegratorAssociationId\": \"xx77df88934hfd\",\n  \"accountId\": \"1234-5678-91\",\n  \"accountNickname\": \"***-91\",\n  \"tokenExpirationTime\": \"0\",\n  \"userInformation\": {\n    \"name\": \"Example Customer\",\n    \"addressLine\": [\"123 Main St\"],\n    \"localityName\": \"Springfield\",\n    \"administrativeAreaName\": \"CO\",\n    \"postalCodeNumber\": \"80309\",\n    \"countryCode\": \"US\"\n  },\n  \"result\": \"SUCCESS\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssociateAccountRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssociateAccountResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/capture": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "Capture",
+                "description": "Initiates money movement between a customer's account held with Google\nand the payment processor. The combination of `requestId` within the\nheader and `paymentIntegratorAccountId` is the idempotency key and uniquely\nidentifies this transaction.  All mutations on this transaction (refunds)\npopulate the `requestId` value in the `capture_request_id`\nfield.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502220196077\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"googlePaymentToken\": \"ZXhhbXBsZSB1bmlxdWUgcGF5bWVudCB0b2tlbiB2YWx1ZQ\",\n  \"transactionDescription\": \"Google - Music\",\n  \"currencyCode\": \"INR\",\n  \"amount\": \"728000000\",\n  \"captureContext\": { \"userIpAddress\":\"\" }\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"result\": \"SUCCESS\",\n  \"paymentIntegratorTransactionId\": \"aW50ZWdyYXRvciB0cmFuc2FjdGlvbiBpZA\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaptureRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CaptureResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/asynchronousCapture": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "AsynchronousCapture",
+                "description": "Triggers the start of a money movement operation between a customer's\naccount and the integrator. The integrator should acknowledge the request\nand perform whatever actions need to happen in order to complete the\ncapture (e.g., collect a PIN from the user). The integrator will inform\nGoogle of the capture's final result by calling the\nCaptureResultNotification API.\n\nThe combination of `requestId` within\nthe header and `paymentIntegratorAccountId` is the idempotency key and\nuniquely identifies this transaction.  All mutations on this transaction\n(refunds) populate the `requestId` value in the `capture_request_id` field.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 1,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502220196077\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashIN_INR\",\n  \"upi_details\": {\n      \"vpa\": \"foo@icici\"\n  },\n  \"transactionDescription\": \"Google - Music\",\n  \"currencyCode\": \"INR\",\n  \"amount\": \"728000000\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"result\": \"ACKNOWLEDGED\",\n  \"paymentIntegratorTransactionId\": \"aW50ZWdyYXRvciB0cmFuc2FjdGlvbiBpZA\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AsynchronousCaptureRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AsynchronousCaptureResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/generateDeviceCaptureToken": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "GenerateDeviceCaptureToken",
+                "description": "Requests a token from the integrator that can be executed on the user's\ndevice in order to debit the device's stored value. The combination of\n`requestId` within the header and `paymentIntegratorAccountId` is the\nidempotency key and uniquely identifies this transaction.  All mutations on\nthis transaction (refunds) populate the `requestId` value in the\n`capture_request_id` field.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 1,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502220196077\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"transactionDescription\": \"Google - Music\",\n  \"currencyCode\": \"JPY\",\n  \"amount\": \"545000000\",\n  \"deviceIdentifier\": \"FC199014344145\",\n  \"instanceIdentifier\": \"edy15626388286838485\",\n  \"sessionIdentifier\": \"5226453\",\n  \"balance\": \"16000000\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"result\": \"SUCCESS\",\n  \"paymentIntegratorTransactionId\": \"aW50ZWdyYXRvciB0cmFuc2FjdGlvbiBpZA\",\n  \"deviceCaptureToken\": \"WW91IHN1cmUgYXJlIGN1cmlvdXMsIGFyZW4ndCB5b3U/\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GenerateDeviceCaptureTokenRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerateDeviceCaptureTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getDeviceCaptureResult": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "GetDeviceCaptureResult",
+                "description": "Requests the result of the execution of a previously generated device\ncapture token.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 1,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502220196077\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"deviceCaptureRequestId\": \"WW91IHN1cFyZW4ndCB5b3U\",\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"result\": \"SUCCESS\",\n  \"device_capture_result\": {\n    \"device_capture_result_code\": \"SUCCESS\"\n  }\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetDeviceCaptureResultRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetDeviceCaptureResultResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/refund": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "Refund",
+                "description": "Refunds a portion of or the entire transaction initiated through `capture`.\nThe combination of `requestId` within the header and\n`paymentIntegratorAccountId` is the idempotency key, which uniquely\nidentifies this transaction.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"liUrreQY233839dfFFb24gaQM\",\n    \"requestTimestamp\": \"1502220434778\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"captureRequestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n  \"currencyCode\": \"INR\",\n  \"refundAmount\": \"208000000\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502220440632\",\n  },\n  \"result\": \"SUCCESS\",\n  \"paymentIntegratorRefundId\": \"cmVmdW5kIGlkZW50aWZpZXINCg\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefundRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RefundResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/disburseFunds": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "DisburseFunds",
+                "description": "Initiates money movement between the payment processor and the customer's\naccount. The combination of `requestId` within the header and\n`paymentIntegratorAccountId` is the idempotency key and uniquely identifies\nthis transaction. All mutations on this transaction populate the\n`requestId` value in the `disburse_funds_request_id` field.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"liUrreQY233839dfFFb24gaQM\",\n    \"requestTimestamp\": \"1502220434778\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"upi_details\": {\n      \"vpa\": \"foo@icici\"\n  },\n  \"transactionDescription\": \"Google - Music\",\n  \"currencyCode\": \"INR\",\n  \"amount\": \"208000000\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"result\": \"SUCCESS\",\n  \"disburse_funds_result\": {\n    \"disburse_funds_result_code\": \"SUCCESS\"\n  }\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DisburseFundsRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DisburseFundsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/refreshToken": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "RefreshToken",
+                "description": "Refreshes a payment token's expiration date.\n\nToken refresh happens when a token has expired, is near expiry, or when\nGoogle chooses to refresh based on risk profiles. The user is\nreauthenticated prior to calling this method. The `authenticationRequestId`\nthat is passed contains the proof of authentication.  The\n`googlePaymentToken` (GPT) is passed as well. A successful response to this\ncall extends the GPT's expiry date.\n\nIf Google sends a GPT that the integrator has never associated before, then\nit throws an error.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"bhHmmdHHvbeY\",\n    \"requestTimestamp\": \"1481899949606\"\n  },\n  \"authenticationRequestId\": \"dGVzdHRva2VuZnJvbWdvb2dsZQ==\",\n  \"googlePaymentToken\": \"ZXhhbXBsZSB1bmlxdWUgcGF5bWVudCB0b2tlbiB2YWx1ZQ\",\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1481900013178\",\n  },\n  \"paymentIntegratorRefreshTokenId\": \"iuKndnVzaCB0b2tlbiYYke=\",\n  \"tokenExpirationTime\": \"1481901824177\",\n  \"result\": \"SUCCESS\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefreshTokenRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RefreshTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/remittanceStatementNotification": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "RemittanceStatementNotification",
+                "description": "Notifies the integrator of a new remittance statement.\n\nStatement notifications occur everytime a new statement is raised that\nrepresents money that Google will pay the integrator or the money that the\nintegrator owes Google.\n\nIf the integrator returns a success, then it is assumed that the\nstatement has been accepted and will be paid.\n\nThe `requestId` is also the statement Id (used elsewhere). The combination\nof `requestId` within the header and `paymentIntegratorAccountId` is the\nidempotency key and uniquely identifies this statement.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"0123434-statement-abc\",\n    \"requestTimestamp\": \"1502632800000\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"remittanceStatementSummary\": {\n    \"statementDate\": \"1502607600000\",\n    \"billingPeriod\": {\n      \"startDate\": \"1502434800000\",\n      \"endDate\": \"1502521199000\",\n    },\n    \"dateDue\": \"1503212400000\",\n    \"currencyCode\": \"INR\",\n    \"totalDueByIntegrator\": \"1076000000\",\n    \"remittanceInstructions\": {\n      \"memoLineId\": \"stmt-1AB-pp0-invisi\"\n    }\n  }\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502632802000\",\n  },\n  \"paymentIntegratorStatementId\": \"334a\",\n  \"result\": \"ACCEPTED\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemittanceStatementNotificationRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RemittanceStatementNotificationResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/sendOtp": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "SendOtp",
+                "description": "Requests the integrator send an OTP to the phone number.\n\nIf the integrator returns `SUCCESS`, then Google\nexpects an SMS sent to the phone number.\n\nGoogle provides only an `accountPhoneNumber` when a user initially\nassociates their account with Google.  During reauthentication,\nGoogle provides the `accountPhoneNumber` and the `associationId`. If,\nduring reauthentication, the phone number provided (identified by\nthe `accountPhoneNumber`) does not match the phone number associated with\nthe account (identified by the `associationId`) the integrator must\nreturn `PHONE_NUMBER_NOT_ASSOCIATED_WITH_ACCOUNT`.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"0123434-otp-abc\",\n    \"requestTimestamp\": \"1502545413026\"\n  },\n  \"account_phone_number\": \"+918067218010\",\n  \"sms_matching_token\": \"AB12345678C\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502545413098\"\n  },\n  \"paymentIntegratorSendOtpId\": \"99==ABC EF\",\n  \"result\": \"SUCCESS\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendOtpRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SendOtpResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/verifyOtp": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "VerifyOtp",
+                "description": "Verifies an OTP value was sent by the integrator for the account.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"0123434-otp-abc\",\n    \"requestTimestamp\": \"1502545413098\"\n  },\n  \"sendOtpRequestId\": \"0123434-otp-abc\",\n  \"otp\": \"7754321\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502545413132\"\n  },\n  \"paymentIntegratorVerifyOtpId\": \"5539163\",\n  \"result\": \"SUCCESS\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyOtpResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/generateReferenceNumber": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "GenerateReferenceNumber",
+                "description": "Creates a reference number and registers payment information (description,\ntimestamp) with the integrator.\n\nThe combination of the\n`paymentIntegratorAccountId` from the request and the `referenceNumber`\nfrom the response form a unique key that identifies the transaction for\nsubsequent operations on this transaction.\n\nThe `amount` field is defined in *micro currency units* (micros), which\nmeans that $2 would be represented with the digit `2` followed by six\ndigits `0`, resulting in `2000000`.\n\nAn example request looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502220196077\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"transactionDescription\": \"Google - Music\",\n  \"currencyCode\": \"USD\",\n  \"amount\": \"2000000\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502220197000\",\n  },\n  \"referenceNumber\": \"aW50ZWdyYXRvciB0cmFuc2FjdGlvbiBpZA\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GenerateReferenceNumberRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerateReferenceNumberResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cancelReferenceNumber": {
+            "post": {
+                "tags": [
+                    "payment_processor_service"
+                ],
+                "operationId": "CancelReferenceNumber",
+                "description": "Cancels a reference number by invalidating it in the integrators system and\npreventing future payments.\n\nOnly a reference number that was previously created by calling\n<a href=\"generateReferenceNumber\">generateReferenceNumber</a> is subject\nto cancellation.\n\nAn example requests looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"requestHeader\": {\n    \"protocolVersion\": {\n      \"major\": 1,\n      \"minor\": 0,\n      \"revision\": 0\n    },\n    \"requestId\": \"bWVyY2hhbnQgdHJhbnNhY3Rpb24gaWQ\",\n    \"requestTimestamp\": \"1502223797000\"\n  },\n  \"paymentIntegratorAccountId\": \"InvisiCashUSA_USD\",\n  \"referenceNumber\": \"aW50ZWdyYXRvciB0cmFuc2FjdGlvbiBpZA\"\n}\n</code></pre>\nAn example response looks like:\n<pre class=\"prettyprint\"><code>\n{\n  \"responseHeader\": {\n    \"responseTimestamp\": \"1502223798000\",\n  },\n  \"result\": \"SUCCESS\"\n}\n</code></pre>",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelReferenceNumberRequest"
+                            }
+                        }
+                    },
+                    "description": "The request body."
+                },
+                "responses": {
+                    "default": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CancelReferenceNumberResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "http://www.integratordomain.com"
+        },
+        {
+            "url": "https://www.integratordomain.com"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "EchoRequest": {
+                "id": "EchoRequest",
+                "description": "Request object for the echo method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "clientMessage": {
+                        "description": "**REQUIRED**: Message to echo in the response.",
+                        "type": "string"
+                    }
+                }
+            },
+            "RequestHeader": {
+                "id": "RequestHeader",
+                "description": "Header object that is defined on all requests sent to the server.",
+                "type": "object",
+                "properties": {
+                    "requestId": {
+                        "description": "**REQUIRED**: Unique identifier of this request.\n\nThis is a string that has a max length of 100 characters, and contains only\nthe characters \"a-z\", \"A-Z\", \"0-9\", \":\", \"-\", and \"_\".",
+                        "type": "string"
+                    },
+                    "requestTimestamp": {
+                        "description": "**REQUIRED**: Timestamp of this request represented as milliseconds since\nepoch.  The receiver should verify that this timestamp is ± 60s of 'now'.\nThis request timestamp is not idempotent upon retries.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "userLocale": {
+                        "description": "**OPTIONAL**: A two- or three-letter ISO 639-2 Alpha 3 language code\noptionally followed by a hyphen and an ISO 3166-1 Alpha-2 country code,\ne.g.'pt', 'pt-BR', 'fil', or 'fil-PH'.  Use this to help drive the\n`user_message` fields in the response.",
+                        "type": "string"
+                    },
+                    "protocolVersion": {
+                        "$ref": "#/components/schemas/Version"
+                    }
+                }
+            },
+            "Version": {
+                "id": "Version",
+                "description": "Version object which is a structured form of the classic `a.b.c` version\nstructure.  Major versions of the same number are guaranteed to be\ncompatible.  Note that minor and revisions can change frequently and without\nnotice.  The integrator must support all requests for the same major version.",
+                "type": "object",
+                "properties": {
+                    "major": {
+                        "description": "**REQUIRED**: Major version.  This is marked for compatibility\nrequests with different versions are not guaranteed to be compatible.",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "minor": {
+                        "description": "**REQUIRED**: Minor version.  This denotes significant bug fixes.",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "revision": {
+                        "description": "**REQUIRED**: Minor version.  This denotes minor bug fixes.",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "EchoResponse": {
+                "id": "EchoResponse",
+                "description": "Response object for the echo method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "clientMessage": {
+                        "description": "**REQUIRED**: Message received in the request.",
+                        "type": "string"
+                    },
+                    "serverMessage": {
+                        "description": "**OPTIONAL**: Server message, independent of the `clientMessage` being\nechoed.",
+                        "type": "string"
+                    }
+                }
+            },
+            "ResponseHeader": {
+                "id": "ResponseHeader",
+                "description": "Header object that is defined on all responses sent from the server.",
+                "type": "object",
+                "properties": {
+                    "responseTimestamp": {
+                        "description": "**REQUIRED**: Timestamp of this response represented as milliseconds since\nepoch.  The receiver should verify that this timestamp is ± 60s of 'now'.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "AssociateAccountRequest": {
+                "id": "AssociateAccountRequest",
+                "description": "Request object for the associate account method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "authenticationRequestId": {
+                        "description": "**OPTIONAL**: `requestId` of the authentication request that preceded\nthis call.  This identifier was generated by Google during the\nauthentication flow.  This is only present if the user went through the\nAndroid app authentication, web authentication, or an asynchronous\nauthentication method that uses `authenticationResultNotification`.",
+                        "type": "string"
+                    },
+                    "otpVerification": {
+                        "$ref": "#/components/schemas/OtpVerification"
+                    },
+                    "provideUserInformation": {
+                        "description": "**REQUIRED**: True if we desire the integrator to provide the address\nassociated with this account.",
+                        "type": "boolean"
+                    },
+                    "googlePaymentToken": {
+                        "description": "**REQUIRED**: The token that Google will use to initiate purchases with the\npayment processor.\n\nThis is a string that has a maximum length of 100 characters.",
+                        "type": "string"
+                    },
+                    "associationId": {
+                        "description": "**REQUIRED**: The identifier of this association.  This identifier is\ncreated by Google and is sent during re-authentication flows to identify\nwhich account should be authenticated.\n\nThis is a string that has a maximum length of 100 characters.",
+                        "type": "string"
+                    }
+                }
+            },
+            "OtpVerification": {
+                "id": "OtpVerification",
+                "description": "Object that encapsulates the OTP verification response.",
+                "type": "object",
+                "properties": {
+                    "sendOtpRequestId": {
+                        "description": "**REQUIRED**:  This is the `requestId` generated by Google during the\n`sendOtp` call which this request is associated with.",
+                        "type": "string"
+                    },
+                    "otp": {
+                        "description": "**REQUIRED**: This is the OTP the user provided if this call was preceded\nby a `sendOtp` call",
+                        "type": "string"
+                    }
+                }
+            },
+            "AssociateAccountResponse": {
+                "id": "AssociateAccountResponse",
+                "description": "Response object for the associate account method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorAssociateAccountId": {
+                        "description": "**REQUIRED**: This identifier is specific to the integrator and is\ngenerated by the integrator.  It is used for debugging purposes only in\norder to identify this call.  This is the identifier that the integrator\nknows this call by.",
+                        "type": "string"
+                    },
+                    "tokenExpirationTime": {
+                        "description": "**OPTIONAL**: Milliseconds since epoch when the token expires. Use `0` to\nsignal the token does not expire.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "accountId": {
+                        "description": "**REQUIRED**: The account ID the user has with the integrator.  This is\nused for Google risk to understand account re-use and account\nrelationships and Google customer operation agents to help customers\ndiagnose issues.  This identifier should be user recognizable (for example\nthe user knows this ID because it appears on their statement or appears\non the website after they log into the account).\n\nThis value must be immutable for the life of the account.",
+                        "type": "string"
+                    },
+                    "accountNickname": {
+                        "description": "**OPTIONAL**: String by which the user knows this account for display\npurposes.  This is a suffix of the account nickname.  For example last\nfour digits of a phone number. Google will indicate in the user interface\nthat this is only a suffix of the nickname.\n\n<aside class=\"caution\"><b>Caution:</b> This value can be PII, but must\nnever be SPII.</aside>\n\nThis value will be displayed in UIs like the purchase flow to\nallow the user to distinguish between payment methods.\n\n<aside class=\"note\"><b>Note:</b> that either this value or the\n`full_account_nickname` must be present, never both.</aside>",
+                        "type": "string"
+                    },
+                    "fullAccountNickname": {
+                        "description": "**OPTIONAL**: String by which the user knows this account for display\npurposes.  Unlike `account_nickname` this is the full account nickname.\nFor example `56565-56501` for a phone number or sally@sample-email.com\nfor an email identity.\n\n<aside class=\"caution\"><b>Caution:</b> This value can be PII, but must\nnever be SPII.</aside>\n\nThis value will be displayed in UIs like the purchase flow to allow the\nuser to distinguish between payment methods.\n\n<aside class=\"note\"><b>Note:</b> that either this value or the\n`account_nickname` must be present, never both.</aside>",
+                        "type": "string"
+                    },
+                    "userMessage": {
+                        "description": "**OPTIONAL**: A description of the result to be displayed to the user if\nthe result is not `SUCCESS`.",
+                        "type": "string"
+                    },
+                    "userInformation": {
+                        "$ref": "#/components/schemas/UserInformation"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this association.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "USER_AUTHENTICATION_FAILED",
+                            "NOT_ELIGIBLE",
+                            "CONTACT_INTEGRATOR",
+                            "OTP_NOT_MATCHED",
+                            "OTP_ALREADY_USED",
+                            "OTP_LIMIT_REACHED"
+                        ]
+                    }
+                }
+            },
+            "UserInformation": {
+                "id": "UserInformation",
+                "description": "Structure holding information about a user.",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "**OPTIONAL**: Customer's full name.",
+                        "type": "string"
+                    },
+                    "addressLine": {
+                        "description": "**OPTIONAL**: This holds unstructured Address text.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "localityName": {
+                        "description": "**OPTIONAL**: This is something of a fuzzy term, but it generally refers to\nthe city/town portion of an address.  In regions of the world\nwhere localities are not well defined or do not fit into this\nstructure well (for example, Japan and China), leave\nlocality_name empty and use address_line.\n\nExamples: US city, IT comune, UK post town.",
+                        "type": "string"
+                    },
+                    "administrativeAreaName": {
+                        "description": "**OPTIONAL**: Top-level administrative subdivision of this country\"\nExamples: US state, IT region, CN province, JP prefecture.\"",
+                        "type": "string"
+                    },
+                    "postalCodeNumber": {
+                        "description": "**OPTIONAL**: Despite the name, postal_code_number values are frequently\nalphanumeric.\nExamples: \"94043\", \"SW1W\", \"SW1W 9TQ\".",
+                        "type": "string"
+                    },
+                    "countryCode": {
+                        "description": "**OPTIONAL**: Customer address country code, expected to be ISO-3166-1\nAlpha-2.",
+                        "type": "string"
+                    },
+                    "phone": {
+                        "description": "**OPTIONAL**: Customer's phone number.",
+                        "type": "string"
+                    },
+                    "emailAddress": {
+                        "description": "**OPTIONAL**: Customer's email address.",
+                        "type": "string"
+                    }
+                }
+            },
+            "CaptureRequest": {
+                "id": "CaptureRequest",
+                "description": "Request object for the capture method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "googlePaymentToken": {
+                        "description": "**REQUIRED**: This is the token that both companies will use to identify\nthe account for purchases between each other.",
+                        "type": "string"
+                    },
+                    "transactionDescription": {
+                        "description": "**REQUIRED**: This is the description of the transaction that can be put on\nthe customer's statement. Localized to the userLocale found in the\n`request_header`.  This format can be changed without notice and must never\nbe parsed.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code",
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "**REQUIRED**: The amount of the purchase, in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "authenticationRequestId": {
+                        "description": "**OPTIONAL**: `requestId` of the associated authentication request.  If\nthis is not present then no authentication can be tied to this capture.\n\nIf this is present then the user was authenticated immediately preceding\nthis call, or was authenticated when an automated payment schedule was\nset up.",
+                        "type": "string"
+                    },
+                    "otpVerification": {
+                        "$ref": "#/components/schemas/OtpVerification"
+                    },
+                    "captureContext": {
+                        "$ref": "#/components/schemas/CaptureContext"
+                    }
+                }
+            },
+            "CaptureContext": {
+                "id": "CaptureContext",
+                "description": "This object provides context about how the capture was requested.",
+                "type": "object",
+                "properties": {
+                    "userIpAddress": {
+                        "description": "**OPTIONAL**: This is the IP address of the user's device if the purchase\nwas made by a user in session.  If the user was not in session this will\nempty.  If the particular contract doesn't stipulate the need for this\nfield it will always be empty.",
+                        "type": "string"
+                    }
+                }
+            },
+            "CaptureResponse": {
+                "id": "CaptureResponse",
+                "description": "Response object for the capture method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorTransactionId": {
+                        "description": "**OPTIONAL**: This identifier is specific to the integrator and is\ngenerated by the integrator.  This is the identifier that the\nintegrator knows this transaction by.\n\nFor convenience, this identifier is included with in the remittance details",
+                        "type": "string"
+                    },
+                    "userMessage": {
+                        "description": "**OPTIONAL**: A description of the result to be displayed to the user if\nthe result is not `SUCCESS`.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this capture.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "CHARGE_EXCEEDS_TRANSACTION_LIMIT",
+                            "CHARGE_EXCEEDS_DAILY_LIMIT",
+                            "CHARGE_EXCEEDS_MONTHLY_LIMIT",
+                            "CHARGE_UNDER_LIMIT",
+                            "INSUFFICIENT_FUNDS",
+                            "ACCOUNT_DOES_NOT_SUPPORT_CURRENCY",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_ON_HOLD",
+                            "ACCOUNT_CLOSED_FRAUD",
+                            "GOOGLE_PAYMENT_TOKEN_INVALIDATED_BY_USER",
+                            "TOKEN_REFRESH_REQUIRED",
+                            "CONTACT_INTEGRATOR",
+                            "OTP_NOT_MATCHED",
+                            "OTP_ALREADY_USED"
+                        ]
+                    },
+                    "rawResult": {
+                        "$ref": "#/components/schemas/RawResult"
+                    },
+                    "transactionLimit": {
+                        "description": "**OPTIONAL**: If Result is `CHARGE_EXCEEDS_TRANSACTION_LIMIT`, then this is\nthe maximum amount the user could spend on a transaction (in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\")).  This\nis used for structured, user facing messaging and decline rate analysis.\n\nThis must be a limit relative to the `currencyCode` on the request.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "RawResult": {
+                "id": "RawResult",
+                "description": "Raw result object.",
+                "type": "object",
+                "properties": {
+                    "scope": {
+                        "description": "**OPTIONAL**: Scope of the raw_code, can be empty.",
+                        "type": "string"
+                    },
+                    "rawCode": {
+                        "description": "**REQUIRED**: Raw code from the integrator or subsystems within it.",
+                        "type": "string"
+                    }
+                }
+            },
+            "AsynchronousCaptureRequest": {
+                "id": "AsynchronousCaptureRequest",
+                "description": "Request object for the capture method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "upiDetails": {
+                        "$ref": "#/components/schemas/AsynchronousCaptureRequestUpiDetails"
+                    },
+                    "tokenizedInstrumentDetails": {
+                        "$ref": "#/components/schemas/AsynchronousCaptureRequestTokenizedInstrumentDetails"
+                    },
+                    "transactionDescription": {
+                        "description": "**REQUIRED**: This is the description of the transaction that can be put on\nthe customer's statement. Localized to the userLocale found in the\n`request_header`.  This format can be changed without notice and must never\nbe parsed.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code",
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "**REQUIRED**: The amount of the purchase, in micros of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "AsynchronousCaptureRequestUpiDetails": {
+                "id": "AsynchronousCaptureRequestUpiDetails",
+                "description": "Details about the UPI account to capture from.",
+                "type": "object",
+                "properties": {
+                    "vpa": {
+                        "description": "**REQUIRED**: The user's Virtual Payment Address (VPA) used for moving\nmoney using the UPI protocol. For example foo@icici.",
+                        "type": "string"
+                    }
+                }
+            },
+            "AsynchronousCaptureRequestTokenizedInstrumentDetails": {
+                "id": "AsynchronousCaptureRequestTokenizedInstrumentDetails",
+                "description": "Details about the account to capture from.",
+                "type": "object",
+                "properties": {
+                    "googlePaymentToken": {
+                        "description": "**REQUIRED**: This is the token that both companies will use to identify\nthe account for purchases between each other.",
+                        "type": "string"
+                    }
+                }
+            },
+            "AsynchronousCaptureResponse": {
+                "id": "AsynchronousCaptureResponse",
+                "description": "Response object for the capture method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorTransactionId": {
+                        "description": "**REQUIRED**: This identifier is specific to the integrator and is\ngenerated by the integrator.  This is the identifier that the\nintegrator knows this transaction by.\n\nFor convenience, this identifier is included with in the remittance details",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: The result of the asynchronous capture call.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "ACKNOWLEDGED",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_ON_HOLD",
+                            "ACCOUNT_CLOSED_FRAUD"
+                        ]
+                    }
+                }
+            },
+            "GenerateDeviceCaptureTokenRequest": {
+                "id": "GenerateDeviceCaptureTokenRequest",
+                "description": "Request object for the generateDeviceCaptureToken method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code",
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "**REQUIRED**: The amount of the purchase, in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "transactionDescription": {
+                        "description": "**REQUIRED**: This is the description of the transaction that can be put on\nthe customer's statement. Localized to the userLocale found in the\n`request_header`.  This format can be changed without notice and must never\nbe parsed.",
+                        "type": "string"
+                    },
+                    "deviceIdentifier": {
+                        "description": "**REQUIRED**: Identifies the device this token should be built for. This is\na hardware identifier.",
+                        "type": "string"
+                    },
+                    "instanceIdentifier": {
+                        "description": "**REQUIRED**: Identifies the eMoney card instance this token should be\nbuilt for.",
+                        "type": "string"
+                    },
+                    "sessionIdentifier": {
+                        "description": "**OPTIONAL**: An identifier for this particular transaction or\nsession that we are executing on the Secure Element.",
+                        "type": "string"
+                    },
+                    "balance": {
+                        "description": "**OPTIONAL**: The current balance on the Secure Element, in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "GenerateDeviceCaptureTokenResponse": {
+                "id": "GenerateDeviceCaptureTokenResponse",
+                "description": "Response object for the generateDeviceCaptureToken method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorTransactionId": {
+                        "description": "**OPTIONAL**: This identifier is specific to the integrator and is\ngenerated by the integrator.  This is the identifier that the\nintegrator knows this transaction by.\n\nFor convenience, this identifier is included with in the remittance details",
+                        "type": "string"
+                    },
+                    "deviceCaptureToken": {
+                        "description": "**OPTIONAL**: Token to be presented to the device to\ntrigger a capture completion.\n\nThis value is **required** if the `result` is `SUCCESS` and should not be\nset if the result is anything other than `SUCCESS`.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "$ref": "#/components/schemas/GenerateDeviceCaptureTokenResult"
+                    }
+                }
+            },
+            "GenerateDeviceCaptureTokenResult": {
+                "id": "GenerateDeviceCaptureTokenResult",
+                "description": "Information about the result of generating a device capture token.",
+                "type": "object",
+                "properties": {
+                    "generateDeviceCaptureTokenResultCode": {
+                        "description": "**REQUIRED**: Result code of this generate device capture token call.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "CHARGE_UNDER_TRANSACTION_LIMIT",
+                            "CHARGE_EXCEEDS_TRANSACTION_LIMIT",
+                            "CHARGE_EXCEEDS_DAILY_LIMIT",
+                            "CHARGE_EXCEEDS_MONTHLY_LIMIT",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD",
+                            "ACCOUNT_ON_HOLD",
+                            "INSUFFICIENT_FUNDS"
+                        ]
+                    },
+                    "transactionMaxLimit": {
+                        "description": "**OPTIONAL**: If `generateDeviceCaptureTokenResultCode` is\n`CHARGE_EXCEEDS_TRANSACTION_LIMIT` then this is the value of the maximum\nallowable transaction. This is used for structured, user facing messaging\nand decline rate analysis.\n\nThis amount is\nmicros/[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the same `currencyCode` as the original\n`generateDeviceCaptureToken` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "transactionMinLimit": {
+                        "description": "**OPTIONAL**: If `generateDeviceCaptureTokenResultCode` is\n`CHARGE_UNDER_TRANSACTION_LIMIT` then this is the value of the minimum\nallowable transaction. This is used for structured, user facing messaging\nand decline rate analysis.\n\nThis amount is\nmicros/[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the same `currencyCode` as the original\n`generateDeviceCaptureToken` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "GetDeviceCaptureResultRequest": {
+                "id": "GetDeviceCaptureResultRequest",
+                "description": "Request object for the getDeviceCaptureResult method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "deviceCaptureRequestId": {
+                        "description": "**REQUIRED**: A unique identifier for this transaction that is a reference\nto the requestId provided at generateDeviceCaptureToken time.",
+                        "type": "string"
+                    }
+                }
+            },
+            "GetDeviceCaptureResultResponse": {
+                "id": "GetDeviceCaptureResultResponse",
+                "description": "Response object for the getDeviceCaptureResult method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: The result of this API call. This result is not the same as\nthe device capture's result; this is an indicator of whether the integrator\nwas able to successfully determine/look up the device capture's result. A\n`SUCCESS` in this result does not necessarily mean the device capture\nitself was successful.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS"
+                        ]
+                    },
+                    "deviceCaptureResult": {
+                        "$ref": "#/components/schemas/DeviceCaptureResult"
+                    }
+                }
+            },
+            "DeviceCaptureResult": {
+                "id": "DeviceCaptureResult",
+                "description": "Information about the final result of a device capture.",
+                "type": "object",
+                "properties": {
+                    "deviceCaptureResultCode": {
+                        "description": "**REQUIRED**: Result code of this device capture.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "CHARGE_UNDER_TRANSACTION_LIMIT",
+                            "CHARGE_EXCEEDS_TRANSACTION_LIMIT",
+                            "CHARGE_EXCEEDS_DAILY_LIMIT",
+                            "CHARGE_EXCEEDS_MONTHLY_LIMIT",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD",
+                            "ACCOUNT_ON_HOLD",
+                            "INSUFFICIENT_FUNDS"
+                        ]
+                    },
+                    "transactionMaxLimit": {
+                        "description": "**OPTIONAL**: If `deviceCaptureResultCode` is\n`CHARGE_EXCEEDS_TRANSACTION_LIMIT` then this is the value of the maximum\nallowable transaction. This is used for structured, user facing messaging\nand decline rate analysis.\n\nThis amount is micros of the same `currencyCode` as the original\n`generateDeviceCaptureToken` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "transactionMinLimit": {
+                        "description": "**OPTIONAL**: If `deviceCaptureResultCode` is\n`CHARGE_UNDER_TRANSACTION_LIMIT` then this is the value of the minimum\nallowable transaction. This is used for structured, user facing messaging\nand decline rate analysis.\n\nThis amount is micros of the same `currencyCode` as the original\n`generateDeviceCaptureToken` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "RefundRequest": {
+                "id": "RefundRequest",
+                "description": "Request object for the refund method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account ID that defines\ncontractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "captureRequestId": {
+                        "description": "**REQUIRED**: A unique identifier for this transaction.  This is the\n`requestId` generated by Google during the `capture` call which this\nrequest is associated with.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code",
+                        "type": "string"
+                    },
+                    "refundAmount": {
+                        "description": "**REQUIRED**: The amount of the refund, a positive number of\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the\ncurrency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "RefundResponse": {
+                "id": "RefundResponse",
+                "description": "Response object for the refund method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorRefundId": {
+                        "description": "**OPTIONAL**: This identifier is specific to the integrator and is\ngenerated by the integrator.  This is the identifier that the\nintegrator knows this refund by.\n\nFor convenience, this identifier is included with in the remittance details",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this refund.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "NO_MONEY_LEFT_ON_TRANSACTION",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD",
+                            "ACCOUNT_ON_HOLD",
+                            "REFUND_EXCEEDS_MAXIMUM_BALANCE"
+                        ]
+                    },
+                    "rawResult": {
+                        "$ref": "#/components/schemas/RawResult"
+                    }
+                }
+            },
+            "DisburseFundsRequest": {
+                "id": "DisburseFundsRequest",
+                "description": "Request object for the disburse funds method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "upiDetails": {
+                        "$ref": "#/components/schemas/DisburseFundsRequestUpiDetails"
+                    },
+                    "transactionDescription": {
+                        "description": "**REQUIRED**: This is the description of the transaction that can be put on\nthe customer's statement. Localized to the userLocale found in the\n`request_header`.  This format can be changed without notice and must never\nbe parsed.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code",
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "**REQUIRED**: The amount of the purchase, in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "DisburseFundsRequestUpiDetails": {
+                "id": "DisburseFundsRequestUpiDetails",
+                "description": "Details about the UPI account to disburse to.",
+                "type": "object",
+                "properties": {
+                    "vpa": {
+                        "description": "**REQUIRED**: The user's Virtual Payment Address (VPA) used for moving\nmoney using the UPI protocol. For example foo@icici.",
+                        "type": "string"
+                    }
+                }
+            },
+            "DisburseFundsResponse": {
+                "id": "DisburseFundsResponse",
+                "description": "Response object for the disburse funds method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorTransactionId": {
+                        "description": "**REQUIRED**: This identifier is specific to the integrator and is\ngenerated by the integrator.  This is the identifier that the\nintegrator knows this transaction by.\n\nFor convenience, this identifier is included with in the remittance details",
+                        "type": "string"
+                    },
+                    "disburseFundsResult": {
+                        "$ref": "#/components/schemas/DisburseFundsResult"
+                    }
+                }
+            },
+            "DisburseFundsResult": {
+                "id": "DisburseFundsResult",
+                "description": "Information about the final result of a disbursement.",
+                "type": "object",
+                "properties": {
+                    "disburseFundsResultCode": {
+                        "description": "**REQUIRED**: Result code of this disbursement.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "DISBURSEMENT_UNDER_TRANSACTION_LIMIT",
+                            "DISBURSEMENT_EXCEEDS_TRANSACTION_LIMIT",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD",
+                            "ACCOUNT_ON_HOLD"
+                        ]
+                    },
+                    "transactionMaxLimit": {
+                        "description": "**OPTIONAL**: If `disburseFundsResultCode` is\n`DISBURSEMENT_EXCEEDS_TRANSACTION_LIMIT` then this is the value of the\nmaximum allowable transaction. This is used for structured, user facing\nmessaging and decline rate analysis.\n\nThis amount is\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the same `currencyCode` as the original\n`disburseFunds` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "transactionMinLimit": {
+                        "description": "**OPTIONAL**: If `disburseFundsResultCode` is\n`DISBURSEMENT_UNDER_TRANSACTION_LIMIT` then this is the value of the\nminimum allowable transaction. This is used for structured, user facing\nmessaging and decline rate analysis.\n\nThis amount is\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the same `currencyCode` as the original\n`disburseFunds` method call.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "rawResult": {
+                        "$ref": "#/components/schemas/RawResult"
+                    }
+                }
+            },
+            "RefreshTokenRequest": {
+                "id": "RefreshTokenRequest",
+                "description": "Request object for the refresh token method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "authenticationRequestId": {
+                        "description": "**OPTIONAL**: `requestId` of the authentication request that preceded\nthis call.  This is only present if the user went through the Android\napp or web authentication paths.",
+                        "type": "string"
+                    },
+                    "otpVerification": {
+                        "$ref": "#/components/schemas/OtpVerification"
+                    },
+                    "googlePaymentToken": {
+                        "description": "**REQUIRED**: This is the token to be refreshed.  This will not be a new\ntoken, but an existing token that has already been established via\nassociateAccount.  If the token is unknown a status of\n`FAILED_PRECONDITION` should be returned.",
+                        "type": "string"
+                    }
+                }
+            },
+            "RefreshTokenResponse": {
+                "id": "RefreshTokenResponse",
+                "description": "Response object for the refresh token method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorRefreshTokenId": {
+                        "description": "**OPTIONAL**: This identifier is specific to the integrator and is\ngenerated by the integrator.  It is used for debugging purposes only in\norder to identify this call.  This is the identifier that the integrator\nknows this call by.",
+                        "type": "string"
+                    },
+                    "tokenExpirationTime": {
+                        "description": "**OPTIONAL**: Milliseconds since epoch when the token expires. Use `0` to\nsignal the token does not expire.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "userMessage": {
+                        "description": "**OPTIONAL**: A description of the result to be displayed to the user if\nthe result is not `SUCCESS`.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this call.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "USER_AUTHENTICATION_FAILED",
+                            "CONTACT_INTEGRATOR",
+                            "OTP_NOT_MATCHED",
+                            "OTP_ALREADY_USED",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD"
+                        ]
+                    }
+                }
+            },
+            "RemittanceStatementNotificationRequest": {
+                "id": "RemittanceStatementNotificationRequest",
+                "description": "Request object for the remittance statement notification method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this statement.",
+                        "type": "string"
+                    },
+                    "remittanceStatementSummary": {
+                        "$ref": "#/components/schemas/RemittanceStatementSummary"
+                    }
+                }
+            },
+            "RemittanceStatementSummary": {
+                "id": "RemittanceStatementSummary",
+                "description": "Summary object about a remittance statement.",
+                "type": "object",
+                "properties": {
+                    "statementDate": {
+                        "description": "**REQUIRED**: Date (in America/Los Angeles) that this statement\nwas created.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "billingPeriod": {
+                        "$ref": "#/components/schemas/BillingPeriod"
+                    },
+                    "dateDue": {
+                        "description": "**OPTIONAL**: The date that the remittance is due.\nThis is represented as milliseconds from epoch. It is a date\n(and therefore will always start at the first millisecond of the day in the\nbilling timezone).\n\nThis is set as long as the `total_due_by_integrator` is greater than 0.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code.",
+                        "type": "string"
+                    },
+                    "totalDueByIntegrator": {
+                        "description": "**REQUIRED**: This value is in micros in the currency of `currencyCode`.\nThis value is always positive.",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "remittanceInstructions": {
+                        "$ref": "#/components/schemas/RemittanceInstructions"
+                    }
+                }
+            },
+            "BillingPeriod": {
+                "id": "BillingPeriod",
+                "description": "Billing period of this statement.",
+                "type": "object",
+                "properties": {
+                    "startDate": {
+                        "description": "The start date of the billing period.\nThis is represented as milliseconds from epoch. It is a date\n(and therefore will always start at the first millisecond of the day in the\nbilling timezone).\n\nThis is the first millisecond of the day of the billing period,\n00:00:00.000",
+                        "type": "string",
+                        "format": "int64"
+                    },
+                    "endDate": {
+                        "description": "The end date of the billing period.\nThis is represented as milliseconds from epoch.\n\nThis is the last millisecond of the last day of the billing period,\n23:59:59.999",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "RemittanceInstructions": {
+                "id": "RemittanceInstructions",
+                "description": "Structure holding information about how to pay this remittance notification.",
+                "type": "object",
+                "properties": {
+                    "memoLineId": {
+                        "description": "**REQUIRED**: Identifier that is mandatory to be put on the memo line\nfor the payment for remittance identification.",
+                        "type": "string"
+                    }
+                }
+            },
+            "RemittanceStatementNotificationResponse": {
+                "id": "RemittanceStatementNotificationResponse",
+                "description": "Response object for the remittance statement notification method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorStatementId": {
+                        "description": "**REQUIRED**: Identifier the integrator knows this statement as.  This is\nintegrator generated.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this statement notification.",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "ACCEPTED"
+                        ]
+                    }
+                }
+            },
+            "SendOtpRequest": {
+                "id": "SendOtpRequest",
+                "description": "Request object for the sendOtp method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "accountPhoneNumber": {
+                        "description": "**REQUIRED**: This is a E.164 formatted phone number.  Examples\ninclude +14035551111 and +918067218000.  This will always lead with a +\nand include only numbers afterwards (no dashes).",
+                        "type": "string"
+                    },
+                    "associationId": {
+                        "description": "**OPTIONAL**: This is the association identifier used to reference\na user's account.  If this is populated then it is expected that the\nintegrator check that this account's phone number is the same phone number\npassed into `accountPhoneNumber`.  This is important to ensure that Google\nand the integrator are verifying an OTP sent to the right account.\n\nThis is populated whenever Google is performing a re-authentication",
+                        "type": "string"
+                    },
+                    "smsMatchingToken": {
+                        "description": "**REQUIRED**: This value is provided by Google and must be included in the\nSMS delivered to the user.  This allows Google to auto-match the SMS on the\ndevice for Android O devices (see\n<a\nhref=\"https://developer.android.com/reference/android/telephony/SmsManager.html#createAppSpecificSmsToken(android.app.PendingIntent)\">reference</a>\n).  This will be 11 characters.\n\n\nSo for example, if the SMS normally looks like:\n<code>Here's the OTP you requested: &LT;OTP&GT;</code>\nAnd Google sends \"0123456789A\"  for this field, then the SMS should look\nlike:\n<code>\n0123456789A\n\nHere's the OTP you requested: YYXXZZ\n</code>\nAlternatively it could look like:\n<code>\nHere's the OTP you requested: YYXXZZ\n\n0123456789A\n</code>",
+                        "type": "string"
+                    }
+                }
+            },
+            "SendOtpResponse": {
+                "id": "SendOtpResponse",
+                "description": "Response object for the sendOtp method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorSendOtpId": {
+                        "description": "**OPTIONAL**: Identifier the integrator knows this send OTP request as.\nThis is integrator generated.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this request",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "PHONE_NUMBER_NOT_ASSOCIATED_WITH_ACCOUNT",
+                            "UNKNOWN_PHONE_NUMBER",
+                            "MESSAGE_UNABLE_TO_BE_SENT",
+                            "INVALID_PHONE_NUMBER",
+                            "NOT_ELIGIBLE",
+                            "OTP_LIMIT_REACHED",
+                            "ACCOUNT_CLOSED",
+                            "ACCOUNT_CLOSED_ACCOUNT_TAKEN_OVER",
+                            "ACCOUNT_CLOSED_FRAUD"
+                        ]
+                    }
+                }
+            },
+            "VerifyOtpRequest": {
+                "id": "VerifyOtpRequest",
+                "description": "Request object for the verifyOtp method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "sendOtpRequestId": {
+                        "description": "**REQUIRED**: `requestId` from the `sendOtp` request that preceded this\ncall.",
+                        "type": "string"
+                    },
+                    "otp": {
+                        "description": "**REQUIRED**: This is the OTP the user provided, which this call is\nverifying",
+                        "type": "string"
+                    }
+                }
+            },
+            "VerifyOtpResponse": {
+                "id": "VerifyOtpResponse",
+                "description": "Response object for the verifyOtp method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "paymentIntegratorVerifyOtpId": {
+                        "description": "**OPTIONAL**: Identifier the integrator knows this verify OTP request as.\nThis is integrator generated.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: Result of this request",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "OTP_NOT_MATCHED",
+                            "OTP_ALREADY_USED"
+                        ]
+                    }
+                }
+            },
+            "GenerateReferenceNumberRequest": {
+                "id": "GenerateReferenceNumberRequest",
+                "description": "Request object for the generate reference number method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "transactionDescription": {
+                        "description": "**REQUIRED**: This is the description of the transaction that can be put on\nthe customer's statement. Localized to the userLocale found in the\n`request_header`.  This format can be changed without notice and must never\nbe parsed.",
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "description": "**REQUIRED**: ISO 4217 3-letter currency code.",
+                        "type": "string"
+                    },
+                    "amount": {
+                        "description": "**REQUIRED**: The amount of the purchase, in\n[micros](https://developers.google.com/standard-payments/reference/glossary#micros\n\"What are micros?\") of the currency unit.",
+                        "type": "string",
+                        "format": "int64"
+                    }
+                }
+            },
+            "GenerateReferenceNumberResponse": {
+                "id": "GenerateReferenceNumberResponse",
+                "description": "Response object for the generate reference number method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "referenceNumber": {
+                        "description": "**REQUIRED**: Reference number created by the integrator.",
+                        "type": "string"
+                    }
+                }
+            },
+            "CancelReferenceNumberRequest": {
+                "id": "CancelReferenceNumberRequest",
+                "description": "Request object for the cancel reference number method.",
+                "type": "object",
+                "properties": {
+                    "requestHeader": {
+                        "$ref": "#/components/schemas/RequestHeader"
+                    },
+                    "paymentIntegratorAccountId": {
+                        "description": "**REQUIRED**: This is the payment integrator account identifier that\nidentifies contractual constraints around this transaction.",
+                        "type": "string"
+                    },
+                    "referenceNumber": {
+                        "description": "**REQUIRED**: The reference number that should be cancelled.",
+                        "type": "string"
+                    }
+                }
+            },
+            "CancelReferenceNumberResponse": {
+                "id": "CancelReferenceNumberResponse",
+                "description": "Response object for the cancel reference number method.",
+                "type": "object",
+                "properties": {
+                    "responseHeader": {
+                        "$ref": "#/components/schemas/ResponseHeader"
+                    },
+                    "result": {
+                        "description": "**REQUIRED**: The result of this call",
+                        "type": "string",
+                        "enum": [
+                            "UNKNOWN_RESULT",
+                            "SUCCESS",
+                            "REFERENCE_NUMBER_ALREADY_PAID",
+                            "REFERENCE_NUMBER_PENDING_TRANSACTION"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
