@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | Contains all supported security schemes defined in the specification
 module OpenAPI.SecuritySchemes where
 
 import qualified Data.Text.Internal

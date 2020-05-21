@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
+-- | Contains the types generated from the schema PetByType
 module OpenAPI.Types.PetByType where
 
 import qualified Prelude as GHC.Integer.Type
@@ -26,10 +27,24 @@ import qualified GHC.Show
 import qualified GHC.Types
 import qualified OpenAPI.Common
 
-data PetByType
-    = PetByType {petByTypeHunts :: (GHC.Maybe.Maybe GHC.Types.Bool),
-                 petByTypePet_type :: PetByTypePet_type}
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- | Defines the data type for the schema PetByType
+-- 
+-- 
+data PetByType = PetByType {
+  -- | hunts
+  petByTypeHunts :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  -- | pet_type
+  , petByTypePet_type :: PetByTypePet_type
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.ToJSON PetByType
+    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "hunts" (petByTypeHunts obj) : (Data.Aeson..=) "pet_type" (petByTypePet_type obj) : [])
+          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "hunts" (petByTypeHunts obj) GHC.Base.<> (Data.Aeson..=) "pet_type" (petByTypePet_type obj))
+instance Data.Aeson.Types.FromJSON.FromJSON PetByType
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))
+-- | Defines the enum schema PetByTypePet_type
+-- 
+-- 
 data PetByTypePet_type
     = PetByTypePet_typeEnumOther Data.Aeson.Types.Internal.Value
     | PetByTypePet_typeEnumTyped GHC.Base.String
@@ -47,8 +62,3 @@ instance Data.Aeson.FromJSON PetByTypePet_type
                                           else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "Dog")
                                                 then PetByTypePet_typeEnumString_Dog
                                                 else PetByTypePet_typeEnumOther val)
-instance Data.Aeson.ToJSON PetByType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "hunts" (petByTypeHunts obj) : (Data.Aeson..=) "pet_type" (petByTypePet_type obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "hunts" (petByTypeHunts obj) GHC.Base.<> (Data.Aeson..=) "pet_type" (petByTypePet_type obj))
-instance Data.Aeson.Types.FromJSON.FromJSON PetByType
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))

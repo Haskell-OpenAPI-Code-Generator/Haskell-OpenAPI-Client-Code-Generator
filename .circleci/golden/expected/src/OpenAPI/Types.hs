@@ -1,3 +1,4 @@
+-- | Rexports all type modules (used in the operation modules).
 module OpenAPI.Types (
   module OpenAPI.CyclicTypes,
   module OpenAPI.Types.Dog,

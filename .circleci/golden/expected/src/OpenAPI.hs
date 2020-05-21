@@ -1,3 +1,4 @@
+-- | The main module which exports all functionality.
 module OpenAPI (
   module OpenAPI.Operations.Patch_pets,
   module OpenAPI.Operations.ShowPetById,

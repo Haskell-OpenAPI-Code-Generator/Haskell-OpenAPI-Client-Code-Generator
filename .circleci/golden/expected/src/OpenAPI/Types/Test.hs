@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
+-- | Contains the types generated from the schema Test
 module OpenAPI.Types.Test where
 
 import qualified Prelude as GHC.Integer.Type
@@ -26,4 +27,7 @@ import qualified GHC.Show
 import qualified GHC.Types
 import qualified OpenAPI.Common
 
+-- | Defines an alias for the schema Test
+-- 
+-- 
 type Test = GHC.Base.String
