@@ -43,7 +43,7 @@ import OpenAPI.Types
 -- 
 -- 
 patch_pets :: forall m s . (OpenAPI.Common.MonadHTTP m, OpenAPI.Common.SecurityScheme s) => OpenAPI.Common.Configuration s  -- ^ The configuration to use in the request
-  -> Patch_petsRequestBodyVariants                                                                                          -- ^ The request body to send
+  -> GHC.Maybe.Maybe Patch_petsRequestBodyVariants                                                                          -- ^ The request body to send
   -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response Patch_petsResponse)) -- ^ Monad containing the result of the operation
 patch_pets config
            body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either Patch_petsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right Patch_petsResponse200
@@ -54,7 +54,7 @@ patch_pets config
 patch_petsRaw :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                OpenAPI.Common.SecurityScheme s) =>
                  OpenAPI.Common.Configuration s ->
-                 Patch_petsRequestBodyVariants ->
+                 GHC.Maybe.Maybe Patch_petsRequestBodyVariants ->
                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
 patch_petsRaw config
@@ -64,7 +64,7 @@ patch_petsRaw config
 -- Monadic version of 'patch_pets' (use with 'OpenAPI.Common.runWithConfiguration')
 patch_petsM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                              OpenAPI.Common.SecurityScheme s) =>
-               Patch_petsRequestBodyVariants ->
+               GHC.Maybe.Maybe Patch_petsRequestBodyVariants ->
                Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
                                                   m
                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
@@ -76,7 +76,7 @@ patch_petsM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (D
 -- Monadic version of 'patch_petsRaw' (use with 'OpenAPI.Common.runWithConfiguration')
 patch_petsRawM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                 OpenAPI.Common.SecurityScheme s) =>
-                  Patch_petsRequestBodyVariants ->
+                  GHC.Maybe.Maybe Patch_petsRequestBodyVariants ->
                   Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
                                                      m
                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
