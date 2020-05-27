@@ -1,6 +1,6 @@
 name:                openapi3-code-generator
-version:             0.1.0.0
-github:              "Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library"
+version:             0.1.0.1
+github:              "Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator"
 author:              "Remo Dörig & Joel Fisch"
 synopsis:            OpenAPI3 Haskell Client Code Generator
 category:            Code-Generator
@@ -14,7 +14,7 @@ extra-source-files:
 - ChangeLog.md
 - LICENSE
 
-description:         Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme>
+description:         Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme>
 
 dependencies:
 - base >= 4.7 && < 5
