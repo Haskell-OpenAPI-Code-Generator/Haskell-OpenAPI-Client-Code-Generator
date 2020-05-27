@@ -6,6 +6,8 @@ node_modules
 *.rej
 *.tix
 public
+dist
+dist-newstyle
 
 build
 
