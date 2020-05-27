@@ -48,6 +48,7 @@ defineConfigurationInformation :: String -> OAT.OpenApiSpecification -> Q Doc
 defineConfigurationInformation moduleName spec =
   let servers' = (OAT.servers :: OAT.OpenApiSpecification -> [OAT.ServerObject]) spec
       defaultURL = getServerURL servers'
+      defaultURLStr = T.unpack defaultURL
       defaultURLName = mkName "defaultURL"
       getServerURL = maybe "/" (OAT.url :: OAT.ServerObject -> Text) . Maybe.listToMaybe
    in Doc.addConfigurationModuleHeader moduleName
@@ -60,7 +61,7 @@ defineConfigurationInformation moduleName spec =
                     "@" <> defaultURL <> "@"
                   ],
               ppr
-                <$> [d|$(varP defaultURLName) = defaultURL|],
+                <$> [d|$(varP defaultURLName) = T.pack defaultURLStr|],
               pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
               ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.AnonymousSecurityScheme|]
             ]

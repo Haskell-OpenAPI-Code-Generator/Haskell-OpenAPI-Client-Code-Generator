@@ -4,10 +4,16 @@
 ## How to use?
 1. install [stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/)
 1. `stack install openapi3-code-generator`
-1. `openapi3-code-generator my_specification.yml`
+1. `openapi3-code-generator-exe my_specification.yml`
 
 An `out` directory is created with the generated code. Hint you can use `--output-dir` to specify another output directory.
 You can use `openapi3-code-generator --help` to list all CLI options.
+
+If `openapi3-code-generator-exe` is not found, you may not have added the cabal bin to your `PATH`. Execute `~/bin/openapi3-code-generator-exe` instead.
+
+## How to run from source
+1. `stack build`
+1. `stack run -- --help`
 
 ## Example package
 In the folder `example` is a package that uses the generated code from `specifications/petstore.yml`.

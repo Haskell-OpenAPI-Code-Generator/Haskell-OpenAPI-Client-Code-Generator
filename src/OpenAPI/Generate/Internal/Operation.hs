@@ -188,6 +188,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
       namedQueryParameters = filter ((== OAT.QueryParameterObjectLocation) . getInFromParameterObject . snd) namedParameters
       queryParameters = generateQueryParams namedQueryParameters
       bodyName = mkName "body"
+      strMethod = T.unpack method
   pure $
     ppr <$> case bodySchema of
       Just RequestBodyDefinition {..} ->
@@ -203,7 +204,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
                          then [|OC.doBodyCallWithConfiguration $(varE configArg)|]
                          else [|OC.doBodyCallWithConfigurationM|]
                      )
-                    (T.toUpper method)
+                    (T.toUpper $ T.pack strMethod)
                     (T.pack $(request))
                     $(queryParameters)
                     $(if required then [|Just $(varE bodyName)|] else varE bodyName)
@@ -218,7 +219,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
                      then [|OC.doCallWithConfiguration $(varE configArg)|]
                      else [|OC.doCallWithConfigurationM|]
                  )
-                (T.toUpper method)
+                (T.toUpper $ T.pack strMethod)
                 (T.pack $(request))
                 $(queryParameters)
               )
@@ -297,9 +298,9 @@ getResponseObject (OAT.Reference ref) = do
 -- | Generates query params in the form of [(Text,ByteString)]
 generateQueryParams :: [(Name, OAT.ParameterObject)] -> Q Exp
 generateQueryParams ((name, param) : xs) =
-  infixE (Just [|(queryName, $(expr))|]) (varE $ mkName ":") (Just $ generateQueryParams xs)
+  infixE (Just [|(T.pack queryName, $(expr))|]) (varE $ mkName ":") (Just $ generateQueryParams xs)
   where
-    queryName = getNameFromParameter param
+    queryName = T.unpack $ getNameFromParameter param
     required = getRequiredFromParameter param
     expr =
       if required
