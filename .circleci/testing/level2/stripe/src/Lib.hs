@@ -75,7 +75,7 @@ runGetPaymentIntent =
     (Just "another_string")
     (Just 100)
     (Just "the last string")
-    GetPaymentIntentsRequestBody
+    Nothing
 
 runPostPaymentIntent :: MonadHTTP m => m (Either HttpException (Response PostPaymentIntentsResponse))
 runPostPaymentIntent = postPaymentIntents defaultConfiguration myPaymentIntent
