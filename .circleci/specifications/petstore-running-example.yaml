@@ -52,6 +52,8 @@ paths:
       description: ''
       operationId: updatePet
       responses:
+        '200':
+          description: Success
         '400':
           description: Invalid ID supplied
         '404':
@@ -63,7 +65,23 @@ paths:
         - write:pets
         - read:pets
       requestBody:
-        "$ref": "#/components/requestBodies/Pet"
+        "$ref": "#/components/requestBodies/PetOrTag"
+    get:
+      summary: oneOf test operation
+      operationId: getAllPetsAsOneOf
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - type: string
+                    - type: number
+        default:
+          description: Failure
   "/pet/findByStatus":
     get:
       tags:
@@ -664,6 +682,15 @@ components:
         application/xml:
           schema:
             "$ref": "#/components/schemas/Pet"
+      description: Pet object that needs to be added to the store
+      required: true
+    PetOrTag:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - "$ref": "#/components/schemas/Pet"
+              - "$ref": "#/components/schemas/Tag"
       description: Pet object that needs to be added to the store
       required: true
     UserArray:

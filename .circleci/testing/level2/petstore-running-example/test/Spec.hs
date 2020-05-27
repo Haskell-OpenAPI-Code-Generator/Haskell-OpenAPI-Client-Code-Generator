@@ -41,3 +41,23 @@ main =
         let requestExpectation = expectBody "{\"category\":null,\"id\":null,\"name\":\"Harro\",\"photoUrls\":[],\"status\":null,\"tags\":null}" $ expectMethod "POST" noExpectation
         response <- runMock runAddPet (requestExpectation, succeededResponse)
         (getResponseBody . fromRight undefined) response `shouldBe` AddPetResponse200
+    describe "runGetAllPetsAsOneOf"
+      $ it "contain different results"
+      $ do
+        let rawResponse = defaultResponse {responseBody = "[1, \"test\", 2]"} :: Response ByteString
+        response <- runMock runGetAllPetsAsOneOf (noExpectation, rawResponse)
+        (getResponseBody . fromRight undefined) response
+          `shouldBe` GetAllPetsAsOneOfResponse200
+            [ GetAllPetsAsOneOfResponseBody200Double 1,
+              GetAllPetsAsOneOfResponseBody200String "test",
+              GetAllPetsAsOneOfResponseBody200Double 2
+            ]
+    describe "updatePet" $ do
+      it "runUpdatePet" $ do
+        let requestExpectation = expectBody "{\"photoUrls\":[],\"status\":null,\"category\":null,\"name\":\"Harro\",\"id\":null,\"tags\":null}" $ expectMethod "PUT" noExpectation
+        response <- runMock runUpdatePet (requestExpectation, succeededResponse)
+        (getResponseBody . fromRight undefined) response `shouldBe` UpdatePetResponse200
+      it "runUpdatePetWithTag" $ do
+        let requestExpectation = expectBody "{\"name\":\"Tag 1\",\"id\":3}" $ expectMethod "PUT" noExpectation
+        response <- runMock runUpdatePetWithTag (requestExpectation, succeededResponse)
+        (getResponseBody . fromRight undefined) response `shouldBe` UpdatePetResponse200
