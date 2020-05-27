@@ -59,8 +59,7 @@ data SchemaObject
         writeOnly :: Bool,
         xml :: Maybe XMLObject,
         externalDocs :: Maybe ExternalDocumentationObject,
-        -- not correct
-        example :: Maybe Text,
+        example :: Maybe Value,
         deprecated :: Bool,
         items :: Maybe Schema
       }
@@ -131,7 +130,11 @@ data DiscriminatorObject
       }
   deriving (Show, Eq, Ord, Generic)
 
-instance FromJSON DiscriminatorObject
+instance FromJSON DiscriminatorObject where
+  parseJSON = withObject "DiscriminatorObject" $ \o ->
+    DiscriminatorObject
+      <$> o .: "propertyName"
+      <*> o .:? "mapping" .!= Map.empty
 
 -- So that Sets are possible
 instance Ord Value where
@@ -156,13 +159,14 @@ data ConcreteValue
   = StringDefaultValue Text
   | NumericDefaultValue Scientific.Scientific
   | BoolDefaultValue Bool
+  | OtherDefaultValue Value
   deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON ConcreteValue where
   parseJSON v@(String _) = StringDefaultValue <$> parseJSON v
   parseJSON v@(Number _) = NumericDefaultValue <$> parseJSON v
   parseJSON v@(Bool _) = BoolDefaultValue <$> parseJSON v
-  parseJSON _ = fail "only text and numeric values are supported for a default value as of now"
+  parseJSON v = pure $ OtherDefaultValue v
 
 data AdditionalProperties
   = NoAdditionalProperties
@@ -177,7 +181,7 @@ instance FromJSON AdditionalProperties where
 
 data XMLObject
   = XMLObject
-      { name :: Text,
+      { name :: Maybe Text,
         namespace :: Maybe Text,
         prefix :: Maybe Text,
         attribute :: Bool,
@@ -188,7 +192,7 @@ data XMLObject
 instance FromJSON XMLObject where
   parseJSON = withObject "SchemaObject" $ \o ->
     XMLObject
-      <$> o .: "name"
+      <$> o .:? "name"
       <*> o .:? "namespace"
       <*> o .:? "prefix"
       <*> o .:? "attribute" .!= False

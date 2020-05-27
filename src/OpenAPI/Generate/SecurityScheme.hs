@@ -98,7 +98,7 @@ basicAuthenticationScheme moduleName description =
                       "",
                       "@",
                       "'" <> moduleName <> ".Configuration.defaultConfiguration'",
-                      "  { _securityScheme =",
+                      "  { configSecurityScheme =",
                       "      'BasicAuthenticationSecurityScheme'",
                       "        { 'basicAuthenticationSecuritySchemeUsername' = \"user\",",
                       "          'basicAuthenticationSecuritySchemePassword' = \"pw\"",
@@ -154,7 +154,7 @@ bearerAuthenticationScheme moduleName description =
                       "",
                       "@",
                       "'" <> moduleName <> ".Configuration.defaultConfiguration'",
-                      "  { _securityScheme = 'BearerAuthenticationSecurityScheme' \"token\"",
+                      "  { configSecurityScheme = 'BearerAuthenticationSecurityScheme' \"token\"",
                       "  }",
                       "@"
                     ]

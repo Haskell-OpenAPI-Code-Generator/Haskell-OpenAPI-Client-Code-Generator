@@ -65,6 +65,14 @@ haskellifyText convertToCamelCase startWithUppercase name =
       replaceReservedWord "then" = "then'"
       replaceReservedWord "type" = "type'"
       replaceReservedWord "where" = "where'"
+      replaceReservedWord "Configuration" = "Configuration'"
+      replaceReservedWord "MonadHTTP" = "MonadHTTP'"
+      replaceReservedWord "StringifyModel" = "StringifyModel'"
+      replaceReservedWord "SecurityScheme" = "SecurityScheme'"
+      replaceReservedWord "AnonymousSecurityScheme" = "AnonymousSecurityScheme'"
+      replaceReservedWord "JsonByteString" = "JsonByteString'"
+      replaceReservedWord "JsonDateTime" = "JsonDateTime'"
+      replaceReservedWord "RequestBodyEncoding" = "RequestBodyEncoding'"
       replaceReservedWord ('_' : rest) = replaceReservedWord rest
       replaceReservedWord a = a
       replacePlus ('+' : rest) = "Plus" <> replacePlus rest
@@ -93,7 +101,12 @@ transformToModuleName =
   let toCamelCase (x : y : xs) | not (Char.isAlphaNum x) && Char.isAlpha y = Char.toUpper y : toCamelCase xs
       toCamelCase (x : xs) = x : toCamelCase xs
       toCamelCase xs = xs
-   in T.pack . toCamelCase . uppercaseFirst . T.unpack . T.map (\c -> if Char.isAlphaNum c then c else '_')
+   in T.pack
+        . toCamelCase
+        . uppercaseFirst
+        . T.unpack
+        . T.dropWhile (== '_')
+        . T.map (\c -> if Char.isAlphaNum c then c else '_')
 
 uppercaseFirst :: String -> String
 uppercaseFirst (x : xs) = Char.toUpper x : xs

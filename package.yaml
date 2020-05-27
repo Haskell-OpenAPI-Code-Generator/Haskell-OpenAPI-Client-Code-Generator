@@ -1,23 +1,20 @@
 name:                openapi3-code-generator
 version:             0.1.0.0
-#github:              "githubuser/openapi3-code-generator"
-#license:             BSD3
+github:              "Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library"
 author:              "Remo Dörig & Joel Fisch"
-#maintainer:          "example@example.com"
+synopsis:            OpenAPI3 Haskell Client Code Generator
+category:            Code-Generator
+license:             MIT
+license-file:        LICENSE
+maintainer:          Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doerig@gmail.com>
 copyright:           "2020 Remo Dörig & Joel Fisch"
 
 extra-source-files:
 - README.md
 - ChangeLog.md
+- LICENSE
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/openapi3-code-generator#readme>
+description:         Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -44,7 +41,6 @@ library:
   source-dirs: src
   ghc-options:
   - -Wall
-  - -Werror
 
 executables:
   openapi3-code-generator-exe:
@@ -55,7 +51,6 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
-    - -Werror
     dependencies:
     - openapi3-code-generator
     - directory
@@ -70,7 +65,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
-    - -Werror
     dependencies:
     - openapi3-code-generator
     - hspec

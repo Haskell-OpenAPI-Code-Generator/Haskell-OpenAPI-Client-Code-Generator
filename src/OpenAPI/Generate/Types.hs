@@ -302,7 +302,7 @@ data ServerVariableObject
 instance FromJSON ServerVariableObject where
   parseJSON = withObject "ServerVariableObject" $ \o ->
     ServerVariableObject
-      <$> o .: "enum"
+      <$> o .:? "enum" .!= []
       <*> o .: "default"
       <*> o .:? "description"
 

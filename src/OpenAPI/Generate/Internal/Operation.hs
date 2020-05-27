@@ -19,6 +19,7 @@ module OpenAPI.Generate.Internal.Operation
     getBodySchemaFromOperation,
     generateParameterizedRequestPath,
     generateQueryParams,
+    RequestBodyDefinition (..),
   )
 where
 
@@ -43,6 +44,14 @@ import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
+
+-- | Extracted request body information which can be used for code generation
+data RequestBodyDefinition
+  = RequestBodyDefinition
+      { schema :: OAT.Schema,
+        encoding :: OC.RequestBodyEncoding,
+        required :: Bool
+      }
 
 -- | wrapper for ambigious usage
 getParametersFromOperationReference :: OAT.OperationObject -> [OAT.Referencable OAT.ParameterObject]
@@ -162,7 +171,7 @@ defineOperationFunction ::
   -- | HTTP Method (POST,GET,etc.)
   Text ->
   -- | Schema of body
-  Maybe.Maybe (OAT.Schema, OC.RequestBodyEncoding) ->
+  Maybe RequestBodyDefinition ->
   -- | An expression used to transform the response from 'B8.ByteString' to the required response type.
   -- Note that the response is nested within a HTTP monad and an 'Either'.
   Q Exp ->
@@ -181,7 +190,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
       bodyName = mkName "body"
   pure $
     ppr <$> case bodySchema of
-      Just (_, encoding) ->
+      Just RequestBodyDefinition {..} ->
         let encodeExpr =
               varE $
                 case encoding of
@@ -197,7 +206,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
                     (T.toUpper method)
                     (T.pack $(request))
                     $(queryParameters)
-                    $(varE bodyName)
+                    $(if required then [|Just $(varE bodyName)|] else varE bodyName)
                     $(encodeExpr)
                   )
               |]
@@ -216,7 +225,7 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
           |]
 
 -- | Extracts the request body schema from an operation and the encoding which should be used on the body data.
-getBodySchemaFromOperation :: OAT.OperationObject -> OAM.Generator (Maybe (OAT.Schema, OC.RequestBodyEncoding))
+getBodySchemaFromOperation :: OAT.OperationObject -> OAM.Generator (Maybe RequestBodyDefinition)
 getBodySchemaFromOperation operation = do
   requestBody <- getRequestBodyObject operation
   case requestBody of
@@ -229,9 +238,16 @@ getRequestBodyContent = OAT.content
 getSchemaFromMedia :: OAT.MediaTypeObject -> Maybe OAT.Schema
 getSchemaFromMedia = OAT.schema
 
-getRequestBodySchema :: OAT.RequestBodyObject -> OAM.Generator (Maybe (OAT.Schema, OC.RequestBodyEncoding))
+getRequestBodySchema :: OAT.RequestBodyObject -> OAM.Generator (Maybe RequestBodyDefinition)
 getRequestBodySchema body =
   let content = Map.lookup "application/json" $ getRequestBodyContent body
+      createRequestBodyDefinition encoding schema =
+        Just $
+          RequestBodyDefinition
+            { schema = schema,
+              encoding = encoding,
+              required = OAT.required (body :: OAT.RequestBodyObject)
+            }
    in case content of
         Nothing ->
           let formContent = Map.lookup "application/x-www-form-urlencoded" $ getRequestBodyContent body
@@ -240,9 +256,13 @@ getRequestBodySchema body =
                   OAM.logWarning "Only content type application/json and application/x-www-form-urlencoded is supported"
                   pure Nothing
                 Just media ->
-                  pure $ getSchemaFromMedia media >>= (\x -> Just (x, OC.RequestBodyEncodingFormData))
+                  pure $
+                    getSchemaFromMedia media
+                      >>= createRequestBodyDefinition OC.RequestBodyEncodingFormData
         Just media ->
-          pure $ getSchemaFromMedia media >>= (\x -> Just (x, OC.RequestBodyEncodingJSON))
+          pure $
+            getSchemaFromMedia media
+              >>= createRequestBodyDefinition OC.RequestBodyEncodingJSON
 
 getRequestBodyObject :: OAT.OperationObject -> OAM.Generator (Maybe OAT.RequestBodyObject)
 getRequestBodyObject operation =

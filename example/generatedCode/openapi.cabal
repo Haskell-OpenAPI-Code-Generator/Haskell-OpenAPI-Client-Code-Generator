@@ -1,0 +1,58 @@
+cabal-version: 1.12
+
+name:           openapi
+version:        0.1.0.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      OpenAPI
+      OpenAPI.Operations.UpdatePet
+      OpenAPI.Operations.AddPet
+      OpenAPI.Operations.FindPetsByStatus
+      OpenAPI.Operations.FindPetsByTags
+      OpenAPI.Operations.GetPetById
+      OpenAPI.Operations.UpdatePetWithForm
+      OpenAPI.Operations.DeletePet
+      OpenAPI.Operations.UploadFile
+      OpenAPI.Operations.GetInventory
+      OpenAPI.Operations.PlaceOrder
+      OpenAPI.Operations.GetOrderById
+      OpenAPI.Operations.DeleteOrder
+      OpenAPI.Operations.CreateUser
+      OpenAPI.Operations.CreateUsersWithArrayInput
+      OpenAPI.Operations.CreateUsersWithListInput
+      OpenAPI.Operations.LoginUser
+      OpenAPI.Operations.LogoutUser
+      OpenAPI.Operations.GetUserByName
+      OpenAPI.Operations.UpdateUser
+      OpenAPI.Operations.DeleteUser
+      OpenAPI.Types
+      OpenAPI.CyclicTypes
+      OpenAPI.Types.ApiResponse
+      OpenAPI.Types.Category
+      OpenAPI.Types.Order
+      OpenAPI.Types.Tag
+      OpenAPI.Types.User
+      OpenAPI.Types.Pet
+      OpenAPI.Configuration
+      OpenAPI.SecuritySchemes
+      OpenAPI.Common
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , text
+    , ghc-prim
+    , http-conduit
+    , http-client
+    , http-types
+    , bytestring
+    , aeson
+    , unordered-containers
+    , vector
+    , scientific
+    , time
+    , mtl
+    , transformers
+  default-language: Haskell2010

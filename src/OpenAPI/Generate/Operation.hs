@@ -1,5 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
 
@@ -153,8 +154,9 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
                 <*> responseBodyDefinitions
           )
 
-getBodyType :: Maybe (OAT.Schema, OC.RequestBodyEncoding) -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)
+getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)
 getBodyType Nothing _ = pure ([], Doc.emptyDoc)
-getBodyType (Just (bodySchema, _)) appendToOperationName = do
+getBodyType (Just RequestBodyDefinition {..}) appendToOperationName = do
+  let transformType = pure . (if required then id else appT $ varT ''Maybe)
   requestBodySuffix <- OAM.getFlag $ T.pack . OAF.optRequestBodyTypeSuffix
-  BF.bimap pure fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) bodySchema
+  BF.bimap transformType fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema

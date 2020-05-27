@@ -351,16 +351,38 @@ fuseSchemasAllOf :: Text -> [OAS.Schema] -> OAM.Generator (Map.Map Text OAS.Sche
 fuseSchemasAllOf schemaName schemas = do
   schemasWithDependencies <- mapMaybeM (resolveSchemaReference schemaName) schemas
   let concreteSchemas = fmap fst schemasWithDependencies
-      setOfProperties = fmap OAS.properties concreteSchemas
-      setOfRequired = fmap OAS.required concreteSchemas
-      propertiesCombined = foldl (Map.unionWith const) Map.empty setOfProperties
-      requiredCombined = foldl Set.union Set.empty setOfRequired
+  subSchemaInformation <- mapM (getPropertiesForAllOf schemaName) concreteSchemas
+  let propertiesCombined = foldl (Map.unionWith const) Map.empty (fmap fst subSchemaInformation)
+  let requiredCombined = foldl Set.union Set.empty (fmap snd subSchemaInformation)
   pure (propertiesCombined, requiredCombined)
+
+-- | gets properties for an allOf merge
+-- looks if subschemas define further subschemas
+getPropertiesForAllOf :: Text -> OAS.SchemaObject -> OAM.Generator (Map.Map Text OAS.Schema, Set.Set Text)
+getPropertiesForAllOf schemaName schema =
+  let allOf = OAS.allOf schema
+      anyOf = OAS.anyOf schema
+      relevantSubschemas = Set.union allOf anyOf
+   in if null relevantSubschemas
+        then pure (OAS.properties schema, OAS.required schema)
+        else do
+          (allOfProps, allOfRequired) <- fuseSchemasAllOf schemaName $ Set.toList allOf
+          (anyOfProps, _) <- fuseSchemasAllOf schemaName $ Set.toList anyOf
+          pure (Map.unionWith const allOfProps anyOfProps, allOfRequired)
 
 -- | defines a allOf subschema
 -- Fuses the subschemas together
 defineAllOfSchema :: Text -> Text -> [OAS.Schema] -> OAM.Generator TypeWithDeclaration
 defineAllOfSchema schemaName description schemas = do
+  newDefs <- defineNewSchemaForAllOf schemaName description schemas
+  case newDefs of
+    Just (newSchema, newDependencies) ->
+      addDependencies newDependencies $ defineModelForSchemaConcrete DontCreateTypeAlias schemaName newSchema
+    Nothing -> pure (varT ''String, (emptyDoc, Set.empty))
+
+-- | defines a new Schema, which properties are fused
+defineNewSchemaForAllOf :: Text -> Text -> [OAS.Schema] -> OAM.Generator (Maybe (OAS.SchemaObject, Dep.Models))
+defineNewSchemaForAllOf schemaName description schemas = do
   OAM.logInfo $ "define allOf Model " <> schemaName
   schemasWithDependencies <- mapMaybeM (resolveSchemaReference schemaName) schemas
   let concreteSchemas = fmap fst schemasWithDependencies
@@ -369,11 +391,11 @@ defineAllOfSchema schemaName description schemas = do
   if Map.null propertiesCombined
     then do
       OAM.logWarning "allOf schemas is empty"
-      pure (varT ''String, (emptyDoc, Set.empty))
+      pure Nothing
     else
       let schemaPrototype = head concreteSchemas
           newSchema = schemaPrototype {OAS.properties = propertiesCombined, OAS.required = requiredCombined, OAS.description = Just description}
-       in addDependencies newDependencies $ defineModelForSchemaConcrete DontCreateTypeAlias schemaName newSchema
+       in pure $ Just (newSchema, newDependencies)
 
 -- | defines an array
 defineArrayModelForSchema :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration

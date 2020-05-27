@@ -148,17 +148,16 @@ doBodyCallWithConfiguration ::
   -- | Query parameters
   [(Text, Maybe String)] ->
   -- | Request body
-  Maybe body ->
+  body ->
   -- | JSON or form data deepobjects
   RequestBodyEncoding ->
   -- | The raw response from the server
   m (Either HS.HttpException (HS.Response B8.ByteString))
-doBodyCallWithConfiguration config method path queryParams Nothing _ = doCallWithConfiguration config method path queryParams
-doBodyCallWithConfiguration config method path queryParams (Just body) RequestBodyEncodingJSON =
+doBodyCallWithConfiguration config method path queryParams body RequestBodyEncodingJSON =
   httpBS $ HS.setRequestMethod (textToByte method) $ HS.setRequestBodyJSON body baseRequest
   where
     baseRequest = createBaseRequest config method path queryParams
-doBodyCallWithConfiguration config method path queryParams (Just body) RequestBodyEncodingFormData =
+doBodyCallWithConfiguration config method path queryParams body RequestBodyEncodingFormData =
   httpBS $ HS.setRequestMethod (textToByte method) $ HS.setRequestBodyURLEncoded byteStringData baseRequest
   where
     baseRequest = createBaseRequest config method path queryParams
@@ -171,7 +170,7 @@ doBodyCallWithConfigurationM ::
   Text ->
   Text ->
   [(Text, Maybe String)] ->
-  Maybe body ->
+  body ->
   RequestBodyEncoding ->
   MR.ReaderT (Configuration s) m (Either HS.HttpException (HS.Response B8.ByteString))
 doBodyCallWithConfigurationM method path queryParams body encoding = do

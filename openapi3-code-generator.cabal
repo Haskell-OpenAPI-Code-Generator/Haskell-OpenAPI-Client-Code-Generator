@@ -4,13 +4,17 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d59c5b53e1007d7d46b8970ab3c1f54c81800028f7c2b4e81e6373be23f5c5c4
+-- hash: 4b9fb84a6053e692ba6c4475ec1d147da46049a8f5f454dc5fc408c8344f04bb
 
 name:           openapi3-code-generator
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/openapi3-code-generator#readme>
+synopsis:       OpenAPI3 Haskell Client Code Generator
+description:    Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme>
+category:       Code-Generator
+homepage:       https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme
+bug-reports:    https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library/issues
 author:         Remo Dörig & Joel Fisch
-maintainer:     Remo Dörig & Joel Fisch
+maintainer:     Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doerig@gmail.com>
 copyright:      2020 Remo Dörig & Joel Fisch
 license:        MIT
 license-file:   LICENSE
@@ -18,6 +22,11 @@ build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
+    LICENSE
+
+source-repository head
+  type: git
+  location: https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library
 
 library
   exposed-modules:
@@ -42,7 +51,7 @@ library
       Paths_openapi3_code_generator
   hs-source-dirs:
       src
-  ghc-options: -Wall -Werror
+  ghc-options: -Wall
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -72,7 +81,7 @@ executable openapi3-code-generator-exe
       Paths_openapi3_code_generator
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -112,7 +121,7 @@ test-suite openapi3-code-generator-test
       Paths_openapi3_code_generator
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
     , aeson
