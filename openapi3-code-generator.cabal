@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4b9fb84a6053e692ba6c4475ec1d147da46049a8f5f454dc5fc408c8344f04bb
+-- hash: a0b220631b06808a2d8d5347bfd98c1ad971f014530d617ee278d105bf020135
 
 name:           openapi3-code-generator
-version:        0.1.0.0
+version:        0.1.0.1
 synopsis:       OpenAPI3 Haskell Client Code Generator
-description:    Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme>
+description:    Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme>
 category:       Code-Generator
-homepage:       https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library#readme
-bug-reports:    https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library/issues
+homepage:       https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme
+bug-reports:    https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/issues
 author:         Remo Dörig & Joel Fisch
 maintainer:     Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doerig@gmail.com>
 copyright:      2020 Remo Dörig & Joel Fisch
@@ -26,7 +26,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/Haskell-OpenAPI-Code-Generator/Stripe-Haskell-Library
+  location: https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator
 
 library
   exposed-modules:
