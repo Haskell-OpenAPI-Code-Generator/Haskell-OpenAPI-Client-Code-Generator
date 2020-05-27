@@ -1,2 +1,2 @@
 set -e
-hlint . --report
+hlint . --report --ignore-glob="example/**/*.hs"

@@ -299,3 +299,5 @@ out
 .pre-commit-config.yaml
 result
 *.tix
+
+report.html
