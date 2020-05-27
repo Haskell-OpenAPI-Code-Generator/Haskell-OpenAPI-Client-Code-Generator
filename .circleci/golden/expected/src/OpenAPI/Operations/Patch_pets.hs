@@ -47,7 +47,11 @@ patch_pets :: forall m s . (OpenAPI.Common.MonadHTTP m, OpenAPI.Common.SecurityS
   -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response Patch_petsResponse)) -- ^ Monad containing the result of the operation
 patch_pets config
            body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either Patch_petsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right Patch_petsResponse200
-                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper (Data.Text.pack "PATCH")) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
+                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack ['P',
+                                                                                                                                                                                                                                                                                                                                                                          'A',
+                                                                                                                                                                                                                                                                                                                                                                          'T',
+                                                                                                                                                                                                                                                                                                                                                                          'C',
+                                                                                                                                                                                                                                                                                                                                                                          'H']) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PATCH /pets
 -- 
 -- The same as 'patch_pets' but returns the raw 'Data.ByteString.Char8.ByteString'
@@ -58,7 +62,11 @@ patch_petsRaw :: forall m s . (OpenAPI.Common.MonadHTTP m,
                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
 patch_petsRaw config
-              body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper (Data.Text.pack "PATCH")) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
+              body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack ['P',
+                                                                                                                                  'A',
+                                                                                                                                  'T',
+                                                                                                                                  'C',
+                                                                                                                                  'H']) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PATCH /pets
 -- 
 -- Monadic version of 'patch_pets' (use with 'OpenAPI.Common.runWithConfiguration')
@@ -70,7 +78,11 @@ patch_petsM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
                                                                       (Network.HTTP.Client.Types.Response Patch_petsResponse))
 patch_petsM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either Patch_petsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right Patch_petsResponse200
-                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper (Data.Text.pack "PATCH")) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
+                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack ['P',
+                                                                                                                                                                                                                                                                                                                                                                     'A',
+                                                                                                                                                                                                                                                                                                                                                                     'T',
+                                                                                                                                                                                                                                                                                                                                                                     'C',
+                                                                                                                                                                                                                                                                                                                                                                     'H']) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PATCH /pets
 -- 
 -- Monadic version of 'patch_petsRaw' (use with 'OpenAPI.Common.runWithConfiguration')
@@ -81,7 +93,11 @@ patch_petsRawM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                                      m
                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-patch_petsRawM body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper (Data.Text.pack "PATCH")) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
+patch_petsRawM body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack ['P',
+                                                                                                                             'A',
+                                                                                                                             'T',
+                                                                                                                             'C',
+                                                                                                                             'H']) (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
 -- | Define the one-of schema patch_petsRequestBody
 -- 
 -- 
