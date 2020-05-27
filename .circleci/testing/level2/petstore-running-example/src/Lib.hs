@@ -19,6 +19,13 @@ myPet =
       petTags = Nothing
     }
 
+myTag :: Tag
+myTag =
+  Tag
+    { tagId = Just 3,
+      tagName = Just "Tag 1"
+    }
+
 bearerConfiguration :: Configuration BearerAuthenticationSecurityScheme
 bearerConfiguration =
   defaultConfiguration
@@ -51,3 +58,12 @@ runMultipleRequestsWithBearerAuth =
 
 runAddPet :: MonadHTTP m => m (Either HttpException (Response AddPetResponse))
 runAddPet = addPet defaultConfiguration myPet
+
+runGetAllPetsAsOneOf :: MonadHTTP m => m (Either HttpException (Response GetAllPetsAsOneOfResponse))
+runGetAllPetsAsOneOf = getAllPetsAsOneOf defaultConfiguration
+
+runUpdatePet :: MonadHTTP m => m (Either HttpException (Response UpdatePetResponse))
+runUpdatePet = updatePet defaultConfiguration (UpdatePetRequestBodyPet myPet)
+
+runUpdatePetWithTag :: MonadHTTP m => m (Either HttpException (Response UpdatePetResponse))
+runUpdatePetWithTag = updatePet defaultConfiguration (UpdatePetRequestBodyTag myTag)
