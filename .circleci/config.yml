@@ -16,13 +16,15 @@ jobs:
           name: Lint
           command: ./.circleci/lint_generator
 
-  test:
+  test-and-coverage:
     <<: *defaults
     steps:
       - checkout
       - run:
-          name: Unit tests
-          command: ./.circleci/test_generator
+          name: Tests and coverage
+          command: ./.circleci/coverage
+      - store_artifacts:
+          path: ./coverage-output
 
   build:
     <<: *defaults
@@ -71,12 +73,21 @@ jobs:
           name: System tests level 3
           command: ./.circleci/test_system_3
 
+  coverage:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 3
+          command: ./.circleci/test_system_3
+
 workflows:
   version: 2
   all:
     jobs:
       - lint
-      - test
+      - test-and-coverage
       - build
       - golden:
           requires:
