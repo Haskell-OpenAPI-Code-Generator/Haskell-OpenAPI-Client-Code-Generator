@@ -70,7 +70,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON CatAnanyoftype
 data CatAnother_relativeVariants
     = CatAnother_relativeCat Cat
     | CatAnother_relativePetByType PetByType
-    | CatAnother_relativeString GHC.Base.String
+    | CatAnother_relativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON CatAnother_relativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -82,7 +82,7 @@ instance Data.Aeson.FromJSON CatAnother_relativeVariants
 data CatRelativeVariants
     = CatRelativeCat Cat
     | CatRelativePetByType PetByType
-    | CatRelativeString GHC.Base.String
+    | CatRelativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON CatRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -123,7 +123,7 @@ data Mischling = Mischling {
   -- | integer
   , mischlingInteger :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
   -- | nickname
-  , mischlingNickname :: (GHC.Maybe.Maybe GHC.Base.String)
+  , mischlingNickname :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | number
   , mischlingNumber :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | pet_type
@@ -138,13 +138,13 @@ data Mischling = Mischling {
   -- 
   -- * Maximum length of 244
   -- * Minimum length of 100
-  , mischlingStr :: (GHC.Maybe.Maybe GHC.Base.String)
+  , mischlingStr :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDate
-  , mischlingStrDate :: (GHC.Maybe.Maybe GHC.Base.String)
+  , mischlingStrDate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDateTime
-  , mischlingStrDateTime :: (GHC.Maybe.Maybe GHC.Base.String)
+  , mischlingStrDateTime :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | tags
-  , mischlingTags :: (GHC.Maybe.Maybe ([] GHC.Base.String))
+  , mischlingTags :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.ToJSON Mischling
@@ -159,7 +159,7 @@ data MischlingAnother_relativeOneOf4 = MischlingAnother_relativeOneOf4 {
   -- | hunts
   mischlingAnother_relativeOneOf4Hunts :: (GHC.Maybe.Maybe GHC.Types.Bool)
   -- | pet_type
-  , mischlingAnother_relativeOneOf4Pet_type :: (GHC.Maybe.Maybe GHC.Base.String)
+  , mischlingAnother_relativeOneOf4Pet_type :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.ToJSON MischlingAnother_relativeOneOf4
@@ -173,9 +173,9 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeOneOf4
 data MischlingAnother_relativeVariants
     = MischlingAnother_relativeCat Cat
     | MischlingAnother_relativePetByType PetByType
-    | MischlingAnother_relativeString GHC.Base.String
+    | MischlingAnother_relativeText Data.Text.Internal.Text
     | MischlingAnother_relativeMischlingAnother_relativeOneOf4 MischlingAnother_relativeOneOf4
-    | MischlingAnother_relativeListString ([] GHC.Base.String)
+    | MischlingAnother_relativeListText ([] Data.Text.Internal.Text)
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON MischlingAnother_relativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -186,7 +186,7 @@ instance Data.Aeson.FromJSON MischlingAnother_relativeVariants
 -- 
 data MischlingBreed
     = MischlingBreedEnumOther Data.Aeson.Types.Internal.Value
-    | MischlingBreedEnumTyped GHC.Base.String
+    | MischlingBreedEnumTyped Data.Text.Internal.Text
     | MischlingBreedEnumString_Dingo
     | MischlingBreedEnumString_Husky
     | MischlingBreedEnumString_Retriever
@@ -262,7 +262,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeAnanyoftype
 data MischlingFirst_relativeAnother_relativeVariants
     = MischlingFirst_relativeAnother_relativeCat Cat
     | MischlingFirst_relativeAnother_relativePetByType PetByType
-    | MischlingFirst_relativeAnother_relativeString GHC.Base.String
+    | MischlingFirst_relativeAnother_relativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON MischlingFirst_relativeAnother_relativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -273,7 +273,7 @@ instance Data.Aeson.FromJSON MischlingFirst_relativeAnother_relativeVariants
 -- 
 data MischlingFirst_relativePet_type
     = MischlingFirst_relativePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | MischlingFirst_relativePet_typeEnumTyped GHC.Base.String
+    | MischlingFirst_relativePet_typeEnumTyped Data.Text.Internal.Text
     | MischlingFirst_relativePet_typeEnumString_Cat
     | MischlingFirst_relativePet_typeEnumString_Dog
     deriving (GHC.Show.Show, GHC.Classes.Eq)
@@ -294,7 +294,7 @@ instance Data.Aeson.FromJSON MischlingFirst_relativePet_type
 data MischlingFirst_relativeRelativeVariants
     = MischlingFirst_relativeRelativeCat Cat
     | MischlingFirst_relativeRelativePetByType PetByType
-    | MischlingFirst_relativeRelativeString GHC.Base.String
+    | MischlingFirst_relativeRelativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON MischlingFirst_relativeRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -318,7 +318,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingPet_type
 data MischlingRelativeVariants
     = MischlingRelativeCat Cat
     | MischlingRelativePetByType PetByType
-    | MischlingRelativeString GHC.Base.String
+    | MischlingRelativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON MischlingRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -347,7 +347,7 @@ data PetByAge = PetByAge {
   -- | first_relative
   , petByAgeFirst_relative :: (GHC.Maybe.Maybe PetByAgeFirst_relative)
   -- | nickname
-  , petByAgeNickname :: (GHC.Maybe.Maybe GHC.Base.String)
+  , petByAgeNickname :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | relative
   , petByAgeRelative :: (GHC.Maybe.Maybe PetByAgeRelativeVariants)
   } deriving (GHC.Show.Show
@@ -364,7 +364,7 @@ data PetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4 {
   -- | hunts
   petByAgeAnother_relativeOneOf4Hunts :: (GHC.Maybe.Maybe GHC.Types.Bool)
   -- | pet_type
-  , petByAgeAnother_relativeOneOf4Pet_type :: (GHC.Maybe.Maybe GHC.Base.String)
+  , petByAgeAnother_relativeOneOf4Pet_type :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.ToJSON PetByAgeAnother_relativeOneOf4
@@ -378,9 +378,9 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeOneOf4
 data PetByAgeAnother_relativeVariants
     = PetByAgeAnother_relativeCat Cat
     | PetByAgeAnother_relativePetByType PetByType
-    | PetByAgeAnother_relativeString GHC.Base.String
+    | PetByAgeAnother_relativeText Data.Text.Internal.Text
     | PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 PetByAgeAnother_relativeOneOf4
-    | PetByAgeAnother_relativeListString ([] GHC.Base.String)
+    | PetByAgeAnother_relativeListText ([] Data.Text.Internal.Text)
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON PetByAgeAnother_relativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -427,7 +427,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativeAnanyoftype
 data PetByAgeFirst_relativeAnother_relativeVariants
     = PetByAgeFirst_relativeAnother_relativeCat Cat
     | PetByAgeFirst_relativeAnother_relativePetByType PetByType
-    | PetByAgeFirst_relativeAnother_relativeString GHC.Base.String
+    | PetByAgeFirst_relativeAnother_relativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON PetByAgeFirst_relativeAnother_relativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -438,7 +438,7 @@ instance Data.Aeson.FromJSON PetByAgeFirst_relativeAnother_relativeVariants
 -- 
 data PetByAgeFirst_relativePet_type
     = PetByAgeFirst_relativePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | PetByAgeFirst_relativePet_typeEnumTyped GHC.Base.String
+    | PetByAgeFirst_relativePet_typeEnumTyped Data.Text.Internal.Text
     | PetByAgeFirst_relativePet_typeEnumString_Cat
     | PetByAgeFirst_relativePet_typeEnumString_Dog
     deriving (GHC.Show.Show, GHC.Classes.Eq)
@@ -459,7 +459,7 @@ instance Data.Aeson.FromJSON PetByAgeFirst_relativePet_type
 data PetByAgeFirst_relativeRelativeVariants
     = PetByAgeFirst_relativeRelativeCat Cat
     | PetByAgeFirst_relativeRelativePetByType PetByType
-    | PetByAgeFirst_relativeRelativeString GHC.Base.String
+    | PetByAgeFirst_relativeRelativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON PetByAgeFirst_relativeRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
@@ -471,7 +471,7 @@ instance Data.Aeson.FromJSON PetByAgeFirst_relativeRelativeVariants
 data PetByAgeRelativeVariants
     = PetByAgeRelativeCat Cat
     | PetByAgeRelativePetByType PetByType
-    | PetByAgeRelativeString GHC.Base.String
+    | PetByAgeRelativeText Data.Text.Internal.Text
     deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
 instance Data.Aeson.ToJSON PetByAgeRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}

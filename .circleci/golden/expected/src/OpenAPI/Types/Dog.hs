@@ -63,13 +63,13 @@ data Dog = Dog {
   -- 
   -- * Maximum length of 244
   -- * Minimum length of 100
-  , dogStr :: (GHC.Maybe.Maybe GHC.Base.String)
+  , dogStr :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDate
-  , dogStrDate :: (GHC.Maybe.Maybe GHC.Base.String)
+  , dogStrDate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDateTime
-  , dogStrDateTime :: (GHC.Maybe.Maybe GHC.Base.String)
+  , dogStrDateTime :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | tags
-  , dogTags :: (GHC.Maybe.Maybe ([] GHC.Base.String))
+  , dogTags :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.ToJSON Dog
@@ -82,7 +82,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON Dog
 -- 
 data DogBreed
     = DogBreedEnumOther Data.Aeson.Types.Internal.Value
-    | DogBreedEnumTyped GHC.Base.String
+    | DogBreedEnumTyped Data.Text.Internal.Text
     | DogBreedEnumString_Dingo
     | DogBreedEnumString_Husky
     | DogBreedEnumString_Retriever

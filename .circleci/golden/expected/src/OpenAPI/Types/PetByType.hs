@@ -47,7 +47,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByType
 -- 
 data PetByTypePet_type
     = PetByTypePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | PetByTypePet_typeEnumTyped GHC.Base.String
+    | PetByTypePet_typeEnumTyped Data.Text.Internal.Text
     | PetByTypePet_typeEnumString_Cat
     | PetByTypePet_typeEnumString_Dog
     deriving (GHC.Show.Show, GHC.Classes.Eq)

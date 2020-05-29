@@ -49,7 +49,7 @@ main =
         (getResponseBody . fromRight undefined) response
           `shouldBe` GetAllPetsAsOneOfResponse200
             [ GetAllPetsAsOneOfResponseBody200Double 1,
-              GetAllPetsAsOneOfResponseBody200String "test",
+              GetAllPetsAsOneOfResponseBody200Text "test",
               GetAllPetsAsOneOfResponseBody200Double 2
             ]
     describe "updatePet" $ do

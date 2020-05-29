@@ -22,6 +22,8 @@ data Flags
         optUseFloatWithArbitraryPrecision :: Bool,
         -- | Convert strings formatted as date / date-time to date types
         optUseDateTypesAsString :: Bool,
+        -- | Use 'String' instead of 'Data.Text.Text'
+        optUseNativeStrings :: Bool,
         -- | Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification
         optConvertToCamelCase :: Bool,
         -- | Add a suffix to property types to prevent naming conflicts
@@ -73,6 +75,10 @@ instance Options Flags where
         (optUseDateTypesAsString defaultFlags)
         "Convert strings formatted as date / date-time to date types"
       <*> simpleOption
+        "use-native-strings"
+        (optUseNativeStrings defaultFlags)
+        "Use 'String' instead of 'Data.Text.Text'"
+      <*> simpleOption
         "convert-to-camel-case"
         (optConvertToCamelCase defaultFlags)
         "Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification"
@@ -109,6 +115,7 @@ defaultFlags =
       optModuleName = "OpenAPI",
       optUseFloatWithArbitraryPrecision = False,
       optUseDateTypesAsString = False,
+      optUseNativeStrings = False,
       optConvertToCamelCase = False,
       optPropertyTypeSuffix = "",
       optResponseTypeSuffix = "Response",

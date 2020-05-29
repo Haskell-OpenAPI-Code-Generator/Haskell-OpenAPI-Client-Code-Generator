@@ -6,6 +6,7 @@ dependencies:
   - http-client
   - http-conduit
   - bytestring
+  - text
   - openapi
   - level2-base
 

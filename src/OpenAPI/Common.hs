@@ -263,6 +263,10 @@ instance StringifyModel String where
   -- stringifyModel :: String -> String
   stringifyModel = id
 
+instance StringifyModel Text where
+  -- stringifyModel :: Text -> String
+  stringifyModel = T.unpack
+
 instance {-# OVERLAPS #-} Show a => StringifyModel a where
   -- stringifyModel :: Show a => a -> String
   stringifyModel = show

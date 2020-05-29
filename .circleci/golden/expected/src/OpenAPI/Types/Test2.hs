@@ -30,4 +30,4 @@ import qualified OpenAPI.Common
 -- | Defines an alias for the schema Test2
 -- 
 -- 
-type Test2 = [] GHC.Base.String
+type Test2 = [] Data.Text.Internal.Text

@@ -44,7 +44,7 @@ import OpenAPI.Types
 -- 
 -- Info for a specific pet
 showPetById :: forall m s . (OpenAPI.Common.MonadHTTP m, OpenAPI.Common.SecurityScheme s) => OpenAPI.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Base.String                                                                                                         -- ^ petId: The id of the pet to retrieve
+  -> Data.Text.Internal.Text                                                                                                 -- ^ petId: The id of the pet to retrieve
   -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response ShowPetByIdResponse)) -- ^ Monad containing the result of the operation
 showPetById config
             petId = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either ShowPetByIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> ShowPetByIdResponseDefault Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
@@ -56,7 +56,7 @@ showPetById config
 showPetByIdRaw :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                 OpenAPI.Common.SecurityScheme s) =>
                   OpenAPI.Common.Configuration s ->
-                  GHC.Base.String ->
+                  Data.Text.Internal.Text ->
                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
 showPetByIdRaw config
@@ -66,7 +66,7 @@ showPetByIdRaw config
 -- Monadic version of 'showPetById' (use with 'OpenAPI.Common.runWithConfiguration')
 showPetByIdM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                               OpenAPI.Common.SecurityScheme s) =>
-                GHC.Base.String ->
+                Data.Text.Internal.Text ->
                 Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
                                                    m
                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
@@ -79,7 +79,7 @@ showPetByIdM petId = GHC.Base.fmap (GHC.Base.fmap (\response_1 -> GHC.Base.fmap 
 -- Monadic version of 'showPetByIdRaw' (use with 'OpenAPI.Common.runWithConfiguration')
 showPetByIdRawM :: forall m s . (OpenAPI.Common.MonadHTTP m,
                                  OpenAPI.Common.SecurityScheme s) =>
-                   GHC.Base.String ->
+                   Data.Text.Internal.Text ->
                    Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
                                                       m
                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
