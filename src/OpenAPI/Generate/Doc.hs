@@ -178,6 +178,7 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "Data.Text.Internal"
     . importQualified "Data.Time.Calendar as Data.Time.Calendar.Days"
     . importQualified "Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime"
+    . importQualified "Data.Vector"
     . importQualified "GHC.Base"
     . importQualified "GHC.Classes"
     . importQualified "GHC.Generics"

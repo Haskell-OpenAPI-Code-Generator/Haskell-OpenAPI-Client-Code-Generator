@@ -666,6 +666,8 @@ getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "b
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary", ..} = ''OC.JsonByteString
 getSchemaType OAF.Flags {optUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date", ..} = ''Day
 getSchemaType OAF.Flags {optUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time", ..} = ''OC.JsonDateTime
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''String
+getSchemaType OAF.Flags {optUseNativeStrings = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''String
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''Text
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool, ..} = ''Bool
-getSchemaType _ OAS.SchemaObject {..} = ''String
+getSchemaType OAF.Flags {optUseNativeStrings = True, ..} OAS.SchemaObject {..} = ''String
+getSchemaType _ OAS.SchemaObject {..} = ''Text

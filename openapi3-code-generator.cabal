@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d7ec1c26136fb123a14fbba656b051e46a7bc9640fdb2fce0d110c00af662e2
+-- hash: 52d397d582d5e30bccd8338895472f440fafb26098c9435e0e83e23fd859bbb8
 
 name:           openapi3-code-generator
-version:        0.1.0.4
+version:        0.1.0.5
 license:        MIT
 license-file:   LICENSE
 copyright:      2020 Remo Dörig & Joel Fisch

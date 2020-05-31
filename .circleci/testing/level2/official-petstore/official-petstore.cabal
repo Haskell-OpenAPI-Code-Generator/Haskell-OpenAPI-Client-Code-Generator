@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ed7af75c748253cddffe33dc5a930d4761ce877575dd84e5f0870503acc4b2f4
+-- hash: 559f8ea695981d5cad332d1fa756f5e4007ecc7b932f3cb5b5d00bb513c8969a
 
 name:           official-petstore
 version:        0.1.0.0
@@ -24,6 +24,7 @@ library
     , http-conduit
     , level2-base
     , openapi
+    , text
   default-language: Haskell2010
 
 test-suite official-petstore-test
@@ -44,5 +45,6 @@ test-suite official-petstore-test
     , level2-base
     , official-petstore
     , openapi
+    , text
     , transformers
   default-language: Haskell2010
