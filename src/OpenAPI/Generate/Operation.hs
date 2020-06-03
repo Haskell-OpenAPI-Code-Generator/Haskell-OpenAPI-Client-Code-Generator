@@ -91,7 +91,8 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
   functionBodyRawWithMonadTransformer <- defineOperationFunction False operationIdNameRawWithMonadTransformer params requestPath method bodySchema rawTransformation
   (bodyType, bodyDefinition) <- getBodyType bodySchema appendToOperationName
   paramDescriptions <- (<> ["The request body to send" | not $ null bodyType]) <$> mapM getParameterDescription params
-  let types = (getParameterType flags <$> params) <> bodyType
+  paramTypes <- mapM getParameterType params
+  let types = paramTypes <> bodyType
       fnType = getParametersTypeForSignature types responseTypeName monadName securitySchemeName
       fnTypeRaw = getParametersTypeForSignature types ''B8.ByteString monadName securitySchemeName
       fnTypeWithMonadTransformer = getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName securitySchemeName

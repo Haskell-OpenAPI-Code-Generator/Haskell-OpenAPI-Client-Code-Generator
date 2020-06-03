@@ -378,7 +378,7 @@ defineAllOfSchema schemaName description schemas = do
   case newDefs of
     Just (newSchema, newDependencies) ->
       addDependencies newDependencies $ defineModelForSchemaConcrete DontCreateTypeAlias schemaName newSchema
-    Nothing -> pure (varT ''String, (emptyDoc, Set.empty))
+    Nothing -> pure (varT ''Text, (emptyDoc, Set.empty))
 
 -- | defines a new Schema, which properties are fused
 defineNewSchemaForAllOf :: Text -> Text -> [OAS.Schema] -> OAM.Generator (Maybe (OAS.SchemaObject, Dep.Models))
@@ -406,7 +406,7 @@ defineArrayModelForSchema strategy schemaName schema = do
       -- not allowed by the spec
       Nothing -> do
         OAM.logWarning $ T.pack "items is empty for an array (assume string) " <> schemaName
-        pure (varT ''String, (emptyDoc, Set.empty))
+        pure (varT ''Text, (emptyDoc, Set.empty))
   let arrayType = appT (varT $ mkName "[]") type'
   schemaName' <- haskellifyNameM True schemaName
   pure
@@ -666,8 +666,6 @@ getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "b
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary", ..} = ''OC.JsonByteString
 getSchemaType OAF.Flags {optUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date", ..} = ''Day
 getSchemaType OAF.Flags {optUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time", ..} = ''OC.JsonDateTime
-getSchemaType OAF.Flags {optUseNativeStrings = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''String
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''Text
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool, ..} = ''Bool
-getSchemaType OAF.Flags {optUseNativeStrings = True, ..} OAS.SchemaObject {..} = ''String
 getSchemaType _ OAS.SchemaObject {..} = ''Text

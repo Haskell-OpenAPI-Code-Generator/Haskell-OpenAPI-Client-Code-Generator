@@ -108,5 +108,5 @@ spec =
             [t|OC.Configuration $(varT securitySchemeName) -> Maybe Int -> $(responseType)|]
           singleTestTH
             "Two parameters"
-            (getParametersTypeForSignature [conT ''Int, conT ''String] responseTypeName monadName securitySchemeName)
-            [t|OC.Configuration $(varT securitySchemeName) -> Int -> String -> $(responseType)|]
+            (getParametersTypeForSignature [conT ''Int, conT ''T.Text] responseTypeName monadName securitySchemeName)
+            [t|OC.Configuration $(varT securitySchemeName) -> Int -> T.Text -> $(responseType)|]

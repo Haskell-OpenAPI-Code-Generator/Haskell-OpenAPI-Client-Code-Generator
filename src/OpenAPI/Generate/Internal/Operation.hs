@@ -38,7 +38,6 @@ import qualified Network.HTTP.Simple as HS
 import qualified Network.HTTP.Types as HT
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
-import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.Monad as OAM
@@ -56,10 +55,6 @@ data RequestBodyDefinition
 -- | wrapper for ambigious usage
 getParametersFromOperationReference :: OAT.OperationObject -> [OAT.Referencable OAT.ParameterObject]
 getParametersFromOperationReference = OAT.parameters
-
--- | wrapper for ambigious usage
-getSchemaFromParameterInner :: OAT.ParameterObject -> OAT.ParameterObjectSchema
-getSchemaFromParameterInner = OAT.schema
 
 -- | wrapper for ambigious usage
 getRequiredFromParameter :: OAT.ParameterObject -> Bool
@@ -90,17 +85,21 @@ getParametersFromOperationConcrete =
       )
     . getParametersFromOperationReference
 
--- | Reads the Schema from the ParameterObjectSchema
---   Only application/json or simple Object Schema is read
-getSchemaFromParameterOuter :: OAT.ParameterObjectSchema -> OAS.SchemaObject
-getSchemaFromParameterOuter OAT.SimpleParameterObjectSchema {..} = case schema of
-  OAT.Concrete e -> e
-  _ -> error "not yet implemented"
-getSchemaFromParameterOuter _ = error "not yet implemented"
+getSchemaFromParameterObjectSchema :: OAT.ParameterObjectSchema -> OAM.Generator (Maybe OAS.SchemaObject)
+getSchemaFromParameterObjectSchema OAT.SimpleParameterObjectSchema {..} = case schema of
+  OAT.Concrete e -> pure $ Just e
+  OAT.Reference ref -> do
+    p <- OAM.getSchemaReferenceM ref
+    when (Maybe.isNothing p) $ OAM.logWarning $
+      "Reference " <> ref <> " to SchemaObject could not be found and therefore will be skipped."
+    pure p
+getSchemaFromParameterObjectSchema (OAT.ComplexParameterObjectSchema _) = do
+  OAM.logWarning "Complex parameter schemas are not supported and therefore will be skipped."
+  pure Nothing
 
--- | Reads the Schema from the Parameter
-getSchemaFromParameter :: OAT.ParameterObject -> OAS.SchemaObject
-getSchemaFromParameter = getSchemaFromParameterOuter . getSchemaFromParameterInner
+-- | Reads the schema from the parameter
+getSchemaFromParameter :: OAT.ParameterObject -> OAM.Generator (Maybe OAS.SchemaObject)
+getSchemaFromParameter OAT.ParameterObject {..} = OAM.nested name $ getSchemaFromParameterObjectSchema schema
 
 getNameFromParameter :: OAT.ParameterObject -> Text
 getNameFromParameter = OAT.name
@@ -139,13 +138,16 @@ getParameterName parameter = haskellifyNameM False $ getNameFromParameter parame
 
 -- | Get the type of a parameter depending on its schema type and the configuration options ('OAF.Flags').
 -- If the parameter is not required, a 'Maybe' type is produced.
-getParameterType :: OAF.Flags -> OAT.ParameterObject -> Q Type
-getParameterType flags parameter =
-  let paramType = varT $ Model.getSchemaType flags (getSchemaFromParameter parameter)
-   in ( if getRequiredFromParameter parameter
-          then paramType
-          else [t|Maybe $(paramType)|]
-      )
+getParameterType :: OAT.ParameterObject -> OAM.Generator (Q Type)
+getParameterType parameter = do
+  flags <- OAM.getFlags
+  schema <- getSchemaFromParameter parameter
+  let paramType = varT $ maybe ''Text (Model.getSchemaType flags) schema
+  pure
+    ( if getRequiredFromParameter parameter
+        then paramType
+        else [t|Maybe $(paramType)|]
+    )
 
 -- | Get a description of a parameter object (the name and if available the description from the specification)
 getParameterDescription :: OAT.ParameterObject -> OAM.Generator Text
@@ -298,13 +300,13 @@ getResponseObject (OAT.Reference ref) = do
 -- | Generates query params in the form of [(Text,ByteString)]
 generateQueryParams :: [(Name, OAT.ParameterObject)] -> Q Exp
 generateQueryParams ((name, param) : xs) =
-  infixE (Just [|(T.pack queryName, $(expr))|]) (varE $ mkName ":") (Just $ generateQueryParams xs)
+  infixE (Just [|(T.pack $(litE $ stringL queryName), $expr)|]) (varE $ mkName ":") (Just $ generateQueryParams xs)
   where
     queryName = T.unpack $ getNameFromParameter param
     required = getRequiredFromParameter param
     expr =
       if required
-        then [|$(varE $ mkName "GHC.Base.Just") $ OC.stringifyModel $(varE name)|]
+        then [|Just $ OC.stringifyModel $(varE name)|]
         else [|OC.stringifyModel <$> $(varE name)|]
 generateQueryParams _ = [|[]|]
 
