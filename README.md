@@ -25,7 +25,7 @@ a Stripe API client.
 
 ## Documentation
 The documentation for the code can be found at https://hackage.haskell.org/package/openapi3-code-generator
-This package was created as part of a bachelor thesis. This thesis can be found here TODO.
+This package was created as part of a bachelor thesis. [public thesis](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/blob/master/thesis.pdf)
 
 ## Large specifications
 For large specifications some modules (CyclicTypes.hs for example) can get pretty big. It may be necessary to use `--fast` with `stack build --fast` to build the code.

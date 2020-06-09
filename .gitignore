@@ -2,6 +2,7 @@
 main.pdf
 node_modules
 *.pdf
+!thesis.pdf
 *.orig
 *.rej
 *.tix
