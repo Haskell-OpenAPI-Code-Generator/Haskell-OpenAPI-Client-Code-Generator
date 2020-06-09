@@ -39,6 +39,7 @@ Schemas with cyclic dependencies are are in the module `OpenAPI.CyclicTypes`.
 ## Troubleshooting naming conflicts
 Naming conflicts can happen, sometimes a little manual adjustment is needed.
 With the following options naming conflicts can be resolved.
+It can happen, that the names get so long, that they are longer than the file system supports.
 
 - `property-type-suffix`
 - `response-type-suffix`
@@ -47,3 +48,26 @@ With the following options naming conflicts can be resolved.
 - `use-numbered-variant-constructors`
 - `convert-to-camel-case`
 
+## Limitations
+The following features are not supported
+- links
+- callbacks
+- Only references to `components` are supported
+- Only JSON is supported for both sending and receiving data. `application/x-www-form-urlencoded` can only be used to send data.
+- Some circular references in the schemas. For example if an `allOf` contains itself
+- Parameters not in `path` or `query`
+- `additionalProperties`
+- `not` schemas
+- `writeOnly` and `readOnly`
+- `multipleOf`
+- `maximum`
+- `exclusiveMaximum`
+- `minimum`
+- `exclusiveMinimum`
+- `minLength`
+- `maxItems`
+- `minItems`
+- `uniqueItems`
+- `maxProperties`
+- `minProperties`
+- `xml`
