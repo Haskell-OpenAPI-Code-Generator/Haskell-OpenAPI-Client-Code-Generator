@@ -72,27 +72,37 @@ defineModuleForOperation ::
 defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
   flags <- OAM.getFlags
-  let operationIdNameRaw = mkName $ nameBase operationIdName <> "Raw"
+  let operationIdAsText = T.pack $ show operationIdName
+      operationIdNameRaw = mkName $ nameBase operationIdName <> "Raw"
       operationIdNameWithMonadTransformer = mkName $ nameBase operationIdName <> "M"
       operationIdNameRawWithMonadTransformer = mkName $ nameBase operationIdNameRaw <> "M"
-      moduleName = haskellifyText (OAF.optConvertToCamelCase flags) True (T.pack $ show operationIdName)
+      moduleName = haskellifyText (OAF.optConvertToCamelCase flags) True operationIdAsText
       description = Doc.escapeText $ getOperationDescription operation
       monadName = mkName "m"
       securitySchemeName = mkName "s"
       appendToOperationName = ((T.pack $ nameBase operationIdName) <>)
       rawTransformation = [|id|]
   OAM.logInfo $ "Generating operation with name: " <> T.pack (show operationIdName)
-  params <- getParametersFromOperationConcrete operation
+  parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
   bodySchema <- getBodySchemaFromOperation operation
   (responseTypeName, responseTransformerExp, responseBodyDefinitions) <- OAR.getResponseDefinitions operation appendToOperationName
-  functionBody <- defineOperationFunction True operationIdName params requestPath method bodySchema responseTransformerExp
-  functionBodyRaw <- defineOperationFunction True operationIdNameRaw params requestPath method bodySchema rawTransformation
-  functionBodyWithMonadTransformer <- defineOperationFunction False operationIdNameWithMonadTransformer params requestPath method bodySchema responseTransformerExp
-  functionBodyRawWithMonadTransformer <- defineOperationFunction False operationIdNameRawWithMonadTransformer params requestPath method bodySchema rawTransformation
+  functionBody <- defineOperationFunction True operationIdName parameterCardinality requestPath method bodySchema responseTransformerExp
+  functionBodyRaw <- defineOperationFunction True operationIdNameRaw parameterCardinality requestPath method bodySchema rawTransformation
+  functionBodyWithMonadTransformer <- defineOperationFunction False operationIdNameWithMonadTransformer parameterCardinality requestPath method bodySchema responseTransformerExp
+  functionBodyRawWithMonadTransformer <- defineOperationFunction False operationIdNameRawWithMonadTransformer parameterCardinality requestPath method bodySchema rawTransformation
   (bodyType, bodyDefinition) <- getBodyType bodySchema appendToOperationName
-  paramDescriptions <- (<> ["The request body to send" | not $ null bodyType]) <$> mapM getParameterDescription params
-  paramTypes <- mapM getParameterType params
-  let types = paramTypes <> bodyType
+  paramDescriptions <-
+    (<> ["The request body to send" | not $ null bodyType])
+      <$> ( case parameterCardinality of
+              NoParameters -> pure []
+              SingleParameter (_, _, parameter) -> pure <$> getParameterDescription parameter
+              MultipleParameters _ -> pure ["Contains all available parameters of this operation (query and path parameters)"]
+          )
+  let (paramType, paramDoc) = case parameterCardinality of
+        NoParameters -> ([], Doc.emptyDoc)
+        SingleParameter (paramType', doc, _) -> ([paramType'], doc)
+        MultipleParameters paramDefinition -> ([parameterTypeDefinitionType paramDefinition], parameterTypeDefinitionDoc paramDefinition)
+      types = paramType <> bodyType
       fnType = getParametersTypeForSignature types responseTypeName monadName securitySchemeName
       fnTypeRaw = getParametersTypeForSignature types ''B8.ByteString monadName securitySchemeName
       fnTypeWithMonadTransformer = getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName securitySchemeName
@@ -149,7 +159,8 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
                           operationDescription ["Monadic version of '" <> T.pack (nameBase operationIdNameRaw) <> "' (use with 'OpenAPI.Common.runWithConfiguration')"],
                           fnSignatureRawWithMonadTransformer,
                           functionBodyRawWithMonadTransformer,
-                          bodyDefinition
+                          bodyDefinition,
+                          paramDoc
                         ]
                   )
                 <*> responseBodyDefinitions

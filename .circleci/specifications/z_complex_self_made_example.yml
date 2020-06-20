@@ -51,6 +51,76 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+  /pet/noparam:
+    get:
+      description: Operation with no parameters
+      operationId: noParam
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+  /pet/singleparam:
+    get:
+      description: Operation with a single parameter
+      operationId: singleParam
+      parameters:
+      - name: status
+        in: query
+        description: Status values that need to be considered for filter
+        required: true
+        schema:
+          type: string
+          enum:
+          - available
+          - pending
+          - sold
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+  /pet/multiparam/{status}:
+    get:
+      description: Operation with multiple parameters
+      operationId: multiParam
+      parameters:
+      - name: status
+        in: query
+        description: Status in query
+        required: true
+        schema:
+          type: string
+          enum:
+          - available
+          - pending
+          - sold
+      - name: status
+        in: path
+        description: Status in path
+        required: true
+        schema:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 5
+      - name: filter
+        in: query
+        description: Filter the entries?
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
 components:
   schemas:
     PetByAge:

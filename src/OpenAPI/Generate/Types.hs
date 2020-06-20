@@ -329,7 +329,11 @@ instance FromJSON ParameterObject where
       <*> o .:? "allowEmptyValue" .!= False
       <*> parseJSON (Object o)
 
-data ParameterObjectLocation = QueryParameterObjectLocation | HeaderParameterObjectLocation | PathParameterObjectLocation | CookieParameterObjectLocation
+data ParameterObjectLocation
+  = QueryParameterObjectLocation
+  | HeaderParameterObjectLocation
+  | PathParameterObjectLocation
+  | CookieParameterObjectLocation
   deriving (Show, Eq, Generic)
 
 instance FromJSON ParameterObjectLocation where
@@ -357,10 +361,11 @@ instance FromJSON ParameterObjectSchema where
     maybeSchema <- o .:? "schema"
     maybeContent <- o .:? "content"
     case (maybeSchema, maybeContent) of
-      (Just schema', Nothing) ->
+      (Just schema', Nothing) -> do
+        maybeStyle <- o .:? "style"
         SimpleParameterObjectSchema
           <$> o .:? "style"
-            <*> o .:? "explode" .!= True
+            <*> o .:? "explode" .!= ((maybeStyle :: Maybe Text) == Just "form") -- The default value is true for form and false otherwise (http://spec.openapis.org/oas/v3.0.3#parameterExplode)
             <*> o .:? "allowReserved" .!= False
             <*> pure schema'
             <*> o .:? "example"

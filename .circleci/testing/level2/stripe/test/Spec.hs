@@ -111,7 +111,7 @@ main =
         let requestExpectation =
               expectMethod "GET" $
                 expectURL
-                  "http://test.url/v1/payment_intents?created=the%20first%20string&ending_before=some_string&expand=another_string&limit=100&starting_after=the%20last%20string"
+                  "http://test.url/v1/payment_intents?created=3&ending_before=some_string&expand%5B%5D=another_string&limit=100&starting_after=the%20last%20string"
                   noExpectation
         response <- runMock runGetPaymentIntent (requestExpectation, successResponseGet)
         (getResponseBody . fromRight undefined) response `shouldBe` GetPaymentIntentsResponse200 successResponseGetExpected

@@ -38,7 +38,7 @@ import OpenAPI.Types.Test2
 -- 
 data Cat = Cat {
   -- | age
-  catAge :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  catAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
   , catAnanyoftype :: (GHC.Maybe.Maybe CatAnanyoftype)
   -- | another_relative
@@ -95,9 +95,9 @@ instance Data.Aeson.FromJSON CatRelativeVariants
 -- 
 data Mischling = Mischling {
   -- | age
-  mischlingAge :: GHC.Integer.Type.Integer
+  mischlingAge :: GHC.Types.Int
   -- | ageThird
-  , mischlingAgeThird :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , mischlingAgeThird :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | another_relative
   , mischlingAnother_relative :: (GHC.Maybe.Maybe MischlingAnother_relativeVariants)
   -- | bark
@@ -123,7 +123,7 @@ data Mischling = Mischling {
   -- | int64
   , mischlingInt64 :: (GHC.Maybe.Maybe GHC.Int.Int64)
   -- | integer
-  , mischlingInteger :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , mischlingInteger :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | nickname
   , mischlingNickname :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | number
@@ -228,7 +228,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFather
 -- 
 data MischlingFirst_relative = MischlingFirst_relative {
   -- | age
-  mischlingFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  mischlingFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
   , mischlingFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe MischlingFirst_relativeAnanyoftype)
   -- | another_relative
@@ -343,7 +343,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingSecondFather
 -- 
 data PetByAge = PetByAge {
   -- | age
-  petByAgeAge :: GHC.Integer.Type.Integer
+  petByAgeAge :: GHC.Types.Int
   -- | another_relative
   , petByAgeAnother_relative :: (GHC.Maybe.Maybe PetByAgeAnother_relativeVariants)
   -- | first_relative
@@ -393,7 +393,7 @@ instance Data.Aeson.FromJSON PetByAgeAnother_relativeVariants
 -- 
 data PetByAgeFirst_relative = PetByAgeFirst_relative {
   -- | age
-  petByAgeFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  petByAgeFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
   , petByAgeFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe PetByAgeFirst_relativeAnanyoftype)
   -- | another_relative

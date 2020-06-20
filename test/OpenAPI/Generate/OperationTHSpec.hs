@@ -30,8 +30,8 @@ spec =
       testParameterSchema = OAT.SimpleParameterObjectSchema Nothing False False (OAT.Concrete schemaObject) Nothing Map.empty
       testParameter = OAT.ParameterObject "testName" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testParameterOtherName = OAT.ParameterObject "testName2" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
-      testTHName = mkName "myTestName"
-      testTHE = [|B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $(varE testTHName))|]
+      testTHName = varE $ mkName "myTestName"
+      testTHE = [|B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $testTHName)|]
       monadName = mkName "m"
       securitySchemeName = mkName "s"
    in do
@@ -51,27 +51,27 @@ spec =
             [|"/my/path/"|]
           singleTestTH
             "should ignore params not names"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "/my/path/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/"))
             [|"/my/path/"|]
           singleTestTH
             "should replace one occurences at the end"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "/my/path/{testName}"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/{testName}"))
             [|"/my/path/" ++ $(testTHE) ++ ""|]
           singleTestTH
             "should replace one occurences at the end"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "/my/path/{testName}/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/{testName}/"))
             [|"/my/path/" ++ $(testTHE) ++ "/"|]
           singleTestTH
             "should replace one occurences at the beginning"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "{testName}/my/path/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "{testName}/my/path/"))
             [|"" ++ $(testTHE) ++ "/my/path/"|]
           singleTestTH
             "should replace one occurences at the beginning"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "/{testName}/my/path/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/{testName}/my/path/"))
             [|"/" ++ $(testTHE) ++ "/my/path/"|]
           singleTestTH
             "should replace one occurences in the middle"
-            (generateParameterizedRequestPath [(mkName "myTestName", testParameter)] (T.pack "/another/test/{testName}/my/path/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/another/test/{testName}/my/path/"))
             [|"/another/test/" ++ $(testTHE) ++ "/my/path/"|]
           singleTestTH
             "should ignore names not given"
@@ -80,14 +80,14 @@ spec =
           singleTestTH
             "should replace two occurences"
             ( generateParameterizedRequestPath
-                [(mkName "myTestName", testParameter), (mkName "myTestName2", testParameterOtherName)]
+                [(testTHName, testParameter), (varE $ mkName "myTestName2", testParameterOtherName)]
                 (T.pack "/{testName2}/my//test/{testName}/my/path/")
             )
             [|("/" ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $(varE $ mkName "myTestName2")) ++ "/my//test/") ++ $(testTHE) ++ "/my/path/"|]
           singleTestTH
             "should replace one variable twice in the path"
             ( generateParameterizedRequestPath
-                [(mkName "myTestName", testParameter)]
+                [(testTHName, testParameter)]
                 (T.pack "/{testName}/my//test/{testName}/my/path/")
             )
             [|"/" ++ $(testTHE) ++ "/my//test/" ++ $(testTHE) ++ "/my/path/"|]

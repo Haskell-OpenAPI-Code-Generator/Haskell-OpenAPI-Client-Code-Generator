@@ -18,8 +18,10 @@ data Flags
         optPackageName :: String,
         -- | Name of the module
         optModuleName :: String,
-        -- | Use Data.Scientific instead of Double to support arbitary number precision
+        -- | Use Data.Scientific instead of Double to support arbitrary number precision
         optUseFloatWithArbitraryPrecision :: Bool,
+        -- | Use 'Integer' instead of 'Int' to support arbitrary number precision
+        optUseIntWithArbitraryPrecision :: Bool,
         -- | Convert strings formatted as date / date-time to date types
         optUseDateTypesAsString :: Bool,
         -- | Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification
@@ -32,6 +34,16 @@ data Flags
         optResponseBodyTypeSuffix :: String,
         -- | The suffix which is added to the request body data types
         optRequestBodyTypeSuffix :: String,
+        -- | The suffix which is added to the parameters type of operations
+        optParametersTypeSuffix :: String,
+        -- | The prefix which is added to query parameters
+        optParameterQueryPrefix :: String,
+        -- | The prefix which is added to path parameters
+        optParameterPathPrefix :: String,
+        -- | The prefix which is added to cookie parameters
+        optParameterCookiePrefix :: String,
+        -- | The prefix which is added to header parameters
+        optParameterHeaderPrefix :: String,
         -- | Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types
         optUseNumberedVariantConstructors :: Bool
       }
@@ -69,6 +81,10 @@ instance Options Flags where
         (optUseFloatWithArbitraryPrecision defaultFlags)
         "Use Data.Scientific instead of Double to support arbitary number precision"
       <*> simpleOption
+        "use-int-with-arbitrary-precision"
+        (optUseIntWithArbitraryPrecision defaultFlags)
+        "Use 'Integer' instead of 'Int' to support arbitrary number precision"
+      <*> simpleOption
         "use-date-types-as-string"
         (optUseDateTypesAsString defaultFlags)
         "Convert strings formatted as date / date-time to date types"
@@ -93,6 +109,26 @@ instance Options Flags where
         (optRequestBodyTypeSuffix defaultFlags)
         "The suffix which is added to the request body data types"
       <*> simpleOption
+        "parameters-type-suffix"
+        (optParametersTypeSuffix defaultFlags)
+        "The suffix which is added to the parameters type of operations"
+      <*> simpleOption
+        "parameter-query-prefix"
+        (optParameterQueryPrefix defaultFlags)
+        "The prefix which is added to query parameters"
+      <*> simpleOption
+        "parameter-path-prefix"
+        (optParameterPathPrefix defaultFlags)
+        "The prefix which is added to path parameters"
+      <*> simpleOption
+        "parameter-cookie-prefix"
+        (optParameterCookiePrefix defaultFlags)
+        "The prefix which is added to cookie parameters"
+      <*> simpleOption
+        "parameter-header-prefix"
+        (optParameterHeaderPrefix defaultFlags)
+        "The prefix which is added to header parameters"
+      <*> simpleOption
         "use-numbered-variant-constructors"
         (optUseNumberedVariantConstructors defaultFlags)
         "Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types"
@@ -108,11 +144,17 @@ defaultFlags =
       optPackageName = "openapi",
       optModuleName = "OpenAPI",
       optUseFloatWithArbitraryPrecision = False,
+      optUseIntWithArbitraryPrecision = False,
       optUseDateTypesAsString = False,
       optConvertToCamelCase = False,
       optPropertyTypeSuffix = "",
       optResponseTypeSuffix = "Response",
       optResponseBodyTypeSuffix = "ResponseBody",
       optRequestBodyTypeSuffix = "RequestBody",
+      optParametersTypeSuffix = "Parameters",
+      optParameterQueryPrefix = "query",
+      optParameterPathPrefix = "path",
+      optParameterCookiePrefix = "cookie",
+      optParameterHeaderPrefix = "header",
       optUseNumberedVariantConstructors = False
     }

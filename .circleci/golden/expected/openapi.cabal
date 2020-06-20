@@ -7,6 +7,9 @@ build-type:     Simple
 library
   exposed-modules:
       OpenAPI
+      OpenAPI.Operations.MultiParam
+      OpenAPI.Operations.NoParam
+      OpenAPI.Operations.SingleParam
       OpenAPI.Operations.Patch_pets
       OpenAPI.Operations.ShowPetById
       OpenAPI.Types

@@ -2,6 +2,9 @@
 
 -- | The main module which exports all functionality.
 module OpenAPI (
+  module OpenAPI.Operations.MultiParam,
+  module OpenAPI.Operations.NoParam,
+  module OpenAPI.Operations.SingleParam,
   module OpenAPI.Operations.Patch_pets,
   module OpenAPI.Operations.ShowPetById,
   module OpenAPI.Types,
@@ -15,6 +18,9 @@ module OpenAPI (
   module OpenAPI.Common,
   ) where
 
+import OpenAPI.Operations.MultiParam
+import OpenAPI.Operations.NoParam
+import OpenAPI.Operations.SingleParam
 import OpenAPI.Operations.Patch_pets
 import OpenAPI.Operations.ShowPetById
 import OpenAPI.Types

@@ -655,9 +655,10 @@ getConstraintDescriptionsOfSchema schema =
 
 -- | Extracts the 'Name' of a 'OAS.SchemaObject' which should be used for primitive types
 getSchemaType :: OAF.Flags -> OAS.SchemaObject -> Name
+getSchemaType OAF.Flags {optUseIntWithArbitraryPrecision = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeInteger, ..} = ''Integer
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int32", ..} = ''Int.Int32
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int64", ..} = ''Int.Int64
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, ..} = ''Integer
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, ..} = ''Int
 getSchemaType OAF.Flags {optUseFloatWithArbitraryPrecision = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeNumber, ..} = ''Scientific.Scientific
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "float", ..} = ''Float
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "double", ..} = ''Double
