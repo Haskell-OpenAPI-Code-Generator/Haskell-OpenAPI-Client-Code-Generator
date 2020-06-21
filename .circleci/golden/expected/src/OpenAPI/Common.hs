@@ -1,6 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- | This module serves the purpose of defining common functionality which remains the same across all OpenAPI specifications.
@@ -20,6 +22,7 @@ module OpenAPI.Common
     JsonByteString (..),
     JsonDateTime (..),
     RequestBodyEncoding (..),
+    QueryParameter (..),
   )
 where
 
@@ -29,6 +32,7 @@ import qualified Control.Monad.Trans.Class as MT
 import qualified Data.Aeson as Aeson
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
+import qualified Data.ByteString.Lazy.Char8 as LB8
 import qualified Data.HashMap.Strict as HMap
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
@@ -98,10 +102,20 @@ data AnonymousSecurityScheme = AnonymousSecurityScheme
 instance SecurityScheme AnonymousSecurityScheme where
   authenticateRequest = const id
 
+-- | Defines a query parameter with the information necessary for serialization
+data QueryParameter
+  = QueryParameter
+      { queryParamName :: Text,
+        queryParamValue :: Maybe Aeson.Value,
+        queryParamStyle :: Text,
+        queryParamExplode :: Bool
+      }
+  deriving (Show, Eq)
+
 -- | Run the 'MR.ReaderT' monad with a specified configuration
 --
 -- Note: This is just @'flip' 'MR.runReaderT'@.
-runWithConfiguration :: SecurityScheme s => Configuration s -> MR.ReaderT (Configuration s) m a -> m a
+runWithConfiguration :: Configuration s -> MR.ReaderT (Configuration s) m a -> m a
 runWithConfiguration = flip MR.runReaderT
 
 -- | This is the main functionality of this module
@@ -116,7 +130,7 @@ doCallWithConfiguration ::
   -- | Path to append to the base URL (path parameters should already be replaced)
   Text ->
   -- | Query parameters
-  [(Text, Maybe String)] ->
+  [QueryParameter] ->
   -- | The raw response from the server
   m (Either HS.HttpException (HS.Response B8.ByteString))
 doCallWithConfiguration config method path queryParams =
@@ -128,7 +142,7 @@ doCallWithConfigurationM ::
   (MonadHTTP m, SecurityScheme s) =>
   Text ->
   Text ->
-  [(Text, Maybe String)] ->
+  [QueryParameter] ->
   MR.ReaderT (Configuration s) m (Either HS.HttpException (HS.Response B8.ByteString))
 doCallWithConfigurationM method path queryParams = do
   config <- MR.ask
@@ -146,7 +160,7 @@ doBodyCallWithConfiguration ::
   -- | Path to append to the base URL (path parameters should already be replaced)
   Text ->
   -- | Query parameters
-  [(Text, Maybe String)] ->
+  [QueryParameter] ->
   -- | Request body
   Maybe body ->
   -- | JSON or form data deepobjects
@@ -170,7 +184,7 @@ doBodyCallWithConfigurationM ::
   (MonadHTTP m, SecurityScheme s, Aeson.ToJSON body) =>
   Text ->
   Text ->
-  [(Text, Maybe String)] ->
+  [QueryParameter] ->
   Maybe body ->
   RequestBodyEncoding ->
   MR.ReaderT (Configuration s) m (Either HS.HttpException (HS.Response B8.ByteString))
@@ -188,7 +202,7 @@ createBaseRequest ::
   -- | The path for which the placeholders have already been replaced
   Text ->
   -- | Query Parameters
-  [(Text, Maybe String)] ->
+  [QueryParameter] ->
   -- | The Response from the server
   HS.Request
 createBaseRequest config method path queryParams =
@@ -206,7 +220,36 @@ createBaseRequest config method path queryParams =
         then ""
         else basePath
     -- filters all maybe
-    query = [(textToByte a, Just $ B8.pack b) | (a, Just b) <- queryParams]
+    query = BF.second pure <$> serializeQueryParams queryParams
+
+serializeQueryParams :: [QueryParameter] -> [(B8.ByteString, B8.ByteString)]
+serializeQueryParams = (>>= serializeQueryParam)
+
+serializeQueryParam :: QueryParameter -> [(B8.ByteString, B8.ByteString)]
+serializeQueryParam QueryParameter {..} =
+  let concatValues joinWith = if queryParamExplode then pure . (queryParamName,) . B8.intercalate joinWith . fmap snd else id
+   in BF.first textToByte <$> case queryParamValue of
+        Nothing -> []
+        Just value ->
+          ( case queryParamStyle of
+              "form" -> concatValues ","
+              "spaceDelimited" -> concatValues " "
+              "pipeDelimited" -> concatValues "|"
+              "deepObject" -> const $ BF.second textToByte <$> jsonToFormDataPrefixed queryParamName value
+              _ -> const []
+          )
+            $ jsonToFormDataFlat queryParamName value
+
+encodeStrict :: Aeson.ToJSON a => a -> B8.ByteString
+encodeStrict = LB8.toStrict . Aeson.encode
+
+jsonToFormDataFlat :: Text -> Aeson.Value -> [(Text, B8.ByteString)]
+jsonToFormDataFlat _ Aeson.Null = []
+jsonToFormDataFlat name (Aeson.Number a) = [(name, encodeStrict a)]
+jsonToFormDataFlat name (Aeson.String a) = [(name, textToByte a)]
+jsonToFormDataFlat name (Aeson.Bool a) = [(name, encodeStrict a)]
+jsonToFormDataFlat _ (Aeson.Object object) = HMap.toList object >>= uncurry jsonToFormDataFlat
+jsonToFormDataFlat name (Aeson.Array vector) = Vector.toList vector >>= jsonToFormDataFlat name
 
 -- | creates form data bytestring array
 createFormData :: (Aeson.ToJSON a) => a -> [(B8.ByteString, B8.ByteString)]
@@ -235,8 +278,8 @@ jsonToFormDataPrefixed :: Text -> Aeson.Value -> [(Text, Text)]
 jsonToFormDataPrefixed prefix (Aeson.Number a) = case Scientific.toBoundedInteger a :: Maybe Int of
   Just myInt -> [(prefix, T.pack $ show myInt)]
   Nothing -> [(prefix, T.pack $ show a)]
-jsonToFormDataPrefixed prefix (Aeson.Bool True) = [(prefix, T.pack "true")]
-jsonToFormDataPrefixed prefix (Aeson.Bool False) = [(prefix, T.pack "false")]
+jsonToFormDataPrefixed prefix (Aeson.Bool True) = [(prefix, "true")]
+jsonToFormDataPrefixed prefix (Aeson.Bool False) = [(prefix, "false")]
 jsonToFormDataPrefixed _ Aeson.Null = []
 jsonToFormDataPrefixed prefix (Aeson.String a) = [(prefix, a)]
 jsonToFormDataPrefixed "" (Aeson.Object object) =

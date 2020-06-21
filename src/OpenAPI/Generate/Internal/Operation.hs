@@ -10,26 +10,30 @@ module OpenAPI.Generate.Internal.Operation
     getResponseSchema,
     defineOperationFunction,
     getParameterDescription,
-    getParameterType,
+    generateParameterTypeFromOperation,
     getParametersTypeForSignature,
     getParametersTypeForSignatureWithMonadTransformer,
     getOperationName,
     getOperationDescription,
-    getParametersFromOperationConcrete,
     getBodySchemaFromOperation,
     generateParameterizedRequestPath,
     generateQueryParams,
     RequestBodyDefinition (..),
+    ParameterTypeDefinition (..),
+    ParameterCardinality (..),
   )
 where
 
 import Control.Monad
 import qualified Control.Monad.Reader as MR
+import qualified Data.Aeson as Aeson
+import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.Char as Char
 import qualified Data.List.Split as Split
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
@@ -38,6 +42,7 @@ import qualified Network.HTTP.Simple as HS
 import qualified Network.HTTP.Types as HT
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
+import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.Monad as OAM
@@ -52,6 +57,25 @@ data RequestBodyDefinition
         required :: Bool
       }
 
+-- | Defines the type of a parameter bundle including the information to access the specific parameters
+data ParameterTypeDefinition
+  = ParameterTypeDefinition
+      { parameterTypeDefinitionType :: Q Type,
+        parameterTypeDefinitionDoc :: Q Doc,
+        parameterTypeDefinitionQueryParams :: [(Name, OAT.ParameterObject)],
+        parameterTypeDefinitionPathParams :: [(Name, OAT.ParameterObject)]
+      }
+
+-- | Represents the number of (supported) parameters and the generated types which result of it
+--
+-- * No type is generated when no parameters are present
+-- * Only the type of the parameter is generated if a single parameter is present
+-- * A combined parameter type is generated for multiple parameters
+data ParameterCardinality
+  = NoParameters
+  | SingleParameter (Q Type, Q Doc, OAT.ParameterObject)
+  | MultipleParameters ParameterTypeDefinition
+
 -- | wrapper for ambigious usage
 getParametersFromOperationReference :: OAT.OperationObject -> [OAT.Referencable OAT.ParameterObject]
 getParametersFromOperationReference = OAT.parameters
@@ -63,6 +87,75 @@ getRequiredFromParameter = OAT.required
 -- | wrapper for ambigious usage
 getInFromParameterObject :: OAT.ParameterObject -> OAT.ParameterObjectLocation
 getInFromParameterObject = OAT.in'
+
+-- | Generates the parameter type for an operation. See 'ParameterCardinality' for further information.
+generateParameterTypeFromOperation :: Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
+generateParameterTypeFromOperation operationName = getParametersFromOperationConcrete >=> generateParameterType operationName
+
+generateParameterType :: Text -> [OAT.ParameterObject] -> OAM.Generator ParameterCardinality
+generateParameterType operationName parameters = OAM.nested "parameters" $ do
+  maybeSchemas <- mapM getSchemaFromParameter parameters
+  parametersSuffix <- OAM.getFlag $ T.pack . OAF.optParametersTypeSuffix
+  let parametersWithSchemas =
+        [ (parameter, OAT.Concrete $ mergeDescriptionOfParameterWithSchema parameter schema)
+          | (parameter, Just schema) <-
+              zip parameters maybeSchemas,
+            getInFromParameterObject parameter `elem` [OAT.QueryParameterObjectLocation, OAT.PathParameterObjectLocation]
+        ]
+      schemaName = operationName <> parametersSuffix
+  when (length parameters > length parametersWithSchemas) $ OAM.logWarning "Parameters are only supported in query and path (skipping parameters in cookie and header)."
+  case parametersWithSchemas of
+    [] -> pure NoParameters
+    [(parameter, schema)] -> do
+      (paramType, (doc, _)) <- Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (getNameFromParameter parameter)) schema
+      pure $
+        SingleParameter
+          ( if getRequiredFromParameter parameter
+              then paramType
+              else [t|Maybe $(paramType)|],
+            doc,
+            parameter
+          )
+    _ -> do
+      properties <-
+        mapM
+          ( \(parameter, schema) -> do
+              prefix <- getParameterLocationPrefix parameter
+              pure (prefix <> uppercaseFirstText (getNameFromParameter parameter), schema)
+          )
+          parametersWithSchemas
+      let parametersWithNames = zip (fst <$> properties) (fst <$> parametersWithSchemas)
+          requiredProperties =
+            Set.fromList $
+              fst <$> filter ((OAT.required :: OAT.ParameterObject -> Bool) . snd) parametersWithNames
+      (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, _)) <-
+        Model.defineModelForSchemaNamed schemaName
+          $ OAT.Concrete
+          $ OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
+      convertToCamelCase <- OAM.getFlag OAF.optConvertToCamelCase
+      let parametersWithPropertyNames = BF.first (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText) <$> parametersWithNames
+          filterByType t = filter ((== t) . getInFromParameterObject . snd) parametersWithPropertyNames
+          parameterTypeDefinitionQueryParams = filterByType OAT.QueryParameterObjectLocation
+          parameterTypeDefinitionPathParams = filterByType OAT.PathParameterObjectLocation
+      pure $ MultipleParameters ParameterTypeDefinition {..}
+
+mergeDescriptionOfParameterWithSchema :: OAT.ParameterObject -> OAS.SchemaObject -> OAS.SchemaObject
+mergeDescriptionOfParameterWithSchema parameter schema =
+  let parameterName = OAT.name (parameter :: OAT.ParameterObject)
+      descriptionParameter = Maybe.maybeToList $ OAT.description (parameter :: OAT.ParameterObject)
+      descriptionSchema = Maybe.maybeToList $ OAS.description schema
+      mergedDescription = T.intercalate "\n\n" (("Represents the parameter named '" <> parameterName <> "'") : descriptionParameter <> descriptionSchema)
+   in schema {OAS.description = Just mergedDescription}
+
+getParameterLocationPrefix :: OAT.ParameterObject -> OAM.Generator Text
+getParameterLocationPrefix =
+  ( \case
+      OAT.QueryParameterObjectLocation -> OAM.getFlag $ T.pack . OAF.optParameterQueryPrefix
+      OAT.PathParameterObjectLocation -> OAM.getFlag $ T.pack . OAF.optParameterPathPrefix
+      OAT.CookieParameterObjectLocation -> OAM.getFlag $ T.pack . OAF.optParameterCookiePrefix
+      OAT.HeaderParameterObjectLocation -> OAM.getFlag $ T.pack . OAF.optParameterHeaderPrefix
+  )
+    . getInFromParameterObject
 
 -- | Extracts all parameters of an operation
 --
@@ -136,19 +229,6 @@ createFunctionType =
 getParameterName :: OAT.ParameterObject -> OAM.Generator Name
 getParameterName parameter = haskellifyNameM False $ getNameFromParameter parameter
 
--- | Get the type of a parameter depending on its schema type and the configuration options ('OAF.Flags').
--- If the parameter is not required, a 'Maybe' type is produced.
-getParameterType :: OAT.ParameterObject -> OAM.Generator (Q Type)
-getParameterType parameter = do
-  flags <- OAM.getFlags
-  schema <- getSchemaFromParameter parameter
-  let paramType = varT $ maybe ''Text (Model.getSchemaType flags) schema
-  pure
-    ( if getRequiredFromParameter parameter
-        then paramType
-        else [t|Maybe $(paramType)|]
-    )
-
 -- | Get a description of a parameter object (the name and if available the description from the specification)
 getParameterDescription :: OAT.ParameterObject -> OAM.Generator Text
 getParameterDescription parameter = do
@@ -167,7 +247,7 @@ defineOperationFunction ::
   -- | How the function should be called
   Name ->
   -- | The parameters
-  [OAT.ParameterObject] ->
+  ParameterCardinality ->
   -- | The request path. It may contain placeholders in the form /my/{var}/path/
   Text ->
   -- | HTTP Method (POST,GET,etc.)
@@ -179,18 +259,32 @@ defineOperationFunction ::
   Q Exp ->
   -- | Function body definition in TH
   OAM.Generator (Q Doc)
-defineOperationFunction useExplicitConfiguration fnName params requestPath method bodySchema responseTransformerExp = do
-  paramVarNames <- mapM getParameterName params
-  let configArg = mkName "config"
-      paraPattern = varP <$> paramVarNames
-      fnPatterns = if useExplicitConfiguration then varP configArg : paraPattern else paraPattern
-      namedParameters = zip paramVarNames params
-      namedPathParameters = filter ((== OAT.PathParameterObjectLocation) . getInFromParameterObject . snd) namedParameters
-      request = generateParameterizedRequestPath namedPathParameters requestPath
-      namedQueryParameters = filter ((== OAT.QueryParameterObjectLocation) . getInFromParameterObject . snd) namedParameters
-      queryParameters = generateQueryParams namedQueryParameters
+defineOperationFunction useExplicitConfiguration fnName parameterCardinality requestPath method bodySchema responseTransformerExp = do
+  let configName = mkName "config"
+      paramName = mkName "parameters"
       bodyName = mkName "body"
+  paraPattern <- case parameterCardinality of
+    NoParameters -> pure []
+    SingleParameter (_, _, parameter) -> do
+      paramName' <- getParameterName parameter
+      pure [varP paramName']
+    MultipleParameters _ -> pure [varP paramName]
+  (pathParameters, queryParameters) <- case parameterCardinality of
+    NoParameters -> pure ([], [])
+    SingleParameter (_, _, parameter) -> do
+      paramName' <- getParameterName parameter
+      let paramExpr = (varE paramName', parameter)
+      pure $
+        if getInFromParameterObject parameter == OAT.PathParameterObjectLocation
+          then ([paramExpr], [])
+          else ([], [paramExpr])
+    MultipleParameters paramDefinition ->
+      let toParamExpr f = BF.first (\name -> [|$(varE name) $(varE paramName)|]) <$> f paramDefinition
+       in pure (toParamExpr parameterTypeDefinitionPathParams, toParamExpr parameterTypeDefinitionQueryParams)
+  let queryParameters' = generateQueryParams queryParameters
+      request = generateParameterizedRequestPath pathParameters requestPath
       methodLit = litE $ stringL $ T.unpack method
+      fnPatterns = if useExplicitConfiguration then varP configName : paraPattern else paraPattern
   pure $
     ppr <$> case bodySchema of
       Just RequestBodyDefinition {..} ->
@@ -203,12 +297,12 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
               $(conP fnName $ fnPatterns <> [varP bodyName]) =
                 $responseTransformerExp
                   ( $( if useExplicitConfiguration
-                         then [|OC.doBodyCallWithConfiguration $(varE configArg)|]
+                         then [|OC.doBodyCallWithConfiguration $(varE configName)|]
                          else [|OC.doBodyCallWithConfigurationM|]
                      )
                     (T.toUpper $ T.pack $methodLit)
                     (T.pack $(request))
-                    $(queryParameters)
+                    $(queryParameters')
                     $(if required then [|Just $(varE bodyName)|] else varE bodyName)
                     $(encodeExpr)
                   )
@@ -218,12 +312,12 @@ defineOperationFunction useExplicitConfiguration fnName params requestPath metho
           $(conP fnName fnPatterns) =
             $responseTransformerExp
               ( $( if useExplicitConfiguration
-                     then [|OC.doCallWithConfiguration $(varE configArg)|]
+                     then [|OC.doCallWithConfiguration $(varE configName)|]
                      else [|OC.doCallWithConfigurationM|]
                  )
                 (T.toUpper $ T.pack $methodLit)
                 (T.pack $(request))
-                $(queryParameters)
+                $(queryParameters')
               )
           |]
 
@@ -298,31 +392,46 @@ getResponseObject (OAT.Reference ref) = do
   pure p
 
 -- | Generates query params in the form of [(Text,ByteString)]
-generateQueryParams :: [(Name, OAT.ParameterObject)] -> Q Exp
-generateQueryParams ((name, param) : xs) =
-  infixE (Just [|(T.pack $(litE $ stringL queryName), $expr)|]) (varE $ mkName ":") (Just $ generateQueryParams xs)
-  where
-    queryName = T.unpack $ getNameFromParameter param
-    required = getRequiredFromParameter param
-    expr =
-      if required
-        then [|Just $ OC.stringifyModel $(varE name)|]
-        else [|OC.stringifyModel <$> $(varE name)|]
-generateQueryParams _ = [|[]|]
+generateQueryParams :: [(Q Exp, OAT.ParameterObject)] -> Q Exp
+generateQueryParams =
+  listE
+    . fmap
+      ( \(var, param) ->
+          let queryName = litE $ stringL $ T.unpack $ getNameFromParameter param
+              required = getRequiredFromParameter param
+              (maybeStyle, explode') = case OAT.schema (param :: OAT.ParameterObject) of
+                OAT.SimpleParameterObjectSchema {..} -> (style, explode)
+                OAT.ComplexParameterObjectSchema _ -> (Just "form", True)
+              style' =
+                litE $ stringL $ T.unpack $
+                  Maybe.fromMaybe
+                    ( case OAT.in' (param :: OAT.ParameterObject) of
+                        OAT.QueryParameterObjectLocation -> "form"
+                        OAT.HeaderParameterObjectLocation -> "simple"
+                        OAT.PathParameterObjectLocation -> "simple"
+                        OAT.CookieParameterObjectLocation -> "form"
+                    )
+                    maybeStyle
+              expr =
+                if required
+                  then [|Just $ Aeson.toJSON $var|]
+                  else [|Aeson.toJSON <$> $var|]
+           in [|OC.QueryParameter (T.pack $queryName) $expr (T.pack $style') explode'|]
+      )
 
 -- | Resolves placeholders in paths with dynamic expressions
 --
 --   "my/{var}/path" -> "my" ++ myVar ++ "/path"
 --
 --   If the placeholder is at the end or at the beginning an empty string gets appended
-generateParameterizedRequestPath :: [(Name, OAT.ParameterObject)] -> Text -> Q Exp
+generateParameterizedRequestPath :: [(Q Exp, OAT.ParameterObject)] -> Text -> Q Exp
 generateParameterizedRequestPath ((paramName, param) : xs) path =
   foldr1 (foldingFn paramName) partExpressiones
   where
     parts = Split.splitOn ("{" <> T.unpack (getNameFromParameter param) <> "}") (T.unpack path)
     partExpressiones = generateParameterizedRequestPath xs . T.pack <$> parts
-    foldingFn :: Name -> Q Exp -> Q Exp -> Q Exp
-    foldingFn var a b = [|$(a) ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $(varE var)) ++ $(b)|]
+    foldingFn :: Q Exp -> Q Exp -> Q Exp -> Q Exp
+    foldingFn var a b = [|$(a) ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $var) ++ $(b)|]
 generateParameterizedRequestPath _ path = litE (stringL $ T.unpack path)
 
 -- | Extracts a description from an 'OAT.OperationObject'.

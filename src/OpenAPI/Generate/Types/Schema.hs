@@ -20,6 +20,7 @@ import Data.Yaml
 import GHC.Generics
 import OpenAPI.Generate.Types.ExternalDocumentation
 import OpenAPI.Generate.Types.Referencable
+import Prelude hiding (maximum, minimum, not)
 
 type Schema = Referencable SchemaObject
 
@@ -104,6 +105,46 @@ instance FromJSON SchemaObject where
       <*> o .:? "deprecated" .!= False
       <*> o .:? "items"
 
+defaultSchema :: SchemaObject
+defaultSchema =
+  SchemaObject
+    { type' = SchemaTypeObject,
+      title = Nothing,
+      multipleOf = Nothing,
+      maximum = Nothing,
+      exclusiveMaximum = False,
+      minimum = Nothing,
+      exclusiveMinimum = False,
+      maxLength = Nothing,
+      minLength = Nothing,
+      pattern' = Nothing,
+      maxItems = Nothing,
+      minItems = Nothing,
+      uniqueItems = False,
+      maxProperties = Nothing,
+      minProperties = Nothing,
+      required = Set.empty,
+      enum = Set.empty,
+      allOf = Set.empty,
+      oneOf = Set.empty,
+      anyOf = Set.empty,
+      not = Nothing,
+      properties = Map.empty,
+      additionalProperties = HasAdditionalProperties,
+      OpenAPI.Generate.Types.Schema.description = Nothing,
+      format = Nothing,
+      default' = Nothing,
+      nullable = False,
+      discriminator = Nothing,
+      readOnly = False,
+      writeOnly = False,
+      xml = Nothing,
+      externalDocs = Nothing,
+      example = Nothing,
+      deprecated = False,
+      items = Nothing
+    }
+
 data SchemaType
   = SchemaTypeString
   | SchemaTypeNumber
@@ -120,7 +161,7 @@ instance FromJSON SchemaType where
   parseJSON (String "boolean") = pure SchemaTypeBool
   parseJSON (String "array") = pure SchemaTypeArray
   parseJSON (String "object") = pure SchemaTypeObject
-  parseJSON (String x) = fail $ "Only types integer, string, number, bool, array and object are supported but got: " <> T.unpack x
+  parseJSON (String x) = fail $ "Only types integer, string, number, boolean, array and object are supported but got: " <> T.unpack x
   parseJSON _ = fail "type must be of type string"
 
 data DiscriminatorObject

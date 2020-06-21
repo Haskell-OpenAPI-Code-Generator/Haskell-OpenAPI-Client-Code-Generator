@@ -24,4 +24,4 @@ runGetInventory :: MonadHTTP m => m (Either HttpException (Response GetInventory
 runGetInventory = getInventory defaultConfiguration
 
 runFindPetsByStatus :: MonadHTTP m => m (Either HttpException (Response FindPetsByStatusResponse))
-runFindPetsByStatus = findPetsByStatus defaultConfiguration "pending"
+runFindPetsByStatus = findPetsByStatus defaultConfiguration [FindPetsByStatusParametersStatusEnumString_pending]

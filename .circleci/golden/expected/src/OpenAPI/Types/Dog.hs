@@ -52,7 +52,7 @@ data Dog = Dog {
   -- | int64
   , dogInt64 :: (GHC.Maybe.Maybe GHC.Int.Int64)
   -- | integer
-  , dogInteger :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , dogInteger :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | number
   , dogNumber :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | pet_type

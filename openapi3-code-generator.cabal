@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5c9f55e3cb67b6324959a3a09c91ecb0c5172a5430099f91fc163132052c7a57
+-- hash: 14f5bbc305106dcb39517b1cedc699325f63855887e77839a0f1deeb587e2e3d
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -52,7 +52,7 @@ library
     other-modules:
         Paths_openapi3_code_generator
     default-language: Haskell2010
-    ghc-options: -Wall
+    ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
     build-depends:
         aeson,
         base >=4.7 && <5,
