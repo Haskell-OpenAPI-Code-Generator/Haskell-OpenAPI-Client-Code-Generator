@@ -155,7 +155,7 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
             (False, _, _) -> defineAllOfSchema schemaName schemaDescription $ Set.toList $ OAS.allOf schema
             (_, False, _) -> typeAliasing $ defineOneOfSchema schemaName schemaDescription $ Set.toList $ OAS.oneOf schema
             (_, _, False) -> defineAnyOfSchema strategy schemaName schemaDescription $ Set.toList $ OAS.anyOf schema
-            _ -> defineObjectModelForSchema schemaName schema
+            _ -> defineObjectModelForSchema strategy schemaName schema
     _ ->
       typeAliasing $ pure (varT $ getSchemaType flags schema, (emptyDoc, Set.empty))
 
@@ -428,51 +428,54 @@ defineArrayModelForSchema strategy schemaName schema = do
     )
 
 -- | Defines a Record
-defineObjectModelForSchema :: Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
-defineObjectModelForSchema schemaName schema = do
-  flags <- OAM.getFlags
-  let convertToCamelCase = OAF.optConvertToCamelCase flags
-      name = haskellifyName convertToCamelCase True schemaName
-      props = Map.toList $ OAS.properties schema
-      propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
-      emptyCtx = pure []
-      required = OAS.required schema
-  OAM.logInfo $ "define object model " <> T.pack (nameBase name)
-  (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes schemaName props required
-  propertyDescriptions <- getDescriptionOfProperties props
-  let dataDefinition :: Q Doc
-      dataDefinition = do
-        bangs <- bangTypes
-        let record = recC name (pure <$> bangs)
-        flip Doc.zipCodeAndComments propertyDescriptions
-          . T.lines
-          . T.pack
-          . show
-          . Doc.breakOnTokensWithReplacement
-            ( \case
-                "{" -> "{\n  "
-                token -> "\n  " <> token
-            )
-            [",", "{", "}"]
-          . ppr <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
-      toJsonInstance = createToJSONImplementation name propsWithNames
-      fromJsonInstance = createFromJSONImplementation name propsWithNames required
-  pure
-    ( varT name,
-      ( pure
-          ( Doc.generateHaddockComment
-              [ "Defines the data type for the schema " <> Doc.escapeText schemaName,
-                "",
-                getDescriptionOfSchema schema
-              ]
+defineObjectModelForSchema :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
+defineObjectModelForSchema strategy schemaName schema =
+  if OAS.isSchemaEmpty schema
+    then createAlias schemaName (getDescriptionOfSchema schema) strategy $ pure ([t|Aeson.Object|], (Doc.emptyDoc, Set.empty))
+    else do
+      flags <- OAM.getFlags
+      let convertToCamelCase = OAF.optConvertToCamelCase flags
+          name = haskellifyName convertToCamelCase True schemaName
+          props = Map.toList $ OAS.properties schema
+          propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
+          emptyCtx = pure []
+          required = OAS.required schema
+      OAM.logInfo $ "define object model " <> T.pack (nameBase name)
+      (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes schemaName props required
+      propertyDescriptions <- getDescriptionOfProperties props
+      let dataDefinition :: Q Doc
+          dataDefinition = do
+            bangs <- bangTypes
+            let record = recC name (pure <$> bangs)
+            flip Doc.zipCodeAndComments propertyDescriptions
+              . T.lines
+              . T.pack
+              . show
+              . Doc.breakOnTokensWithReplacement
+                ( \case
+                    "{" -> "{\n  "
+                    token -> "\n  " <> token
+                )
+                [",", "{", "}"]
+              . ppr <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
+          toJsonInstance = createToJSONImplementation name propsWithNames
+          fromJsonInstance = createFromJSONImplementation name propsWithNames required
+      pure
+        ( varT name,
+          ( pure
+              ( Doc.generateHaddockComment
+                  [ "Defines the data type for the schema " <> Doc.escapeText schemaName,
+                    "",
+                    getDescriptionOfSchema schema
+                  ]
+              )
+              `appendDoc` dataDefinition
+              `appendDoc` toJsonInstance
+              `appendDoc` fromJsonInstance
+              `appendDoc` propertyContent,
+            propertyDependencies
           )
-          `appendDoc` dataDefinition
-          `appendDoc` toJsonInstance
-          `appendDoc` fromJsonInstance
-          `appendDoc` propertyContent,
-        propertyDependencies
-      )
-    )
+        )
 
 -- | create toJSON implementation for an object
 createToJSONImplementation :: Name -> [(Text, Name)] -> Q Doc

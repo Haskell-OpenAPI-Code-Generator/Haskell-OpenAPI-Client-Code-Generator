@@ -44,7 +44,7 @@ data Dog = Dog {
   -- | double
   , dogDouble :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | father
-  , dogFather :: (GHC.Maybe.Maybe DogFather)
+  , dogFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | float
   , dogFloat :: (GHC.Maybe.Maybe GHC.Types.Float)
   -- | int32
@@ -56,9 +56,9 @@ data Dog = Dog {
   -- | number
   , dogNumber :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | pet_type
-  , dogPet_type :: (GHC.Maybe.Maybe DogPet_type)
+  , dogPet_type :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | secondFather
-  , dogSecondFather :: (GHC.Maybe.Maybe DogSecondFather)
+  , dogSecondFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | str
   -- 
   -- Constraints:
@@ -107,39 +107,3 @@ instance Data.Aeson.FromJSON DogBreed
                                                       else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "Shepherd")
                                                             then DogBreedEnumString_Shepherd
                                                             else DogBreedEnumOther val)
--- | Defines the data type for the schema DogFather
--- 
--- 
-data DogFather = DogFather {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON DogFather
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON DogFather
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "DogFather" (\obj -> GHC.Base.pure DogFather)
--- | Defines the data type for the schema DogPet_type
--- 
--- 
-data DogPet_type = DogPet_type {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON DogPet_type
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON DogPet_type
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "DogPet_type" (\obj -> GHC.Base.pure DogPet_type)
--- | Defines the data type for the schema DogSecondFather
--- 
--- 
-data DogSecondFather = DogSecondFather {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON DogSecondFather
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON DogSecondFather
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "DogSecondFather" (\obj -> GHC.Base.pure DogSecondFather)

@@ -145,6 +145,15 @@ defaultSchema =
       items = Nothing
     }
 
+-- | Checks if the given schema is an empty object schema (without properties)
+isSchemaEmpty :: SchemaObject -> Bool
+isSchemaEmpty s =
+  SchemaTypeObject == type' s
+    && Map.null (properties s)
+    && Set.null (allOf s)
+    && Set.null (oneOf s)
+    && Set.null (anyOf s)
+
 data SchemaType
   = SchemaTypeString
   | SchemaTypeNumber

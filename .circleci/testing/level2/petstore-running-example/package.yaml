@@ -10,6 +10,7 @@ dependencies:
   - mtl
   - transformers
   - level2-base
+  - unordered-containers
 
 library:
   source-dirs: src

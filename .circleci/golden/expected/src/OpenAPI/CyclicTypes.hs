@@ -40,7 +40,7 @@ data Cat = Cat {
   -- | age
   catAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
-  , catAnanyoftype :: (GHC.Maybe.Maybe CatAnanyoftype)
+  , catAnanyoftype :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | another_relative
   , catAnother_relative :: (GHC.Maybe.Maybe CatAnother_relativeVariants)
   -- | hunts
@@ -54,18 +54,6 @@ instance Data.Aeson.ToJSON Cat
           toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (catAge obj) GHC.Base.<> ((Data.Aeson..=) "ananyoftype" (catAnanyoftype obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (catAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "hunts" (catHunts obj) GHC.Base.<> (Data.Aeson..=) "relative" (catRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON Cat
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> ((((GHC.Base.pure Cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Defines the data type for the schema CatAnanyoftype
--- 
--- 
-data CatAnanyoftype = CatAnanyoftype {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON CatAnanyoftype
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON CatAnanyoftype
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "CatAnanyoftype" (\obj -> GHC.Base.pure CatAnanyoftype)
 -- | Define the one-of schema CatAnother_relative
 -- 
 -- 
@@ -111,7 +99,7 @@ data Mischling = Mischling {
   -- | double
   , mischlingDouble :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | father
-  , mischlingFather :: (GHC.Maybe.Maybe MischlingFather)
+  , mischlingFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | first_relative
   , mischlingFirst_relative :: (GHC.Maybe.Maybe MischlingFirst_relative)
   -- | float
@@ -129,11 +117,11 @@ data Mischling = Mischling {
   -- | number
   , mischlingNumber :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | pet_type
-  , mischlingPet_type :: (GHC.Maybe.Maybe MischlingPet_type)
+  , mischlingPet_type :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | relative
   , mischlingRelative :: (GHC.Maybe.Maybe MischlingRelativeVariants)
   -- | secondFather
-  , mischlingSecondFather :: (GHC.Maybe.Maybe MischlingSecondFather)
+  , mischlingSecondFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | str
   -- 
   -- Constraints:
@@ -211,18 +199,6 @@ instance Data.Aeson.FromJSON MischlingBreed
                                                       else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "Shepherd")
                                                             then MischlingBreedEnumString_Shepherd
                                                             else MischlingBreedEnumOther val)
--- | Defines the data type for the schema MischlingFather
--- 
--- 
-data MischlingFather = MischlingFather {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MischlingFather
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON MischlingFather
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFather" (\obj -> GHC.Base.pure MischlingFather)
 -- | Defines the data type for the schema MischlingFirst_relative
 -- 
 -- 
@@ -230,7 +206,7 @@ data MischlingFirst_relative = MischlingFirst_relative {
   -- | age
   mischlingFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
-  , mischlingFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe MischlingFirst_relativeAnanyoftype)
+  , mischlingFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | another_relative
   , mischlingFirst_relativeAnother_relative :: (GHC.Maybe.Maybe MischlingFirst_relativeAnother_relativeVariants)
   -- | hunts
@@ -246,18 +222,6 @@ instance Data.Aeson.ToJSON MischlingFirst_relative
           toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (mischlingFirst_relativeAge obj) GHC.Base.<> ((Data.Aeson..=) "ananyoftype" (mischlingFirst_relativeAnanyoftype obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (mischlingFirst_relativeAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "hunts" (mischlingFirst_relativeHunts obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (mischlingFirst_relativePet_type obj) GHC.Base.<> (Data.Aeson..=) "relative" (mischlingFirst_relativeRelative obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relative
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFirst_relative" (\obj -> (((((GHC.Base.pure MischlingFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Defines the data type for the schema MischlingFirst_relativeAnanyoftype
--- 
--- 
-data MischlingFirst_relativeAnanyoftype = MischlingFirst_relativeAnanyoftype {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MischlingFirst_relativeAnanyoftype
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeAnanyoftype
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFirst_relativeAnanyoftype" (\obj -> GHC.Base.pure MischlingFirst_relativeAnanyoftype)
 -- | Define the one-of schema MischlingFirst_relativeAnother_relative
 -- 
 -- 
@@ -302,18 +266,6 @@ instance Data.Aeson.ToJSON MischlingFirst_relativeRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
 instance Data.Aeson.FromJSON MischlingFirst_relativeRelativeVariants
     where parseJSON = Data.Aeson.Types.FromJSON.genericParseJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
--- | Defines the data type for the schema MischlingPet_type
--- 
--- 
-data MischlingPet_type = MischlingPet_type {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MischlingPet_type
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON MischlingPet_type
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingPet_type" (\obj -> GHC.Base.pure MischlingPet_type)
 -- | Define the one-of schema MischlingRelative
 -- 
 -- 
@@ -326,18 +278,6 @@ instance Data.Aeson.ToJSON MischlingRelativeVariants
     where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
 instance Data.Aeson.FromJSON MischlingRelativeVariants
     where parseJSON = Data.Aeson.Types.FromJSON.genericParseJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
--- | Defines the data type for the schema MischlingSecondFather
--- 
--- 
-data MischlingSecondFather = MischlingSecondFather {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MischlingSecondFather
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON MischlingSecondFather
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingSecondFather" (\obj -> GHC.Base.pure MischlingSecondFather)
 -- | Defines the data type for the schema PetByAge
 -- 
 -- 
@@ -395,7 +335,7 @@ data PetByAgeFirst_relative = PetByAgeFirst_relative {
   -- | age
   petByAgeFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | ananyoftype
-  , petByAgeFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe PetByAgeFirst_relativeAnanyoftype)
+  , petByAgeFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | another_relative
   , petByAgeFirst_relativeAnother_relative :: (GHC.Maybe.Maybe PetByAgeFirst_relativeAnother_relativeVariants)
   -- | hunts
@@ -411,18 +351,6 @@ instance Data.Aeson.ToJSON PetByAgeFirst_relative
           toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (petByAgeFirst_relativeAge obj) GHC.Base.<> ((Data.Aeson..=) "ananyoftype" (petByAgeFirst_relativeAnanyoftype obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "hunts" (petByAgeFirst_relativeHunts obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (petByAgeFirst_relativePet_type obj) GHC.Base.<> (Data.Aeson..=) "relative" (petByAgeFirst_relativeRelative obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relative
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relative" (\obj -> (((((GHC.Base.pure PetByAgeFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Defines the data type for the schema PetByAgeFirst_relativeAnanyoftype
--- 
--- 
-data PetByAgeFirst_relativeAnanyoftype = PetByAgeFirst_relativeAnanyoftype {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PetByAgeFirst_relativeAnanyoftype
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativeAnanyoftype
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relativeAnanyoftype" (\obj -> GHC.Base.pure PetByAgeFirst_relativeAnanyoftype)
 -- | Define the one-of schema PetByAgeFirst_relativeAnother_relative
 -- 
 -- 
