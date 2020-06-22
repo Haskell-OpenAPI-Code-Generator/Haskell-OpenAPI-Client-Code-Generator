@@ -45,7 +45,9 @@ data Flags
         -- | The prefix which is added to header parameters
         optParameterHeaderPrefix :: String,
         -- | Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types
-        optUseNumberedVariantConstructors :: Bool
+        optUseNumberedVariantConstructors :: Bool,
+        -- | Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)
+        optGenerateOptionalEmptyRequestBody :: Bool
       }
   deriving (Show, Eq)
 
@@ -132,6 +134,10 @@ instance Options Flags where
         "use-numbered-variant-constructors"
         (optUseNumberedVariantConstructors defaultFlags)
         "Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types"
+      <*> simpleOption
+        "generate-optional-empty-request-body"
+        (optGenerateOptionalEmptyRequestBody defaultFlags)
+        "Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)"
 
 -- | Default flags which can be used for tests and as a reference which values actually are used
 defaultFlags :: Flags
@@ -156,5 +162,6 @@ defaultFlags =
       optParameterPathPrefix = "path",
       optParameterCookiePrefix = "cookie",
       optParameterHeaderPrefix = "header",
-      optUseNumberedVariantConstructors = False
+      optUseNumberedVariantConstructors = False,
+      optGenerateOptionalEmptyRequestBody = False
     }

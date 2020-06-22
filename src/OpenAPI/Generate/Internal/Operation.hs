@@ -18,6 +18,7 @@ module OpenAPI.Generate.Internal.Operation
     getBodySchemaFromOperation,
     generateParameterizedRequestPath,
     generateQueryParams,
+    shouldGenerateRequestBody,
     RequestBodyDefinition (..),
     ParameterTypeDefinition (..),
     ParameterCardinality (..),
@@ -285,29 +286,31 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
       request = generateParameterizedRequestPath pathParameters requestPath
       methodLit = litE $ stringL $ T.unpack method
       fnPatterns = if useExplicitConfiguration then varP configName : paraPattern else paraPattern
+  generateBody <- shouldGenerateRequestBody bodySchema
   pure $
     ppr <$> case bodySchema of
-      Just RequestBodyDefinition {..} ->
-        let encodeExpr =
-              varE $
-                case encoding of
-                  OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
-                  OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
-         in [d|
-              $(conP fnName $ fnPatterns <> [varP bodyName]) =
-                $responseTransformerExp
-                  ( $( if useExplicitConfiguration
-                         then [|OC.doBodyCallWithConfiguration $(varE configName)|]
-                         else [|OC.doBodyCallWithConfigurationM|]
-                     )
-                    (T.toUpper $ T.pack $methodLit)
-                    (T.pack $(request))
-                    $(queryParameters')
-                    $(if required then [|Just $(varE bodyName)|] else varE bodyName)
-                    $(encodeExpr)
-                  )
-              |]
-      Nothing ->
+      Just RequestBodyDefinition {..}
+        | generateBody ->
+          let encodeExpr =
+                varE $
+                  case encoding of
+                    OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
+                    OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
+           in [d|
+                $(conP fnName $ fnPatterns <> [varP bodyName]) =
+                  $responseTransformerExp
+                    ( $( if useExplicitConfiguration
+                           then [|OC.doBodyCallWithConfiguration $(varE configName)|]
+                           else [|OC.doBodyCallWithConfigurationM|]
+                       )
+                      (T.toUpper $ T.pack $methodLit)
+                      (T.pack $(request))
+                      $(queryParameters')
+                      $(if required then [|Just $(varE bodyName)|] else varE bodyName)
+                      $(encodeExpr)
+                    )
+                |]
+      _ ->
         [d|
           $(conP fnName fnPatterns) =
             $responseTransformerExp
@@ -320,6 +323,20 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                 $(queryParameters')
               )
           |]
+
+-- | Checks if a request body should be generated based on the CLI options and if the body type is an empty object
+shouldGenerateRequestBody :: Maybe RequestBodyDefinition -> OAM.Generator Bool
+shouldGenerateRequestBody Nothing = pure False
+shouldGenerateRequestBody (Just RequestBodyDefinition {..}) = do
+  maybeSchema <- Model.resolveSchemaReferenceWithoutWarning schema
+  generateEmptyRequestBody <- OAM.getFlag OAF.optGenerateOptionalEmptyRequestBody
+  case maybeSchema of
+    Just s
+      | not generateEmptyRequestBody
+          && not required
+          && OAS.isSchemaEmpty s ->
+        pure False
+    _ -> pure True
 
 -- | Extracts the request body schema from an operation and the encoding which should be used on the body data.
 getBodySchemaFromOperation :: OAT.OperationObject -> OAM.Generator (Maybe RequestBodyDefinition)

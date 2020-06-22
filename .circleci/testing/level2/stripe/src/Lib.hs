@@ -66,7 +66,6 @@ runGetPaymentIntent =
   getPaymentIntents
     defaultConfiguration {configBaseURL = "http://test.url"}
     parameters
-    Nothing
   where
     parameters =
       GetPaymentIntentsParameters

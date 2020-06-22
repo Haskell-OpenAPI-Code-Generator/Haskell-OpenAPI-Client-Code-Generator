@@ -167,8 +167,11 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
           )
 
 getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)
-getBodyType Nothing _ = pure ([], Doc.emptyDoc)
-getBodyType (Just RequestBodyDefinition {..}) appendToOperationName = do
-  let transformType = pure . (if required then id else appT $ varT ''Maybe)
-  requestBodySuffix <- OAM.getFlag $ T.pack . OAF.optRequestBodyTypeSuffix
-  BF.bimap transformType fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
+getBodyType requestBody appendToOperationName = do
+  generateBody <- shouldGenerateRequestBody requestBody
+  case requestBody of
+    Just RequestBodyDefinition {..} | generateBody -> do
+      let transformType = pure . (if required then id else appT $ varT ''Maybe)
+      requestBodySuffix <- OAM.getFlag $ T.pack . OAF.optRequestBodyTypeSuffix
+      BF.bimap transformType fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
+    _ -> pure ([], Doc.emptyDoc)
