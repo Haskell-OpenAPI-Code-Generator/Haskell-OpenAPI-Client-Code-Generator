@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
@@ -7,26 +7,28 @@
 
 -- | This module serves the purpose of defining common functionality which remains the same across all OpenAPI specifications.
 module OpenAPI.Common
-  ( Configuration (..),
-    doCallWithConfiguration,
+  ( doCallWithConfiguration,
     doCallWithConfigurationM,
     doBodyCallWithConfiguration,
     doBodyCallWithConfigurationM,
     runWithConfiguration,
-    MonadHTTP (..),
-    stringifyModel,
-    StringifyModel,
-    SecurityScheme (..),
-    AnonymousSecurityScheme (..),
     textToByte,
+    stringifyModel,
+    anonymousSecurityScheme,
+    Configuration (..),
+    SecurityScheme,
+    MonadHTTP (..),
+    StringifyModel,
     JsonByteString (..),
     JsonDateTime (..),
     RequestBodyEncoding (..),
     QueryParameter (..),
+    StripeT (..),
+    StripeM,
   )
 where
 
-import qualified Control.Exception as Exception
+import qualified Control.Monad.IO.Class as MIO
 import qualified Control.Monad.Reader as MR
 import qualified Control.Monad.Trans.Class as MT
 import qualified Data.Aeson as Aeson
@@ -40,23 +42,43 @@ import qualified Data.Text as T
 import Data.Text (Text)
 import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
-import GHC.Generics
 import qualified Network.HTTP.Client as HC
 import qualified Network.HTTP.Simple as HS
 
 -- | Abstracts the usage of 'Network.HTTP.Simple.httpBS' away,
 --  so that it can be used for testing
 class Monad m => MonadHTTP m where
-  httpBS :: HS.Request -> m (Either HS.HttpException (HS.Response B8.ByteString))
+  httpBS :: HS.Request -> m (HS.Response B8.ByteString)
 
 -- | This instance is the default instance used for production code
 instance MonadHTTP IO where
-  httpBS request =
-    BF.first (\e -> e :: HS.HttpException)
-      <$> Exception.try (HS.httpBS request)
+  httpBS = HS.httpBS
 
 instance MonadHTTP m => MonadHTTP (MR.ReaderT r m) where
   httpBS = MT.lift . httpBS
+
+instance MonadHTTP m => MonadHTTP (StripeT m) where
+  httpBS = MT.lift . httpBS
+
+-- | The monad in which the operations can be run.
+-- Contains the 'Configuration' to run the requests with.
+--
+-- Run it with 'runWithConfiguration'
+newtype StripeT m a = StripeT (MR.ReaderT Configuration m a)
+  deriving (Functor, Applicative, Monad, MR.MonadReader Configuration)
+
+instance MT.MonadTrans StripeT where
+  lift = StripeT . MT.lift
+
+instance MIO.MonadIO m => MIO.MonadIO (StripeT m) where
+  liftIO = StripeT . MIO.liftIO
+
+-- | Utility type which uses 'IO' as underlying monad
+type StripeM a = StripeT IO a
+
+-- | Run a 'StripeT' monad transformer in another monad with a specified configuration
+runWithConfiguration :: Configuration -> StripeT m a -> m a
+runWithConfiguration c (StripeT r) = MR.runReaderT r c
 
 -- | An operation can and must be configured with data, which may be common
 -- for many operations.
@@ -71,16 +93,15 @@ instance MonadHTTP m => MonadHTTP (MR.ReaderT r m) where
 --
 -- To get started, the 'OpenAPI.Configuration.defaultConfiguration' can be used and changed accordingly.
 --
--- Note that it is possible that @BearerAuthenticationSecurityScheme@ is not available because it is not a security scheme in the OpenAPI specification.
+-- Note that it is possible that @bearerAuthenticationSecurityScheme@ is not available because it is not a security scheme in the OpenAPI specification.
 --
 -- > defaultConfiguration
--- >   { configSecurityScheme = BearerAuthenticationSecurityScheme "token" }
-data Configuration s
+-- >   { configSecurityScheme = bearerAuthenticationSecurityScheme "token" }
+data Configuration
   = Configuration
       { configBaseURL :: Text,
-        configSecurityScheme :: s
+        configSecurityScheme :: SecurityScheme
       }
-  deriving (Show, Ord, Eq, Generic)
 
 -- | Defines how a request body is encoded
 data RequestBodyEncoding
@@ -88,19 +109,6 @@ data RequestBodyEncoding
     RequestBodyEncodingJSON
   | -- | Encode the body as form data
     RequestBodyEncodingFormData
-
--- | Allows to specify an authentication scheme for requests done with 'doCallWithConfiguration'
---
--- This can be used to define custom schemes as well
-class SecurityScheme s where
-  authenticateRequest :: s -> HS.Request -> HS.Request
-
--- | The default authentication scheme which does not add any authentication information
-data AnonymousSecurityScheme = AnonymousSecurityScheme
-
--- | Instance for the anonymous scheme which does not alter the request in any way
-instance SecurityScheme AnonymousSecurityScheme where
-  authenticateRequest = const id
 
 -- | Defines a query parameter with the information necessary for serialization
 data QueryParameter
@@ -112,19 +120,20 @@ data QueryParameter
       }
   deriving (Show, Eq)
 
--- | Run the 'MR.ReaderT' monad with a specified configuration
---
--- Note: This is just @'flip' 'MR.runReaderT'@.
-runWithConfiguration :: Configuration s -> MR.ReaderT (Configuration s) m a -> m a
-runWithConfiguration = flip MR.runReaderT
+-- | This type specifies a security scheme which can modify a request according to the scheme (e. g. add an Authorization header)
+type SecurityScheme = HS.Request -> HS.Request
+
+-- | Anonymous security scheme which does not alter the request in any way
+anonymousSecurityScheme :: SecurityScheme
+anonymousSecurityScheme = id
 
 -- | This is the main functionality of this module
 --
 --   It makes a concrete Call to a Server without a body
 doCallWithConfiguration ::
-  (MonadHTTP m, SecurityScheme s) =>
+  MonadHTTP m =>
   -- | Configuration options like base URL and security scheme
-  Configuration s ->
+  Configuration ->
   -- | HTTP method (GET, POST, etc.)
   Text ->
   -- | Path to append to the base URL (path parameters should already be replaced)
@@ -132,18 +141,18 @@ doCallWithConfiguration ::
   -- | Query parameters
   [QueryParameter] ->
   -- | The raw response from the server
-  m (Either HS.HttpException (HS.Response B8.ByteString))
+  m (HS.Response B8.ByteString)
 doCallWithConfiguration config method path queryParams =
   httpBS $ createBaseRequest config method path queryParams
 
 -- | Same as 'doCallWithConfiguration' but run in a 'MR.ReaderT' environment which contains the configuration.
 -- This is useful if multiple calls have to be executed with the same configuration.
 doCallWithConfigurationM ::
-  (MonadHTTP m, SecurityScheme s) =>
+  MonadHTTP m =>
   Text ->
   Text ->
   [QueryParameter] ->
-  MR.ReaderT (Configuration s) m (Either HS.HttpException (HS.Response B8.ByteString))
+  StripeT m (HS.Response B8.ByteString)
 doCallWithConfigurationM method path queryParams = do
   config <- MR.ask
   MT.lift $ doCallWithConfiguration config method path queryParams
@@ -152,9 +161,9 @@ doCallWithConfigurationM method path queryParams = do
 --
 --   It makes a concrete Call to a Server with a body
 doBodyCallWithConfiguration ::
-  (MonadHTTP m, SecurityScheme s, Aeson.ToJSON body) =>
+  (MonadHTTP m, Aeson.ToJSON body) =>
   -- | Configuration options like base URL and security scheme
-  Configuration s ->
+  Configuration ->
   -- | HTTP method (GET, POST, etc.)
   Text ->
   -- | Path to append to the base URL (path parameters should already be replaced)
@@ -166,7 +175,7 @@ doBodyCallWithConfiguration ::
   -- | JSON or form data deepobjects
   RequestBodyEncoding ->
   -- | The raw response from the server
-  m (Either HS.HttpException (HS.Response B8.ByteString))
+  m (HS.Response B8.ByteString)
 doBodyCallWithConfiguration config method path queryParams Nothing _ = doCallWithConfiguration config method path queryParams
 doBodyCallWithConfiguration config method path queryParams (Just body) RequestBodyEncodingJSON =
   httpBS $ HS.setRequestMethod (textToByte method) $ HS.setRequestBodyJSON body baseRequest
@@ -181,23 +190,22 @@ doBodyCallWithConfiguration config method path queryParams (Just body) RequestBo
 -- | Same as 'doBodyCallWithConfiguration' but run in a 'MR.ReaderT' environment which contains the configuration.
 -- This is useful if multiple calls have to be executed with the same configuration.
 doBodyCallWithConfigurationM ::
-  (MonadHTTP m, SecurityScheme s, Aeson.ToJSON body) =>
+  (MonadHTTP m, Aeson.ToJSON body) =>
   Text ->
   Text ->
   [QueryParameter] ->
   Maybe body ->
   RequestBodyEncoding ->
-  MR.ReaderT (Configuration s) m (Either HS.HttpException (HS.Response B8.ByteString))
+  StripeT m (HS.Response B8.ByteString)
 doBodyCallWithConfigurationM method path queryParams body encoding = do
   config <- MR.ask
   MT.lift $ doBodyCallWithConfiguration config method path queryParams body encoding
 
 -- | Creates a Base Request
 createBaseRequest ::
-  SecurityScheme s =>
-  -- | Common configuration Options
-  Configuration s ->
-  -- | HTTP Method (GET,POST,etc.)
+  -- | Configuration options like base URL and security scheme
+  Configuration ->
+  -- | HTTP method (GET, POST, etc.)
   Text ->
   -- | The path for which the placeholders have already been replaced
   Text ->
@@ -206,7 +214,7 @@ createBaseRequest ::
   -- | The Response from the server
   HS.Request
 createBaseRequest config method path queryParams =
-  authenticateRequest (configSecurityScheme config)
+  configSecurityScheme config
     $ HS.setRequestMethod (textToByte method)
     $ HS.setRequestQueryString query
     $ HS.setRequestPath

@@ -13,4 +13,4 @@ import qualified OpenAPI.Common
 -- @https://api.stripe.com/@
 defaultURL = Data.Text.pack "https://api.stripe.com/"
 -- | The default configuration containing the 'defaultURL' and no authorization
-defaultConfiguration = OpenAPI.Common.Configuration defaultURL OpenAPI.Common.AnonymousSecurityScheme
+defaultConfiguration = OpenAPI.Common.Configuration defaultURL OpenAPI.Common.anonymousSecurityScheme

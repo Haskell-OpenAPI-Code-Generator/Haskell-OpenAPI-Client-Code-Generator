@@ -93,20 +93,20 @@ spec =
             [|"/" ++ $(testTHE) ++ "/my//test/" ++ $(testTHE) ++ "/my/path/"|]
         describe "getParametersTypeForSignature" $ do
           let responseTypeName = mkName "Test"
-              responseType = [t|$(varT monadName) (Either HS.HttpException (HS.Response $(varT responseTypeName)))|]
+              responseType = [t|$(varT monadName) (HS.Response $(varT responseTypeName))|]
           singleTestTH
             "no parameters"
-            (getParametersTypeForSignature [] responseTypeName monadName securitySchemeName)
-            [t|OC.Configuration $(varT securitySchemeName) -> $(responseType)|]
+            (getParametersTypeForSignature [] responseTypeName monadName)
+            [t|OC.Configuration -> $(responseType)|]
           singleTestTH
             "One parameters"
-            (getParametersTypeForSignature [conT ''Int] responseTypeName monadName securitySchemeName)
-            [t|OC.Configuration $(varT securitySchemeName) -> Int -> $(responseType)|]
+            (getParametersTypeForSignature [conT ''Int] responseTypeName monadName)
+            [t|OC.Configuration -> Int -> $(responseType)|]
           singleTestTH
             "Optional parameters"
-            (getParametersTypeForSignature [[t|Maybe Int|]] responseTypeName monadName securitySchemeName)
-            [t|OC.Configuration $(varT securitySchemeName) -> Maybe Int -> $(responseType)|]
+            (getParametersTypeForSignature [[t|Maybe Int|]] responseTypeName monadName)
+            [t|OC.Configuration -> Maybe Int -> $(responseType)|]
           singleTestTH
             "Two parameters"
-            (getParametersTypeForSignature [conT ''Int, conT ''T.Text] responseTypeName monadName securitySchemeName)
-            [t|OC.Configuration $(varT securitySchemeName) -> Int -> T.Text -> $(responseType)|]
+            (getParametersTypeForSignature [conT ''Int, conT ''T.Text] responseTypeName monadName)
+            [t|OC.Configuration -> Int -> T.Text -> $(responseType)|]

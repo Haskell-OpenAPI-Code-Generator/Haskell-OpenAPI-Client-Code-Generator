@@ -95,7 +95,7 @@ instance (Monad m, MonadFail m) => MonadHTTP (MockMonadHTTP m) where
               _ -> Nothing
          in when (maybeBody /= Just body) $
               throw (BodyMismatch maybeBody)
-    pure $ pure response
+    pure response
 
 defaultResponse :: Response ByteString
 defaultResponse =

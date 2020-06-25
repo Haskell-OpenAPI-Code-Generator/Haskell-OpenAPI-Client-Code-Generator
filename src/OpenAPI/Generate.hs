@@ -62,7 +62,7 @@ defineConfigurationInformation moduleName spec =
               ppr
                 <$> [d|$(varP defaultURLName) = T.pack $(litE $ stringL $ T.unpack defaultURL)|],
               pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
-              ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.AnonymousSecurityScheme|]
+              ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
             ]
 
 -- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'

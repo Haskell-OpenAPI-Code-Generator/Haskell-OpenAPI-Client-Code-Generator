@@ -45,48 +45,11 @@ import OpenAPI.Types
 -- | > GET /pets/{petId}
 -- 
 -- Info for a specific pet
-showPetById :: forall m s . (OpenAPI.Common.MonadHTTP m, OpenAPI.Common.SecurityScheme s) => OpenAPI.Common.Configuration s  -- ^ The configuration to use in the request
-  -> Data.Text.Internal.Text                                                                                                 -- ^ petId: The id of the pet to retrieve
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response ShowPetByIdResponse)) -- ^ Monad containing the result of the operation
-showPetById config
-            petId = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either ShowPetByIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> ShowPetByIdResponseDefault Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                      Dog)
-                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
--- | > GET /pets/{petId}
--- 
--- The same as 'showPetById' but returns the raw 'Data.ByteString.Char8.ByteString'
-showPetByIdRaw :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                                OpenAPI.Common.SecurityScheme s) =>
-                  OpenAPI.Common.Configuration s ->
-                  Data.Text.Internal.Text ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-showPetByIdRaw config
-               petId = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
--- | > GET /pets/{petId}
--- 
--- Monadic version of 'showPetById' (use with 'OpenAPI.Common.runWithConfiguration')
-showPetByIdM :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                              OpenAPI.Common.SecurityScheme s) =>
-                Data.Text.Internal.Text ->
-                Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response ShowPetByIdResponse))
-showPetByIdM petId = GHC.Base.fmap (GHC.Base.fmap (\response_1 -> GHC.Base.fmap (Data.Either.either ShowPetByIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> ShowPetByIdResponseDefault Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                       Dog)
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_1) response_1)) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
--- | > GET /pets/{petId}
--- 
--- Monadic version of 'showPetByIdRaw' (use with 'OpenAPI.Common.runWithConfiguration')
-showPetByIdRawM :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                                 OpenAPI.Common.SecurityScheme s) =>
-                   Data.Text.Internal.Text ->
-                   Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-showPetByIdRawM petId = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
+showPetById :: forall m . OpenAPI.Common.MonadHTTP m => Data.Text.Internal.Text        -- ^ petId: The id of the pet to retrieve
+  -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response ShowPetByIdResponse) -- ^ Monadic computation which returns the result of the operation
+showPetById petId = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either ShowPetByIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> ShowPetByIdResponseDefault Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                       Dog)
+                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
 -- | Represents a response of the operation 'showPetById'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'ShowPetByIdResponseError' is used.
@@ -94,3 +57,27 @@ data ShowPetByIdResponse =
    ShowPetByIdResponseError GHC.Base.String  -- ^ Means either no matching case available or a parse error
   | ShowPetByIdResponseDefault Dog           -- ^ Expected response to a valid request
   deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- | > GET /pets/{petId}
+-- 
+-- The same as 'showPetById' but accepts an explicit configuration.
+showPetByIdWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text                                                                           -- ^ petId: The id of the pet to retrieve
+  -> m (Network.HTTP.Client.Types.Response ShowPetByIdResponse)                                        -- ^ Monadic computation which returns the result of the operation
+showPetByIdWithConfiguration config
+                             petId = GHC.Base.fmap (\response_1 -> GHC.Base.fmap (Data.Either.either ShowPetByIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> ShowPetByIdResponseDefault Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                        Dog)
+                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_1) response_1) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
+-- | > GET /pets/{petId}
+-- 
+-- The same as 'showPetById' but returns the raw 'Data.ByteString.Char8.ByteString'.
+showPetByIdRaw :: forall m . OpenAPI.Common.MonadHTTP m => Data.Text.Internal.Text                     -- ^ petId: The id of the pet to retrieve
+  -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+showPetByIdRaw petId = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])
+-- | > GET /pets/{petId}
+-- 
+-- The same as 'showPetById' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+showPetByIdWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text                                                                              -- ^ petId: The id of the pet to retrieve
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString)                           -- ^ Monadic computation which returns the result of the operation
+showPetByIdWithConfigurationRaw config
+                                petId = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) [])

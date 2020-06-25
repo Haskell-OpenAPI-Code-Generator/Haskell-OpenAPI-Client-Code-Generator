@@ -10,6 +10,7 @@ module OpenAPI.Generate.Operation
   )
 where
 
+import qualified Control.Applicative as Applicative
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
 import Data.Text (Text)
@@ -71,26 +72,15 @@ defineModuleForOperation ::
   OAM.Generator (Q Dep.ModuleDefinition)
 defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
-  flags <- OAM.getFlags
+  convertToCamelCase <- OAM.getFlag OAF.optConvertToCamelCase
   let operationIdAsText = T.pack $ show operationIdName
-      operationIdNameRaw = mkName $ nameBase operationIdName <> "Raw"
-      operationIdNameWithMonadTransformer = mkName $ nameBase operationIdName <> "M"
-      operationIdNameRawWithMonadTransformer = mkName $ nameBase operationIdNameRaw <> "M"
-      moduleName = haskellifyText (OAF.optConvertToCamelCase flags) True operationIdAsText
-      description = Doc.escapeText $ getOperationDescription operation
-      monadName = mkName "m"
-      securitySchemeName = mkName "s"
       appendToOperationName = ((T.pack $ nameBase operationIdName) <>)
-      rawTransformation = [|id|]
-  OAM.logInfo $ "Generating operation with name: " <> T.pack (show operationIdName)
-  parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
+      moduleName = haskellifyText convertToCamelCase True operationIdAsText
+  OAM.logInfo $ "Generating operation with name: " <> operationIdAsText
   bodySchema <- getBodySchemaFromOperation operation
   (responseTypeName, responseTransformerExp, responseBodyDefinitions) <- OAR.getResponseDefinitions operation appendToOperationName
-  functionBody <- defineOperationFunction True operationIdName parameterCardinality requestPath method bodySchema responseTransformerExp
-  functionBodyRaw <- defineOperationFunction True operationIdNameRaw parameterCardinality requestPath method bodySchema rawTransformation
-  functionBodyWithMonadTransformer <- defineOperationFunction False operationIdNameWithMonadTransformer parameterCardinality requestPath method bodySchema responseTransformerExp
-  functionBodyRawWithMonadTransformer <- defineOperationFunction False operationIdNameRawWithMonadTransformer parameterCardinality requestPath method bodySchema rawTransformation
   (bodyType, bodyDefinition) <- getBodyType bodySchema appendToOperationName
+  parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
   paramDescriptions <-
     (<> ["The request body to send" | not $ null bodyType])
       <$> ( case parameterCardinality of
@@ -103,67 +93,57 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
         SingleParameter (paramType', doc, _) -> ([paramType'], doc)
         MultipleParameters paramDefinition -> ([parameterTypeDefinitionType paramDefinition], parameterTypeDefinitionDoc paramDefinition)
       types = paramType <> bodyType
-      fnType = getParametersTypeForSignature types responseTypeName monadName securitySchemeName
-      fnTypeRaw = getParametersTypeForSignature types ''B8.ByteString monadName securitySchemeName
-      fnTypeWithMonadTransformer = getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName securitySchemeName
-      fnTypeRawWithMonadTransformer = getParametersTypeForSignatureWithMonadTransformer types ''B8.ByteString monadName securitySchemeName
+      monadName = mkName "m"
       createFunSignature operationName fnType' =
         ppr
           <$> sigD
             operationName
             ( forallT
-                [plainTV monadName, plainTV securitySchemeName]
-                (cxt [appT (conT ''OC.MonadHTTP) (varT monadName), appT (conT ''OC.SecurityScheme) (varT securitySchemeName)])
+                [plainTV monadName]
+                (cxt [appT (conT ''OC.MonadHTTP) (varT monadName)])
                 fnType'
             )
-      fnSignature =
-        createFunSignature
-          operationIdName
-          fnType
-      fnSignatureRaw =
-        createFunSignature
-          operationIdNameRaw
-          fnTypeRaw
-      fnSignatureWithMonadTransformer =
-        createFunSignature
-          operationIdNameWithMonadTransformer
-          fnTypeWithMonadTransformer
-      fnSignatureRawWithMonadTransformer =
-        createFunSignature
-          operationIdNameRawWithMonadTransformer
-          fnTypeRawWithMonadTransformer
       methodAndPath = T.toUpper method <> " " <> requestPath
       operationNameAsString = nameBase operationIdName
       operationDescription = pure . Doc.generateHaddockComment . ("> " <> methodAndPath :) . ("" :)
+      cartesianProduct = Applicative.liftA2 (,)
+      addToName suffix = mkName . (<> suffix) . nameBase
+      availableOperationCombinations =
+        cartesianProduct
+          [ (id, responseTransformerExp, responseTypeName),
+            (addToName "Raw", [|id|], ''B8.ByteString)
+          ]
+          [ (id, False, getParametersTypeForSignatureWithMonadTransformer),
+            (addToName "WithConfiguration", True, getParametersTypeForSignature)
+          ]
+      description = Doc.escapeText $ getOperationDescription operation
+      comments =
+        [ [operationDescription [description]],
+          [paramDoc, bodyDefinition, responseBodyDefinitions, operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration."]],
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but returns the raw 'Data.ByteString.Char8.ByteString'."]],
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'."]]
+        ]
+  functionDefinitions <-
+    mapM
+      ( \((f1, transformExp, responseType), (f2, explicitConfiguration, getParameterType)) -> do
+          let fnName = f1 . f2 $ operationIdName
+              fnSignature = createFunSignature fnName $ getParameterType types responseType monadName
+              addCommentsToFnSignature =
+                ( `Doc.sideBySide`
+                    Doc.sideComments
+                      ((if explicitConfiguration then ("The configuration to use in the request" :) else id) $ paramDescriptions <> ["Monadic computation which returns the result of the operation"])
+                )
+                  . Doc.breakOnTokens ["->"]
+          functionBody <- defineOperationFunction explicitConfiguration fnName parameterCardinality requestPath method bodySchema transformExp
+          pure [fmap addCommentsToFnSignature fnSignature `Doc.appendDoc` functionBody]
+      )
+      availableOperationCombinations
   pure $
     ([moduleName],)
       . Doc.addOperationsModuleHeader mainModuleName moduleName operationNameAsString
       . ($$ text "")
-      <$> ( ($$)
-              <$> ( vcat
-                      <$> sequence
-                        [ operationDescription [description],
-                          ( `Doc.sideBySide`
-                              Doc.sideComments
-                                ("The configuration to use in the request" : paramDescriptions <> ["Monad containing the result of the operation"])
-                          )
-                            . Doc.breakOnTokens ["->"]
-                            <$> fnSignature,
-                          functionBody,
-                          operationDescription ["The same as '" <> T.pack operationNameAsString <> "' but returns the raw 'Data.ByteString.Char8.ByteString'"],
-                          fnSignatureRaw,
-                          functionBodyRaw,
-                          operationDescription ["Monadic version of '" <> T.pack operationNameAsString <> "' (use with 'OpenAPI.Common.runWithConfiguration')"],
-                          fnSignatureWithMonadTransformer,
-                          functionBodyWithMonadTransformer,
-                          operationDescription ["Monadic version of '" <> T.pack (nameBase operationIdNameRaw) <> "' (use with 'OpenAPI.Common.runWithConfiguration')"],
-                          fnSignatureRawWithMonadTransformer,
-                          functionBodyRawWithMonadTransformer,
-                          bodyDefinition,
-                          paramDoc
-                        ]
-                  )
-                <*> responseBodyDefinitions
+      <$> ( vcat
+              <$> sequence (concat $ zipWith (<>) comments functionDefinitions)
           )
 
 getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)

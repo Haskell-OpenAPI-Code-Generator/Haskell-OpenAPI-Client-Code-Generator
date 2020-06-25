@@ -184,7 +184,7 @@ createResponseTransformerFn createName schemas =
             schemas
             <> [normalGE [|otherwise|] [|Left "Missing default response type"|]]
       transformLambda = lamE [varP responseArgName, varP bodyName] ifCases
-   in [|fmap (fmap (\response -> fmap (Either.either $(varE $ createName errorSuffix) id . $transformLambda response) response))|]
+   in [|fmap (\response -> fmap (Either.either $(varE $ createName errorSuffix) id . $transformLambda response) response)|]
 
 getResponseDescription :: OAT.ResponseObject -> Text
 getResponseDescription response = Doc.escapeText $ OAT.description (response :: OAT.ResponseObject)
