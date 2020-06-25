@@ -45,48 +45,11 @@ import OpenAPI.Types
 -- | > GET /pet/singleparam
 -- 
 -- Operation with a single parameter
-singleParam :: forall m s . (OpenAPI.Common.MonadHTTP m, OpenAPI.Common.SecurityScheme s) => OpenAPI.Common.Configuration s  -- ^ The configuration to use in the request
-  -> SingleParamParametersStatus                                                                                             -- ^ status: Status values that need to be considered for filter
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response SingleParamResponse)) -- ^ Monad containing the result of the operation
-singleParam config
-            status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                     Dog)
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
--- | > GET /pet/singleparam
--- 
--- The same as 'singleParam' but returns the raw 'Data.ByteString.Char8.ByteString'
-singleParamRaw :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                                OpenAPI.Common.SecurityScheme s) =>
-                  OpenAPI.Common.Configuration s ->
-                  SingleParamParametersStatus ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-singleParamRaw config
-               status = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
--- | > GET /pet/singleparam
--- 
--- Monadic version of 'singleParam' (use with 'OpenAPI.Common.runWithConfiguration')
-singleParamM :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                              OpenAPI.Common.SecurityScheme s) =>
-                SingleParamParametersStatus ->
-                Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response SingleParamResponse))
-singleParamM status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                      Dog)
-                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
--- | > GET /pet/singleparam
--- 
--- Monadic version of 'singleParamRaw' (use with 'OpenAPI.Common.runWithConfiguration')
-singleParamRawM :: forall m s . (OpenAPI.Common.MonadHTTP m,
-                                 OpenAPI.Common.SecurityScheme s) =>
-                   SingleParamParametersStatus ->
-                   Control.Monad.Trans.Reader.ReaderT (OpenAPI.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-singleParamRawM status = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
+singleParam :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus    -- ^ status: Status values that need to be considered for filter
+  -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response SingleParamResponse) -- ^ Monadic computation which returns the result of the operation
+singleParam status = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                      Dog)
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
 -- | Defines the enum schema singleParamParametersStatus
 -- 
 -- Represents the parameter named \'status\'
@@ -120,3 +83,27 @@ data SingleParamResponse =
    SingleParamResponseError GHC.Base.String  -- ^ Means either no matching case available or a parse error
   | SingleParamResponse200 Dog               -- ^ successful operation
   deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- | > GET /pet/singleparam
+-- 
+-- The same as 'singleParam' but accepts an explicit configuration.
+singleParamWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
+  -> SingleParamParametersStatus                                                                       -- ^ status: Status values that need to be considered for filter
+  -> m (Network.HTTP.Client.Types.Response SingleParamResponse)                                        -- ^ Monadic computation which returns the result of the operation
+singleParamWithConfiguration config
+                             status = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                       Dog)
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /pet/singleparam
+-- 
+-- The same as 'singleParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
+singleParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus                 -- ^ status: Status values that need to be considered for filter
+  -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+singleParamRaw status = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /pet/singleparam
+-- 
+-- The same as 'singleParam' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+singleParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
+  -> SingleParamParametersStatus                                                                          -- ^ status: Status values that need to be considered for filter
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString)                           -- ^ Monadic computation which returns the result of the operation
+singleParamWithConfigurationRaw config
+                                status = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])

@@ -16,22 +16,27 @@ main =
       $ it "get inventory"
       $ do
         response <- runGetInventory
-        getResponseBody (fromRight undefined response)
+        getResponseBody response
           `shouldSatisfy` ( \case
                               GetInventoryResponse200 _ -> True
                               _ -> False
                           )
-    describe "runAddPet"
-      $ it "add pet"
+    describe "runAddPetAndFindIt"
+      $ it "add pet and find it"
       $ do
-        response <- runAddPet
-        getResponseBody (fromRight undefined response)
+        (response1, response2) <- runAddPetAndFindIt
+        getResponseBody response1
           `shouldBe` AddPetResponse200
+        getResponseBody response2
+          `shouldSatisfy` ( \case
+                              FindPetsByStatusResponse200 pets -> any (\p -> petName p == "Harro") pets
+                              _ -> False
+                          )
     describe "runFindPetsByStatus"
       $ it "find pets by status"
       $ do
         response <- runFindPetsByStatus
-        getResponseBody (fromRight undefined response)
+        getResponseBody response
           `shouldSatisfy` ( \case
                               FindPetsByStatusResponse200 _ -> True
                               _ -> False

@@ -26,7 +26,6 @@ module OpenAPI.Generate.Internal.Operation
 where
 
 import Control.Monad
-import qualified Control.Monad.Reader as MR
 import qualified Data.Aeson as Aeson
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
@@ -206,20 +205,20 @@ getNameFromParameter = OAT.name
 --     [t|OC.Configuration -> Int -> $(varT monadName) ($(responseType) $(responseInnerType))|]
 --       = getParametersTypeForSignature [conT ''Int] (monadName)
 --   @
-getParametersTypeForSignature :: [Q Type] -> Name -> Name -> Name -> Q Type
-getParametersTypeForSignature types responseTypeName monadName securitySchemeName =
+getParametersTypeForSignature :: [Q Type] -> Name -> Name -> Q Type
+getParametersTypeForSignature types responseTypeName monadName =
   createFunctionType
-    ( [t|OC.Configuration $(varT securitySchemeName)|]
+    ( [t|OC.Configuration|]
         : types
-        <> [[t|$(varT monadName) (Either HS.HttpException (HS.Response $(varT responseTypeName)))|]]
+        <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
 -- | Same as 'getParametersTypeForSignature' but with the configuration in 'MR.ReaderT' instead of a parameter
-getParametersTypeForSignatureWithMonadTransformer :: [Q Type] -> Name -> Name -> Name -> Q Type
-getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName securitySchemeName =
+getParametersTypeForSignatureWithMonadTransformer :: [Q Type] -> Name -> Name -> Q Type
+getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName =
   createFunctionType
     ( types
-        <> [[t|MR.ReaderT (OC.Configuration $(varT securitySchemeName)) $(varT monadName) (Either HS.HttpException (HS.Response $(varT responseTypeName)))|]]
+        <> [[t|OC.StripeT $(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
 createFunctionType :: [Q Type] -> Q Type

@@ -51,19 +51,19 @@ checkoutSession =
       postCheckoutSessionsRequestBodySuccessUrl = "https://localhost:8080/payments/index.html?success=true&sessionId={CHECKOUT_SESSION_ID}"
     }
 
-runCheckoutSession :: MonadHTTP m => m (Either HttpException (Response PostCheckoutSessionsResponse))
+runCheckoutSession :: MonadHTTP m => m (Response PostCheckoutSessionsResponse)
 runCheckoutSession =
   runWithConfiguration defaultConfiguration $
-    postCheckoutSessionsM checkoutSession
+    postCheckoutSessions checkoutSession
 
-runCheckoutSessionRaw :: MonadHTTP m => m (Either HttpException (Response ByteString))
+runCheckoutSessionRaw :: MonadHTTP m => m (Response ByteString)
 runCheckoutSessionRaw =
   runWithConfiguration defaultConfiguration $
-    postCheckoutSessionsRawM checkoutSession
+    postCheckoutSessionsRaw checkoutSession
 
-runGetPaymentIntent :: MonadHTTP m => m (Either HttpException (Response GetPaymentIntentsResponse))
+runGetPaymentIntent :: MonadHTTP m => m (Response GetPaymentIntentsResponse)
 runGetPaymentIntent =
-  getPaymentIntents
+  getPaymentIntentsWithConfiguration
     defaultConfiguration {configBaseURL = "http://test.url"}
     parameters
   where
@@ -77,8 +77,8 @@ runGetPaymentIntent =
           getPaymentIntentsParametersQueryStartingAfter = Just "the last string"
         }
 
-runPostPaymentIntent :: MonadHTTP m => m (Either HttpException (Response PostPaymentIntentsResponse))
-runPostPaymentIntent = postPaymentIntents defaultConfiguration myPaymentIntent
+runPostPaymentIntent :: MonadHTTP m => m (Response PostPaymentIntentsResponse)
+runPostPaymentIntent = postPaymentIntentsWithConfiguration defaultConfiguration myPaymentIntent
   where
     myPaymentIntent =
       PostPaymentIntentsRequestBody

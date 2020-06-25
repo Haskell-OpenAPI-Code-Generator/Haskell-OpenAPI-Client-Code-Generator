@@ -26,44 +26,45 @@ myTag =
       tagName = Just "Tag 1"
     }
 
-bearerConfiguration :: Configuration BearerAuthenticationSecurityScheme
+bearerConfiguration :: Configuration
 bearerConfiguration =
   defaultConfiguration
-    { configSecurityScheme = BearerAuthenticationSecurityScheme "token"
+    { configSecurityScheme = bearerAuthenticationSecurityScheme "token"
     }
 
-runGetInventoryAnonymous :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse))
-runGetInventoryAnonymous = getInventory defaultConfiguration
+runGetInventoryAnonymous :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventoryAnonymous = getInventoryWithConfiguration defaultConfiguration
 
-runGetInventoryBasicAuth :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse))
+runGetInventoryBasicAuth :: MonadHTTP m => m (Response GetInventoryResponse)
 runGetInventoryBasicAuth =
-  getInventory $
+  getInventoryWithConfiguration $
     defaultConfiguration
       { configSecurityScheme =
-          BasicAuthenticationSecurityScheme
-            { basicAuthenticationSecuritySchemeUsername = "user",
-              basicAuthenticationSecuritySchemePassword = "pw"
-            }
+          basicAuthenticationSecurityScheme
+            BasicAuthenticationData
+              { basicAuthenticationDataUsername = "user",
+                basicAuthenticationDataPassword = "pw"
+              }
       }
 
-runGetInventoryBearerAuth :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse))
-runGetInventoryBearerAuth = getInventory bearerConfiguration
+runGetInventoryBearerAuth :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventoryBearerAuth = getInventoryWithConfiguration bearerConfiguration
 
-runMultipleRequestsWithBearerAuth :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse), Either HttpException (Response AddPetResponse))
+runMultipleRequestsWithBearerAuth :: MonadHTTP m => m (Response GetInventoryResponse, Response AddPetResponse)
 runMultipleRequestsWithBearerAuth =
   runWithConfiguration bearerConfiguration $ do
-    response1 <- getInventoryM
-    response2 <- addPetM myPet
+    response1 <- getInventory
+    response2 <- addPet myPet
     pure (response1, response2)
 
-runAddPet :: MonadHTTP m => m (Either HttpException (Response AddPetResponse))
-runAddPet = addPet defaultConfiguration myPet
+runAddPet :: MonadHTTP m => m (Response AddPetResponse)
+runAddPet = addPetWithConfiguration defaultConfiguration myPet
 
-runGetAllPetsAsOneOf :: MonadHTTP m => m (Either HttpException (Response GetAllPetsAsOneOfResponse))
-runGetAllPetsAsOneOf = getAllPetsAsOneOf defaultConfiguration
+runGetAllPetsAsOneOf :: MonadHTTP m => m (Response GetAllPetsAsOneOfResponse)
+runGetAllPetsAsOneOf = getAllPetsAsOneOfWithConfiguration defaultConfiguration
 
-runUpdatePet :: MonadHTTP m => m (Either HttpException (Response UpdatePetResponse))
-runUpdatePet = updatePet defaultConfiguration (UpdatePetRequestBodyPet myPet)
+runUpdatePet :: MonadHTTP m => m (Response UpdatePetResponse)
+runUpdatePet = updatePetWithConfiguration defaultConfiguration (UpdatePetRequestBodyPet myPet)
 
-runUpdatePetWithTag :: MonadHTTP m => m (Either HttpException (Response UpdatePetResponse))
-runUpdatePetWithTag = updatePet defaultConfiguration (UpdatePetRequestBodyTag myTag)
+runUpdatePetWithTag :: MonadHTTP m => m (Response UpdatePetResponse)
+runUpdatePetWithTag = updatePetWithConfiguration defaultConfiguration (UpdatePetRequestBodyTag myTag)

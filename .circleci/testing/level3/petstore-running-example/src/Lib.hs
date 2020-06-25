@@ -7,8 +7,11 @@ import Network.HTTP.Client
 import OpenAPI
 import OpenAPI.Common
 
-runAddPet :: MonadHTTP m => m (Either HttpException (Response AddPetResponse))
-runAddPet = addPet defaultConfiguration myPet
+runAddPetAndFindIt :: MonadHTTP m => m (Response AddPetResponse, Response FindPetsByStatusResponse)
+runAddPetAndFindIt = runWithConfiguration defaultConfiguration $ do
+  response1 <- addPet myPet
+  response2 <- findPetsByStatus [FindPetsByStatusParametersStatusEnumString_pending]
+  pure (response1, response2)
   where
     myPet =
       Pet
@@ -16,12 +19,12 @@ runAddPet = addPet defaultConfiguration myPet
           petId = Nothing,
           petName = "Harro",
           petPhotoUrls = [],
-          petStatus = Nothing,
+          petStatus = Just PetStatusEnumString_pending,
           petTags = Nothing
         }
 
-runGetInventory :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse))
-runGetInventory = getInventory defaultConfiguration
+runGetInventory :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventory = getInventoryWithConfiguration defaultConfiguration
 
-runFindPetsByStatus :: MonadHTTP m => m (Either HttpException (Response FindPetsByStatusResponse))
-runFindPetsByStatus = findPetsByStatus defaultConfiguration [FindPetsByStatusParametersStatusEnumString_pending]
+runFindPetsByStatus :: MonadHTTP m => m (Response FindPetsByStatusResponse)
+runFindPetsByStatus = findPetsByStatusWithConfiguration defaultConfiguration [FindPetsByStatusParametersStatusEnumString_pending]

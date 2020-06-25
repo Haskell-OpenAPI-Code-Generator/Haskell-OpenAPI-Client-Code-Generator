@@ -45,18 +45,12 @@ defineSecurityScheme moduleName (OAT.HttpSecuritySchemeObject scheme) =
         _ -> Nothing
 defineSecurityScheme _ _ = Nothing
 
--- | The name used in the instance declaration (referencing 'OC.authenticateRequest').
--- It is necessary because it is not possible to fully qualify the name in the instance declaration.
-authenticateRequestName :: Name
-authenticateRequestName = mkName "authenticateRequest"
-
 -- | BasicAuthentication scheme with simple username and password
 basicAuthenticationScheme :: Text -> Text -> Q Doc
 basicAuthenticationScheme moduleName description =
-  let dataName = mkName "BasicAuthenticationSecurityScheme"
-      usernameName = mkName "basicAuthenticationSecuritySchemeUsername"
-      passwordName = mkName "basicAuthenticationSecuritySchemePassword"
-      paramName = mkName "basicAuth"
+  let dataName = mkName "BasicAuthenticationData"
+      usernameName = mkName "basicAuthenticationDataUsername"
+      passwordName = mkName "basicAuthenticationDataPassword"
       dataDefinition =
         dataD
           (cxt [])
@@ -70,97 +64,67 @@ basicAuthenticationScheme moduleName description =
               ]
           ]
           [derivClause Nothing [conT ''Show, conT ''Ord, conT ''Eq]]
-      instanceDefinition =
-        instanceD
-          (cxt [])
-          (appT (conT ''OC.SecurityScheme) (conT dataName))
-          [ funD
-              authenticateRequestName
-              [ clause
-                  [varP paramName]
-                  ( normalB
-                      [|
-                        HC.applyBasicAuth
-                          (OC.textToByte $ $(varE usernameName) $(varE paramName))
-                          (OC.textToByte $ $(varE passwordName) $(varE paramName))
-                        |]
-                  )
-                  []
-              ]
-          ]
+      fnName = mkName "basicAuthenticationSecurityScheme"
+      functionType = sigD fnName [t|$(varT dataName) -> OC.SecurityScheme|]
+      functionBody =
+        [d|
+          $(varP fnName) = \basicAuth ->
+            HC.applyBasicAuth
+              (OC.textToByte $ $(varE usernameName) basicAuth)
+              (OC.textToByte $ $(varE passwordName) basicAuth)
+          |]
    in vcat
         <$> sequence
           [ ($$ text "")
               . ( Doc.generateHaddockComment
-                    [ "Use this security scheme to use basic authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
-                      "",
-                      description,
-                      "",
-                      "@",
-                      "'" <> moduleName <> ".Configuration.defaultConfiguration'",
-                      "  { configSecurityScheme =",
-                      "      'BasicAuthenticationSecurityScheme'",
-                      "        { 'basicAuthenticationSecuritySchemeUsername' = \"user\",",
-                      "          'basicAuthenticationSecuritySchemePassword' = \"pw\"",
-                      "        }",
-                      "  }",
-                      "@"
+                    [ "Used to pass the authentication information for BasicAuthentication to 'basicAuthenticationSecurityScheme'."
                     ]
                     $$
                 )
               . ppr <$> dataDefinition,
-            ppr <$> instanceDefinition
+            ( Doc.generateHaddockComment
+                [ "Use this security scheme to use basic authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
+                  "",
+                  description,
+                  "",
+                  "@",
+                  "'" <> moduleName <> ".Configuration.defaultConfiguration'",
+                  "  { configSecurityScheme =",
+                  "      'basicAuthenticationSecurityScheme' 'BasicAuthenticationData'",
+                  "        { 'basicAuthenticationDataUsername' = \"user\",",
+                  "          'basicAuthenticationDataPassword' = \"pw\"",
+                  "        }",
+                  "  }",
+                  "@"
+                ]
+                $$
+            )
+              . ppr <$> functionType,
+            ppr <$> functionBody
           ]
 
 -- | BearerAuthentication scheme with a bearer token
 bearerAuthenticationScheme :: Text -> Text -> Q Doc
 bearerAuthenticationScheme moduleName description =
-  let dataName = mkName "BearerAuthenticationSecurityScheme"
-      tokenName = mkName "token"
-      dataDefinition =
-        dataD
-          (cxt [])
-          dataName
-          []
-          Nothing
-          [ normalC
-              dataName
-              [bangType (bang noSourceUnpackedness noSourceStrictness) $ conT ''Text]
-          ]
-          [derivClause Nothing [conT ''Show, conT ''Ord, conT ''Eq]]
-      instanceDefinition =
-        instanceD
-          (cxt [])
-          (appT (conT ''OC.SecurityScheme) (conT dataName))
-          [ funD
-              authenticateRequestName
-              [ clause
-                  [conP dataName [varP tokenName]]
-                  ( normalB
-                      [|
-                        HS.addRequestHeader "Authorization" $ OC.textToByte $ "Bearer " <> $(varE tokenName)
-                        |]
-                  )
-                  []
-              ]
-          ]
+  let fnName = mkName "bearerAuthenticationSecurityScheme"
+      functionType = sigD fnName [t|Text -> OC.SecurityScheme|]
+      functionBody = [d|$(varP fnName) = \token -> HS.addRequestHeader "Authorization" $ OC.textToByte $ "Bearer " <> token|]
    in vcat
         <$> sequence
-          [ ($$ text "")
-              . ( Doc.generateHaddockComment
-                    [ "Use this security scheme to use bearer authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
-                      "",
-                      description,
-                      "",
-                      "@",
-                      "'" <> moduleName <> ".Configuration.defaultConfiguration'",
-                      "  { configSecurityScheme = 'BearerAuthenticationSecurityScheme' \"token\"",
-                      "  }",
-                      "@"
-                    ]
-                    $$
-                )
+          [ ( Doc.generateHaddockComment
+                [ "Use this security scheme to use bearer authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
+                  "",
+                  description,
+                  "",
+                  "@",
+                  "'" <> moduleName <> ".Configuration.defaultConfiguration'",
+                  "  { configSecurityScheme = 'bearerAuthenticationSecurityScheme' \"token\"",
+                  "  }",
+                  "@"
+                ]
+                $$
+            )
               . ppr
-              <$> dataDefinition,
-            ppr <$> instanceDefinition
+              <$> functionType,
+            ppr <$> functionBody
           ]
