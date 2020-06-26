@@ -47,7 +47,9 @@ data Flags
         -- | Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types
         optUseNumberedVariantConstructors :: Bool,
         -- | Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)
-        optGenerateOptionalEmptyRequestBody :: Bool
+        optGenerateOptionalEmptyRequestBody :: Bool,
+        -- | Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration
+        optOmitAdditionalOperationFunctions :: Bool
       }
   deriving (Show, Eq)
 
@@ -138,6 +140,10 @@ instance Options Flags where
         "generate-optional-empty-request-body"
         (optGenerateOptionalEmptyRequestBody defaultFlags)
         "Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)"
+      <*> simpleOption
+        "omit-additional-operation-functions"
+        (optOmitAdditionalOperationFunctions defaultFlags)
+        "Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration"
 
 -- | Default flags which can be used for tests and as a reference which values actually are used
 defaultFlags :: Flags
@@ -163,5 +169,6 @@ defaultFlags =
       optParameterCookiePrefix = "cookie",
       optParameterHeaderPrefix = "header",
       optUseNumberedVariantConstructors = False,
-      optGenerateOptionalEmptyRequestBody = False
+      optGenerateOptionalEmptyRequestBody = False,
+      optOmitAdditionalOperationFunctions = False
     }

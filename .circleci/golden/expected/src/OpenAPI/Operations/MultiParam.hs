@@ -3,13 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation multiParam
 module OpenAPI.Operations.MultiParam where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types
@@ -28,7 +28,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -69,7 +68,7 @@ data MultiParamParameters = MultiParamParameters {
   , multiParamParametersQueryStatus :: MultiParamParametersQueryStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MultiParamParameters
+instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParameters
     where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pathStatus" (multiParamParametersPathStatus obj) : (Data.Aeson..=) "queryFilter" (multiParamParametersQueryFilter obj) : (Data.Aeson..=) "queryStatus" (multiParamParametersQueryStatus obj) : [])
           toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pathStatus" (multiParamParametersPathStatus obj) GHC.Base.<> ((Data.Aeson..=) "queryFilter" (multiParamParametersQueryFilter obj) GHC.Base.<> (Data.Aeson..=) "queryStatus" (multiParamParametersQueryStatus obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParameters
@@ -82,24 +81,21 @@ instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParameters
 data MultiParamParametersPathStatus
     = MultiParamParametersPathStatusEnumOther Data.Aeson.Types.Internal.Value
     | MultiParamParametersPathStatusEnumTyped GHC.Types.Int
-    | MultiParamParametersPathStatusEnumNumber_1'0
-    | MultiParamParametersPathStatusEnumNumber_3'0
-    | MultiParamParametersPathStatusEnumNumber_5'0
+    | MultiParamParametersPathStatusEnum1
+    | MultiParamParametersPathStatusEnum3
+    | MultiParamParametersPathStatusEnum5
     deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MultiParamParametersPathStatus
+instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParametersPathStatus
     where toJSON (MultiParamParametersPathStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
           toJSON (MultiParamParametersPathStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MultiParamParametersPathStatusEnumNumber_1'0) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0)
-          toJSON (MultiParamParametersPathStatusEnumNumber_3'0) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0)
-          toJSON (MultiParamParametersPathStatusEnumNumber_5'0) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0)
-instance Data.Aeson.FromJSON MultiParamParametersPathStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0)
-                                          then MultiParamParametersPathStatusEnumNumber_1'0
-                                          else if val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0)
-                                                then MultiParamParametersPathStatusEnumNumber_3'0
-                                                else if val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0)
-                                                      then MultiParamParametersPathStatusEnumNumber_5'0
-                                                      else MultiParamParametersPathStatusEnumOther val)
+          toJSON (MultiParamParametersPathStatusEnum1) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0)
+          toJSON (MultiParamParametersPathStatusEnum3) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0)
+          toJSON (MultiParamParametersPathStatusEnum5) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0)
+instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParametersPathStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0) -> MultiParamParametersPathStatusEnum1
+                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0) -> MultiParamParametersPathStatusEnum3
+                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0) -> MultiParamParametersPathStatusEnum5
+                                            | GHC.Base.otherwise -> MultiParamParametersPathStatusEnumOther val)
 -- | Defines the enum schema multiParamParametersQueryStatus
 -- 
 -- Represents the parameter named \'status\'
@@ -112,20 +108,17 @@ data MultiParamParametersQueryStatus
     | MultiParamParametersQueryStatusEnumString_pending
     | MultiParamParametersQueryStatusEnumString_sold
     deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON MultiParamParametersQueryStatus
+instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParametersQueryStatus
     where toJSON (MultiParamParametersQueryStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
           toJSON (MultiParamParametersQueryStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MultiParamParametersQueryStatusEnumString_available) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (MultiParamParametersQueryStatusEnumString_pending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-          toJSON (MultiParamParametersQueryStatusEnumString_sold) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "sold"
-instance Data.Aeson.FromJSON MultiParamParametersQueryStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then MultiParamParametersQueryStatusEnumString_available
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then MultiParamParametersQueryStatusEnumString_pending
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "sold")
-                                                      then MultiParamParametersQueryStatusEnumString_sold
-                                                      else MultiParamParametersQueryStatusEnumOther val)
+          toJSON (MultiParamParametersQueryStatusEnumString_available) = "available"
+          toJSON (MultiParamParametersQueryStatusEnumString_pending) = "pending"
+          toJSON (MultiParamParametersQueryStatusEnumString_sold) = "sold"
+instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> MultiParamParametersQueryStatusEnumString_available
+                                            | val GHC.Classes.== "pending" -> MultiParamParametersQueryStatusEnumString_pending
+                                            | val GHC.Classes.== "sold" -> MultiParamParametersQueryStatusEnumString_sold
+                                            | GHC.Base.otherwise -> MultiParamParametersQueryStatusEnumOther val)
 -- | Represents a response of the operation 'multiParam'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'MultiParamResponseError' is used.

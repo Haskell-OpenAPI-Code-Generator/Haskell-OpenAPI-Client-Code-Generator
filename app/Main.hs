@@ -1,4 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Main where
@@ -111,21 +112,21 @@ main = runCommand $ \opts args -> case args of
     let env = OAM.createEnvironment opts $ Ref.buildReferenceMap spec
         logMessages = mapM_ (putStrLn . T.unpack) . OAM.transformGeneratorLogs
         moduleName = OAF.optModuleName opts
+        showAndReplace = replaceOpenAPI moduleName . show
         (operationsQ, logs) = OAM.runGenerator env $ defineOperations (OAF.optModuleName opts) spec
     logMessages logs
     operationModules <- runQ operationsQ
     configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
     let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec
     logMessages logsModels
-    modelModules <- runQ modelsQ
+    modelModules <- fmap (BF.second showAndReplace) <$> runQ modelsQ
     let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
     logMessages logs'
     securitySchemes' <- runQ securitySchemesQ
     let outputDirectory = OAF.optOutputDir opts
-        showAndReplace = replaceOpenAPI moduleName . show
         modules =
           fmap (BF.bimap ("Operations" :) showAndReplace) operationModules
-            <> fmap (BF.second showAndReplace) modelModules
+            <> modelModules
             <> [ (["Configuration"], showAndReplace configurationInfo),
                  (["SecuritySchemes"], showAndReplace securitySchemes'),
                  (["Common"], replaceOpenAPI moduleName $(embedFile "src/OpenAPI/Common.hs"))
@@ -139,7 +140,42 @@ main = runCommand $ \opts args -> case args of
             modules
         mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
         mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
-        filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+        hsBootFiles =
+          BF.bimap
+            ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs-boot") . foldr1 (</>))
+            ( T.unpack
+                . T.unlines
+                . ( \xs -> case xs of
+                      x : xs' -> x : "import Data.Aeson" : "import qualified Data.Aeson as Data.Aeson.Types.Internal" : xs'
+                      _ -> xs
+                  )
+                . ( >>=
+                      ( \l ->
+                          maybe
+                            [l]
+                            ( \suffix ->
+                                [ l,
+                                  "instance Show" <> suffix,
+                                  "instance Eq" <> suffix,
+                                  "instance FromJSON" <> suffix,
+                                  "instance ToJSON" <> suffix
+                                ]
+                            )
+                            $ T.stripPrefix "data" l
+                      )
+                  )
+                . fmap (\l -> if T.isPrefixOf "type" l then l else T.takeWhile (/= '=') l)
+                . filter (\line -> T.isPrefixOf "data" line || T.isPrefixOf "module" line || T.isPrefixOf "type" line)
+                . T.lines
+                . T.pack
+            )
+            <$> filter
+              ( \(p, _) -> case p of
+                  "Types" : _ : _ -> True
+                  _ -> False
+              )
+              modelModules
+        filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules) <> hsBootFiles
     if OAF.optDryRun opts
       then
         mapM_

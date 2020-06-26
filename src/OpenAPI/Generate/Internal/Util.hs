@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | Utility functions for the OpenAPI code generator
@@ -117,15 +118,27 @@ haskellifyNameM startWithUppercase name = do
 transformToModuleName :: Text -> Text
 transformToModuleName name =
   let toCamelCase (x : y : xs) | not (isValidCharaterInSuffixExceptUnderscore x) && isCasableAlpha y = Char.toUpper y : toCamelCase xs
+      toCamelCase ('\'' : y : xs) | isCasableAlpha y = '\'' : Char.toUpper y : toCamelCase xs
       toCamelCase (x : xs) = x : toCamelCase xs
       toCamelCase xs = xs
    in T.pack
         $ uppercaseFirst
         $ generateNameForEmptyIdentifier name
         $ removeIllegalLeadingCharacters
+        $ fmap
+          ( \case
+              '\'' -> '_'
+              c -> c
+          )
         $ toCamelCase
         $ T.unpack
-        $ T.map (\c -> if isValidCharaterInSuffixExceptUnderscore c then c else '_') name
+        $ T.map
+          ( \case
+              '.' -> '\''
+              c | isValidCharaterInSuffixExceptUnderscore c -> c
+              _ -> '_'
+          )
+          name
 
 uppercaseFirst :: String -> String
 uppercaseFirst (x : xs) = Char.toUpper x : xs

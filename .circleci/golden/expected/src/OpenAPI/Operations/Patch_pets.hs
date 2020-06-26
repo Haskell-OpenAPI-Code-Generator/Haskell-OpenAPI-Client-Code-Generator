@@ -3,13 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation patch_pets
 module OpenAPI.Operations.Patch_pets where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types
@@ -28,7 +28,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -54,11 +53,16 @@ patch_pets body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.eithe
 -- 
 data Patch_petsRequestBodyVariants
     = Patch_petsRequestBodyCat Cat | Patch_petsRequestBodyDog Dog
-    deriving (GHC.Show.Show, GHC.Classes.Eq, GHC.Generics.Generic)
-instance Data.Aeson.ToJSON Patch_petsRequestBodyVariants
-    where toJSON = Data.Aeson.Types.ToJSON.genericToJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
-instance Data.Aeson.FromJSON Patch_petsRequestBodyVariants
-    where parseJSON = Data.Aeson.Types.FromJSON.genericParseJSON Data.Aeson.Types.Internal.defaultOptions{Data.Aeson.Types.Internal.sumEncoding = Data.Aeson.Types.Internal.UntaggedValue}
+    deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON Patch_petsRequestBodyVariants
+    where toJSON (Patch_petsRequestBodyCat a) = Data.Aeson.Types.ToJSON.toJSON a
+          toJSON (Patch_petsRequestBodyDog a) = Data.Aeson.Types.ToJSON.toJSON a
+instance Data.Aeson.Types.FromJSON.FromJSON Patch_petsRequestBodyVariants
+    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ Patch_petsRequestBodyCat a
+                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
+                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ Patch_petsRequestBodyDog a
+                                                                       Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Represents a response of the operation 'patch_pets'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'Patch_petsResponseError' is used.

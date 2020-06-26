@@ -13,6 +13,7 @@ where
 import qualified Control.Applicative as Applicative
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
+import qualified Data.Maybe as Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
@@ -138,12 +139,26 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
           pure [fmap addCommentsToFnSignature fnSignature `Doc.appendDoc` functionBody]
       )
       availableOperationCombinations
+  omitAdditionalFunctions <- OAM.getFlag OAF.optOmitAdditionalOperationFunctions
+  let content =
+        concat $
+          if omitAdditionalFunctions
+            then
+              zipWith
+                (<>)
+                [ [operationDescription [description]],
+                  [paramDoc, bodyDefinition, responseBodyDefinitions]
+                ]
+                $ (<> [[Doc.emptyDoc]])
+                $ maybe [] pure
+                $ Maybe.listToMaybe functionDefinitions
+            else zipWith (<>) comments functionDefinitions
   pure $
     ([moduleName],)
       . Doc.addOperationsModuleHeader mainModuleName moduleName operationNameAsString
       . ($$ text "")
       <$> ( vcat
-              <$> sequence (concat $ zipWith (<>) comments functionDefinitions)
+              <$> sequence content
           )
 
 getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)
