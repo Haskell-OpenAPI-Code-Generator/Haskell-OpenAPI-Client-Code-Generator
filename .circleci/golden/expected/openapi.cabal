@@ -13,11 +13,12 @@ library
       OpenAPI.Operations.Patch_pets
       OpenAPI.Operations.ShowPetById
       OpenAPI.Types
-      OpenAPI.CyclicTypes
+      OpenAPI.TypeAlias
+      OpenAPI.Types.Cat
       OpenAPI.Types.Dog
+      OpenAPI.Types.Mischling
+      OpenAPI.Types.PetByAge
       OpenAPI.Types.PetByType
-      OpenAPI.Types.Test
-      OpenAPI.Types.Test2
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common

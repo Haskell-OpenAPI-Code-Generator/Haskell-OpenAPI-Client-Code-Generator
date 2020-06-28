@@ -3,7 +3,8 @@
 
 -- | Utility functions for 'Language.Haskell.TH.PprLib.Doc' manipulation
 module OpenAPI.Generate.Doc
-  ( emptyDoc,
+  ( typeAliasModule,
+    emptyDoc,
     appendDoc,
     generateHaddockComment,
     escapeText,
@@ -25,6 +26,10 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH.PprLib hiding ((<>))
 import OpenAPI.Generate.Internal.Util
+
+-- | The name of the module which contains all type aliases which would be in their own module otherwise
+typeAliasModule :: String
+typeAliasModule = "TypeAlias"
 
 -- | Empty document inside an 'Applicative' (typically 'Language.Haskell.TH.Q')
 emptyDoc :: Applicative f => f Doc
@@ -160,13 +165,13 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . languageExtension "OverloadedStrings"
     . languageExtension "ExplicitForAll"
     . languageExtension "MultiWayIf"
-    . languageExtension "DeriveGeneric"
     . emptyLine
     . moduleDescription ("Contains the different functions to run the operation " <> operationId)
     . moduleDeclaration (mainModuleName <> ".Operations") moduleName
     . emptyLine
     . importQualified "Prelude as GHC.Integer.Type"
     . importQualified "Prelude as GHC.Maybe"
+    . importQualified "Control.Monad.Fail"
     . importQualified "Control.Monad.Trans.Reader"
     . importQualified "Data.Aeson"
     . importQualified "Data.Aeson as Data.Aeson.Types"
@@ -185,7 +190,6 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "Data.Vector"
     . importQualified "GHC.Base"
     . importQualified "GHC.Classes"
-    . importQualified "GHC.Generics"
     . importQualified "GHC.Int"
     . importQualified "GHC.Show"
     . importQualified "GHC.Types"
@@ -205,13 +209,14 @@ addModelModuleHeader :: String -> String -> [String] -> String -> Doc -> Doc
 addModelModuleHeader mainModuleName moduleName modelModulesToImport description =
   generatorNote
     . languageExtension "OverloadedStrings"
-    . languageExtension "DeriveGeneric"
+    . languageExtension "MultiWayIf"
     . emptyLine
     . moduleDescription description
     . moduleDeclaration mainModuleName moduleName
     . emptyLine
     . importQualified "Prelude as GHC.Integer.Type"
     . importQualified "Prelude as GHC.Maybe"
+    . importQualified "Control.Monad.Fail"
     . importQualified "Data.Aeson"
     . importQualified "Data.Aeson as Data.Aeson.Types"
     . importQualified "Data.Aeson as Data.Aeson.Types.FromJSON"
@@ -227,12 +232,12 @@ addModelModuleHeader mainModuleName moduleName modelModulesToImport description 
     . importQualified "Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime"
     . importQualified "GHC.Base"
     . importQualified "GHC.Classes"
-    . importQualified "GHC.Generics"
     . importQualified "GHC.Int"
     . importQualified "GHC.Show"
     . importQualified "GHC.Types"
     . importQualified (mainModuleName <> ".Common")
-    . (vcat (fmap (text . ("import " <>) . ((mainModuleName <> ".") <>)) modelModulesToImport) $$)
+    . (if moduleName == typeAliasModule then id else importUnqualified (mainModuleName <> "." <> typeAliasModule))
+    . (vcat (fmap (text . ("import {-# SOURCE #-} " <>) . ((mainModuleName <> ".") <>)) modelModulesToImport) $$)
     . emptyLine
 
 -- | Add the module header to the security scheme module

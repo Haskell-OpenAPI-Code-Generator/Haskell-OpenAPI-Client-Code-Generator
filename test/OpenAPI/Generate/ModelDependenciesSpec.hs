@@ -20,31 +20,32 @@ spec =
       result <-
         runQ $
           sut
-            [ ("A", (t "aToken", Set.fromList [])),
-              ("B", (t "bToken", Set.fromList ["A"])),
-              ("C", (t "cToken", Set.fromList ["A", "B"])),
-              ("D", (t "dToken", Set.fromList ["C"])),
-              ("E", (t "eToken", Set.fromList ["E"])),
-              ("F", (t "fToken", Set.fromList ["G"])),
-              ("G", (t "gToken", Set.fromList ["F"]))
+            [ ("A", (t "data A", Set.fromList [])),
+              ("B", (t "data B", Set.fromList ["A"])),
+              ("C", (t "type C", Set.fromList ["A", "B"])),
+              ("D", (t "type D\ndata D", Set.fromList ["C"])),
+              ("E", (t "data E", Set.fromList ["E"])),
+              ("F", (t "-- XYZ\ntype F", Set.fromList ["G"])),
+              ("G", (t "data G", Set.fromList ["F"]))
             ]
       sortBy (\(a, _) (b, _) -> compare a b) (fmap (second show) result)
         `shouldSatisfy` ( \case
-                            [ (["CyclicTypes"], cyclicContent),
+                            [ (["TypeAlias"], typeAliasContent),
                               (["Types"], _),
                               (["Types", "A"], aContent),
                               (["Types", "B"], bContent),
-                              (["Types", "C"], cContent),
-                              (["Types", "D"], dContent)
+                              (["Types", "D"], dContent),
+                              (["Types", "E"], eContent),
+                              (["Types", "G"], gContent)
                               ] ->
                                 and
-                                  [ "aToken" `isInfixOf` aContent,
-                                    "bToken" `isInfixOf` bContent,
-                                    "cToken" `isInfixOf` cContent,
-                                    "dToken" `isInfixOf` dContent,
-                                    "eToken" `isInfixOf` cyclicContent,
-                                    "fToken" `isInfixOf` cyclicContent,
-                                    "gToken" `isInfixOf` cyclicContent
+                                  [ "data A" `isInfixOf` aContent,
+                                    "data B" `isInfixOf` bContent,
+                                    "type D\ndata D" `isInfixOf` dContent,
+                                    "data E" `isInfixOf` eContent,
+                                    "data G" `isInfixOf` gContent,
+                                    "type C" `isInfixOf` typeAliasContent,
+                                    "-- XYZ\ntype F" `isInfixOf` typeAliasContent
                                   ]
                             _ -> False
                         )

@@ -3,13 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation singleParam
 module OpenAPI.Operations.SingleParam where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types
@@ -28,7 +28,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -62,20 +61,17 @@ data SingleParamParametersStatus
     | SingleParamParametersStatusEnumString_pending
     | SingleParamParametersStatusEnumString_sold
     deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON SingleParamParametersStatus
+instance Data.Aeson.Types.ToJSON.ToJSON SingleParamParametersStatus
     where toJSON (SingleParamParametersStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
           toJSON (SingleParamParametersStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (SingleParamParametersStatusEnumString_available) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (SingleParamParametersStatusEnumString_pending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-          toJSON (SingleParamParametersStatusEnumString_sold) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "sold"
-instance Data.Aeson.FromJSON SingleParamParametersStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then SingleParamParametersStatusEnumString_available
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then SingleParamParametersStatusEnumString_pending
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "sold")
-                                                      then SingleParamParametersStatusEnumString_sold
-                                                      else SingleParamParametersStatusEnumOther val)
+          toJSON (SingleParamParametersStatusEnumString_available) = "available"
+          toJSON (SingleParamParametersStatusEnumString_pending) = "pending"
+          toJSON (SingleParamParametersStatusEnumString_sold) = "sold"
+instance Data.Aeson.Types.FromJSON.FromJSON SingleParamParametersStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> SingleParamParametersStatusEnumString_available
+                                            | val GHC.Classes.== "pending" -> SingleParamParametersStatusEnumString_pending
+                                            | val GHC.Classes.== "sold" -> SingleParamParametersStatusEnumString_sold
+                                            | GHC.Base.otherwise -> SingleParamParametersStatusEnumOther val)
 -- | Represents a response of the operation 'singleParam'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'SingleParamResponseError' is used.

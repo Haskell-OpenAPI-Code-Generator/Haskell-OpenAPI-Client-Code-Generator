@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections #-}
 
 -- | Functionality to split models into multiple modules according to their dependencies
 module OpenAPI.Generate.ModelDependencies
@@ -36,58 +35,65 @@ type ModelWithDependencies = (Text, ModelContentWithDependencies)
 typesModule :: String
 typesModule = "Types"
 
-cyclicTypesModule :: String
-cyclicTypesModule = "CyclicTypes"
-
 -- | Analyzes the dependencies of the provided models and splits them into modules.
--- All models with cyclic dependencies (between each other or to itself) are put in a module named by @cyclicTypesModule@.
+-- All models which would form an own module but only consist of a type alias are put in a module named by 'Doc.typeAliasModule'.
 getModelModulesFromModelsWithDependencies :: String -> [ModelWithDependencies] -> Q [ModuleDefinition]
-getModelModulesFromModelsWithDependencies mainModuleName = createModelModules mainModuleName . extractCyclicModuleDependentModels
-
-createModelModules :: String -> ([ModelWithDependencies], Q Doc) -> Q [ModuleDefinition]
-createModelModules mainModuleName (models, cyclicModuleContentQ) = do
+getModelModulesFromModelsWithDependencies mainModuleName models = do
   let prependTypesModule = ((typesModule <> ".") <>) . T.unpack
-  let prependMainModule = ((mainModuleName <> ".") <>)
-  cyclicModuleContent <- cyclicModuleContentQ
-  modules <-
+      prependMainModule = ((mainModuleName <> ".") <>)
+  modelsWithResolvedContent <-
     mapM
-      ( \(modelName, (doc, dependencies)) ->
-          ([typesModule, T.unpack modelName],)
-            . Doc.addModelModuleHeader
-              mainModuleName
-              (prependTypesModule modelName)
-              (prependTypesModule <$> Set.toList dependencies)
-              ("Contains the types generated from the schema " <> T.unpack modelName)
-              <$> doc
+      ( \(name, (contentQ, dependencies)) -> do
+          content <- contentQ
+          pure (name, (content, dependencies))
       )
       models
-  let modelModuleNames = fmap (joinWithPoint . fst) modules
+  let (typeAliasModels, modelsWithContent) = partition (\(_, (content, _)) -> isTypeAliasModule content) modelsWithResolvedContent
+      (typeAliasModuleNames, typeAliasContent, typeAliasDependencies) =
+        foldr
+          ( \(name, (content, dependencies)) (names, allContent, allDependencies) ->
+              (Set.insert name names, allContent $$ text "" $$ content, Set.union dependencies allDependencies)
+          )
+          (Set.empty, empty, Set.empty)
+          typeAliasModels
+      modules =
+        fmap
+          ( \(modelName, (doc, dependencies)) ->
+              ( [typesModule, T.unpack modelName],
+                Doc.addModelModuleHeader
+                  mainModuleName
+                  (prependTypesModule modelName)
+                  (prependTypesModule <$> Set.toList (Set.difference dependencies $ Set.insert modelName typeAliasModuleNames))
+                  ("Contains the types generated from the schema " <> T.unpack modelName)
+                  doc
+              )
+          )
+          modelsWithContent
+      modelModuleNames = fmap (joinWithPoint . fst) modules
   pure $
     ( [typesModule],
       Doc.createModuleHeaderWithReexports
         (prependMainModule typesModule)
-        (fmap prependMainModule (cyclicTypesModule : modelModuleNames))
+        (fmap prependMainModule (Doc.typeAliasModule : modelModuleNames))
         "Rexports all type modules (used in the operation modules)."
     )
-      : ( [cyclicTypesModule],
+      : ( [Doc.typeAliasModule],
           Doc.addModelModuleHeader
             mainModuleName
-            cyclicTypesModule
-            modelModuleNames
+            Doc.typeAliasModule
+            (prependTypesModule <$> Set.toList (Set.difference typeAliasDependencies typeAliasModuleNames))
             "Contains all types with cyclic dependencies (between each other or to itself)"
-            cyclicModuleContent
+            typeAliasContent
         )
       : modules
 
-extractCyclicModuleDependentModels :: [ModelWithDependencies] -> ([ModelWithDependencies], Q Doc)
-extractCyclicModuleDependentModels models =
-  let (cyclicModels, extractedModels) = extractUnidirectionallyDependentModels (models, [])
-   in (extractedModels, vcat <$> mapM (fst . snd) cyclicModels)
-
-extractUnidirectionallyDependentModels :: ([ModelWithDependencies], [ModelWithDependencies]) -> ([ModelWithDependencies], [ModelWithDependencies])
-extractUnidirectionallyDependentModels (rest, extractedModels) =
-  let extractedModelNames = Set.fromList $ fmap fst extractedModels
-      (newExtractedModels, notExtractedModels) = partition ((`Set.isSubsetOf` extractedModelNames) . snd . snd) rest
-   in if null newExtractedModels
-        then (rest, extractedModels)
-        else extractUnidirectionallyDependentModels (notExtractedModels, extractedModels <> newExtractedModels)
+isTypeAliasModule :: Doc -> Bool
+isTypeAliasModule =
+  all
+    ( \l ->
+        isPrefixOf "--" l
+          || isPrefixOf "type" l
+          || null l
+    )
+    . lines
+    . show

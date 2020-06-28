@@ -253,6 +253,7 @@ components:
       allOf: # Combines the main `Pet` schema with `Cat`-specific properties
         - $ref: '#/components/schemas/Dog'
         - $ref: '#/components/schemas/PetByAge'
+        - $ref: '#/components/schemas/Test2'
         - type: object
           # all other properties specific to a `Cat`
           properties:
@@ -266,6 +267,16 @@ components:
       type: array
       items:
         type: string
+    Test3:
+      description: No properties
+    Test4:
+      type: array
+      items:
+        $ref: '#/components/schemas/Test2'
+    Test5:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dog'
   parameters:
     PetParameters:
       name: petId
