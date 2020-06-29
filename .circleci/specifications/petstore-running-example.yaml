@@ -639,7 +639,6 @@ components:
     Pet:
       type: object
       required:
-      - name
       - photoUrls
       properties:
         id:

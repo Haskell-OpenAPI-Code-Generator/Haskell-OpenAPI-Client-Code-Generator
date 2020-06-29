@@ -33,7 +33,6 @@ spec =
       testTHName = varE $ mkName "myTestName"
       testTHE = [|B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $testTHName)|]
       monadName = mkName "m"
-      securitySchemeName = mkName "s"
    in do
         describe "generateQueryParams" $
           singleTestTH

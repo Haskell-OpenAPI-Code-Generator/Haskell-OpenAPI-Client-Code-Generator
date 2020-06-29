@@ -13,7 +13,7 @@ myPet =
   Pet
     { petCategory = Nothing,
       petId = Nothing,
-      petName = "Harro",
+      petName = Just "Harro",
       petPhotoUrls = [],
       petStatus = Nothing,
       petTags = Nothing

@@ -130,17 +130,9 @@ instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeVariants
           toJSON (MischlingAnother_relativeMischlingAnother_relativeOneOf4 a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingAnother_relativeListTText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingAnother_relativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingAnother_relativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingAnother_relativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                                                         Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingAnother_relativeMischlingAnother_relativeOneOf4 a
-                                                                                                                                                         Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                                                                                                  Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingAnother_relativeListTText a
-                                                                                                                                                                                                  Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Defines the enum schema MischlingBreed
 -- 
 -- 
@@ -201,13 +193,9 @@ instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relativeAnother_relativeV
           toJSON (MischlingFirst_relativeAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingFirst_relativeAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeAnother_relativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeAnother_relativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeAnother_relativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeAnother_relativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (MischlingFirst_relativeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Defines the enum schema MischlingFirst_relativePet_type
 -- 
 -- 
@@ -239,13 +227,9 @@ instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relativeRelativeVariants
           toJSON (MischlingFirst_relativeRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingFirst_relativeRelativeText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeRelativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeRelativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeRelativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingFirst_relativeRelativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (MischlingFirst_relativeRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Define the one-of schema MischlingRelative
 -- 
 -- 
@@ -259,10 +243,6 @@ instance Data.Aeson.Types.ToJSON.ToJSON MischlingRelativeVariants
           toJSON (MischlingRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingRelativeText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingRelativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingRelativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingRelativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ MischlingRelativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (MischlingRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
