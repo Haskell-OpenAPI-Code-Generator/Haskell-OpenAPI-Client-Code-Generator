@@ -17,7 +17,7 @@ runAddPetAndFindIt = runWithConfiguration defaultConfiguration $ do
       Pet
         { petCategory = Nothing,
           petId = Nothing,
-          petName = "Harro",
+          petName = Just "Harro",
           petPhotoUrls = [],
           petStatus = Just PetStatusEnumString_pending,
           petTags = Nothing

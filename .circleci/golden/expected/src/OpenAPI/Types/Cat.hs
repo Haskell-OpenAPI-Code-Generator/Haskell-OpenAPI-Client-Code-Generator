@@ -65,13 +65,9 @@ instance Data.Aeson.Types.ToJSON.ToJSON CatAnother_relativeVariants
           toJSON (CatAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (CatAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON CatAnother_relativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatAnother_relativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatAnother_relativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatAnother_relativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (CatAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Define the one-of schema CatRelative
 -- 
 -- 
@@ -85,10 +81,6 @@ instance Data.Aeson.Types.ToJSON.ToJSON CatRelativeVariants
           toJSON (CatRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (CatRelativeText a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON CatRelativeVariants
-    where parseJSON val = case Data.Aeson.Types.FromJSON.fromJSON val of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatRelativeCat a
-                              Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                       Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatRelativePetByType a
-                                                                       Data.Aeson.Types.Internal.Error _ -> case Data.Aeson.Types.FromJSON.fromJSON val of
-                                                                                                                Data.Aeson.Types.Internal.Success a -> GHC.Base.pure GHC.Base.$ CatRelativeText a
-                                                                                                                Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = case (CatRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a

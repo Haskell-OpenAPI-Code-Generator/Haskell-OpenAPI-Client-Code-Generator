@@ -29,7 +29,7 @@ main =
           `shouldBe` AddPetResponse200
         getResponseBody response2
           `shouldSatisfy` ( \case
-                              FindPetsByStatusResponse200 pets -> any (\p -> petName p == "Harro") pets
+                              FindPetsByStatusResponse200 pets -> any (\p -> petName p == Just "Harro") pets
                               _ -> False
                           )
     describe "runFindPetsByStatus"

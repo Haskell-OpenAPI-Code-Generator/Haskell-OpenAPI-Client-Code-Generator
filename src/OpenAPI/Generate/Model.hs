@@ -16,6 +16,7 @@ module OpenAPI.Generate.Model
   )
 where
 
+import Control.Applicative
 import Control.Monad
 import qualified Data.Aeson as Aeson
 import qualified Data.Int as Int
@@ -303,23 +304,18 @@ defineOneOfSchema schemaName description schemas = do
         let paramName = mkName "val"
             body = do
               constructorNames' <- sequence constructorNames
-              case constructorNames' of
-                [] -> [|fail "No constructors available"|]
-                xs ->
-                  foldr
-                    ( \constructorName expr ->
-                        [|
-                          case Aeson.fromJSON $(varE paramName) of
-                            Aeson.Success $p -> pure $ $(varE constructorName) $e
-                            Aeson.Error _ -> $expr
-                          |]
-                    )
-                    [|
-                      case Aeson.fromJSON $(varE paramName) of
-                        Aeson.Success $p -> pure $ $(varE $ last xs) $e
-                        Aeson.Error $p -> fail $e
-                      |]
-                    $ init xs
+              let resultExpr =
+                    foldr
+                      ( \constructorName expr ->
+                          [|($(varE constructorName) <$> Aeson.fromJSON $(varE paramName)) <|> $expr|]
+                      )
+                      [|Aeson.Error "No variant matched"|]
+                      constructorNames'
+              [|
+                case $resultExpr of
+                  Aeson.Success $p -> pure $e
+                  Aeson.Error $p -> fail $e
+                |]
          in funD
               (mkName "parseJSON")
               [ clause
