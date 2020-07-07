@@ -23,11 +23,11 @@ import Language.Haskell.TH.Syntax
 import qualified Network.HTTP.Client as HC
 import qualified Network.HTTP.Types as HT
 import qualified OpenAPI.Generate.Doc as Doc
-import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Operation
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.Monad as OAM
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
 
 -- | Generates a response type with a constructor for all possible response types of the operation.
@@ -41,17 +41,17 @@ getResponseDefinitions ::
   -- | Returns the name of the reponse data type, the response transformation function and the document containing
   -- the definitions of all response types.
   OAM.Generator (Name, Q Exp, Q Doc)
-getResponseDefinitions operation appendToOperationName = do
-  convertToCamelCase <- OAM.getFlag OAF.optConvertToCamelCase
-  responseSuffix <- OAM.getFlag $ T.pack . OAF.optResponseTypeSuffix
-  responseBodySuffix <- OAM.getFlag $ T.pack . OAF.optResponseBodyTypeSuffix
+getResponseDefinitions operation appendToOperationName = OAM.nested "responses" $ do
+  convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
+  responseSuffix <- OAM.getFlag OAO.flagResponseTypeSuffix
+  responseBodySuffix <- OAM.getFlag OAO.flagResponseBodyTypeSuffix
   let responsesObject = OAT.responses (operation :: OAT.OperationObject)
       createBodyName = createResponseNameAsText convertToCamelCase appendToOperationName . (responseBodySuffix <>)
       createName = createResponseName convertToCamelCase appendToOperationName . (responseSuffix <>)
       responseName = createName ""
       responseReferenceCases = getStatusCodeResponseCases responsesObject <> getRangeResponseCases responsesObject
   responseCases <- resolveResponseReferences responseReferenceCases
-  let responseDescriptions = getResponseDescription . (\(_, _, r) -> r) <$> responseCases
+  let responseDescriptions = getResponseDescription . (\(_, _, (r, _)) -> r) <$> responseCases
   schemas <- generateResponseCaseDefinitions createBodyName responseCases
   pure $ (responseName,createResponseTransformerFn createName schemas,) $
     vcat
@@ -67,12 +67,7 @@ getResponseDefinitions operation appendToOperationName = do
           ( `Doc.sideBySide`
               (text "" $$ Doc.sideComments ("Means either no matching case available or a parse error" : responseDescriptions))
           )
-            . Doc.breakOnTokensWithReplacement
-              ( \case
-                  "=" -> "=\n  "
-                  token -> "\n  " <> token
-              )
-              ["=", "deriving", "|"]
+            . Doc.reformatADT
             . ppr
               <$> dataD
                 (cxt [])
@@ -100,7 +95,7 @@ getResponseDefinitions operation appendToOperationName = do
 type ResponseReferenceCase = (Text, TExpQ (HT.Status -> Bool), OAT.Referencable OAT.ResponseObject)
 
 -- | Same as @ResponseReferenceCase@ but with resolved reference
-type ResponseCase = (Text, TExpQ (HT.Status -> Bool), OAT.ResponseObject)
+type ResponseCase = (Text, TExpQ (HT.Status -> Bool), (OAT.ResponseObject, [Text]))
 
 -- | Same as @ResponseReferenceCase@ but with type definition
 type ResponseCaseDefinition = (Text, TExpQ (HT.Status -> Bool), Maybe Model.TypeWithDeclaration)
@@ -153,9 +148,9 @@ resolveResponseReferences =
 generateResponseCaseDefinitions :: (Text -> Text) -> [ResponseCase] -> OAM.Generator [ResponseCaseDefinition]
 generateResponseCaseDefinitions createBodyName =
   mapM
-    ( \(suffix, guard, r) -> OAM.nested suffix $ do
-        responseSchema <- getResponseSchema r
-        (suffix,guard,) <$> mapM (Model.defineModelForSchemaNamed $ createBodyName suffix) responseSchema
+    ( \(suffix, guard, (r, path)) -> OAM.resetPath path $ do
+        (responseSchema, path') <- getResponseSchema r
+        (suffix,guard,) <$> mapM (OAM.resetPath path' . Model.defineModelForSchemaNamed (createBodyName suffix)) responseSchema
     )
 
 -- | Prints the definitions of the different response case data types in 'Q'

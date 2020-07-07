@@ -4,20 +4,20 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 14f5bbc305106dcb39517b1cedc699325f63855887e77839a0f1deeb587e2e3d
+-- hash: a15b70445f58580ef040cd136bb8005fd94d720d7736b374cceb2729c88e0509
 
 name:           openapi3-code-generator
 version:        0.1.0.6
-license:        MIT
-license-file:   LICENSE
-copyright:      2020 Remo Dörig & Joel Fisch
-maintainer:     Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doerig@gmail.com>
-author:         Remo Dörig & Joel Fisch
-homepage:       https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme
-bug-reports:    https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/issues
 synopsis:       OpenAPI3 Haskell Client Code Generator
 description:    Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme>
 category:       Code-Generator
+homepage:       https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme
+bug-reports:    https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/issues
+author:         Remo Dörig & Joel Fisch
+maintainer:     Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doerig@gmail.com>
+copyright:      2020 Remo Dörig & Joel Fisch
+license:        MIT
+license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
@@ -25,129 +25,130 @@ extra-source-files:
     LICENSE
 
 source-repository head
-    type: git
-    location: https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator
+  type: git
+  location: https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator
 
 library
-    exposed-modules:
-        OpenAPI.Common
-        OpenAPI.Generate
-        OpenAPI.Generate.Doc
-        OpenAPI.Generate.Flags
-        OpenAPI.Generate.Internal.Operation
-        OpenAPI.Generate.Internal.Util
-        OpenAPI.Generate.Model
-        OpenAPI.Generate.ModelDependencies
-        OpenAPI.Generate.Monad
-        OpenAPI.Generate.Operation
-        OpenAPI.Generate.Reference
-        OpenAPI.Generate.Response
-        OpenAPI.Generate.SecurityScheme
-        OpenAPI.Generate.Types
-        OpenAPI.Generate.Types.ExternalDocumentation
-        OpenAPI.Generate.Types.Referencable
-        OpenAPI.Generate.Types.Schema
-    hs-source-dirs:
-        src
-    other-modules:
-        Paths_openapi3_code_generator
-    default-language: Haskell2010
-    ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
-    build-depends:
-        aeson,
-        base >=4.7 && <5,
-        bytestring,
-        containers,
-        hashmap,
-        http-client,
-        http-conduit,
-        http-types,
-        mtl,
-        options,
-        scientific,
-        split,
-        template-haskell,
-        text,
-        time,
-        transformers,
-        unordered-containers,
-        vector,
-        yaml
+  exposed-modules:
+      OpenAPI.Common
+      OpenAPI.Generate
+      OpenAPI.Generate.Doc
+      OpenAPI.Generate.Internal.Operation
+      OpenAPI.Generate.Internal.Util
+      OpenAPI.Generate.Log
+      OpenAPI.Generate.Model
+      OpenAPI.Generate.ModelDependencies
+      OpenAPI.Generate.Monad
+      OpenAPI.Generate.Operation
+      OpenAPI.Generate.OptParse
+      OpenAPI.Generate.Reference
+      OpenAPI.Generate.Response
+      OpenAPI.Generate.SecurityScheme
+      OpenAPI.Generate.Types
+      OpenAPI.Generate.Types.ExternalDocumentation
+      OpenAPI.Generate.Types.Referencable
+      OpenAPI.Generate.Types.Schema
+  other-modules:
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , hashmap
+    , http-client
+    , http-conduit
+    , http-types
+    , mtl
+    , optparse-applicative
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
 
 executable openapi3-code-generator-exe
-    main-is: Main.hs
-    hs-source-dirs:
-        app
-    other-modules:
-        Embed
-        Paths_openapi3_code_generator
-    default-language: Haskell2010
-    ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
-    build-depends:
-        aeson,
-        base >=4.7 && <5,
-        bytestring,
-        containers,
-        directory,
-        filepath,
-        hashmap,
-        http-client,
-        http-conduit,
-        http-types,
-        mtl,
-        openapi3-code-generator,
-        options,
-        scientific,
-        split,
-        template-haskell,
-        text,
-        time,
-        transformers,
-        unordered-containers,
-        vector,
-        yaml
+  main-is: Main.hs
+  other-modules:
+      Embed
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , directory
+    , filepath
+    , hashmap
+    , http-client
+    , http-conduit
+    , http-types
+    , mtl
+    , openapi3-code-generator
+    , optparse-applicative
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
 
 test-suite openapi3-code-generator-test
-    type: exitcode-stdio-1.0
-    main-is: Spec.hs
-    hs-source-dirs:
-        test
-    other-modules:
-        OpenAPI.Generate.DocSpec
-        OpenAPI.Generate.Internal.UtilSpec
-        OpenAPI.Generate.ModelDependenciesSpec
-        OpenAPI.Generate.MonadSpec
-        OpenAPI.Generate.OperationGetOperationDescriptionSpec
-        OpenAPI.Generate.OperationTHSpec
-        OpenAPI.Generate.ReferenceSpec
-        Paths_openapi3_code_generator
-    default-language: Haskell2010
-    ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
-    build-depends:
-        QuickCheck,
-        aeson,
-        base >=4.7 && <5,
-        bytestring,
-        containers,
-        genvalidity,
-        genvalidity-hspec,
-        genvalidity-text,
-        hashmap,
-        hspec,
-        http-client,
-        http-conduit,
-        http-types,
-        mtl,
-        openapi3-code-generator,
-        options,
-        scientific,
-        split,
-        template-haskell,
-        text,
-        time,
-        transformers,
-        unordered-containers,
-        validity,
-        validity-text,
-        vector,
-        yaml
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      OpenAPI.Generate.DocSpec
+      OpenAPI.Generate.Internal.UtilSpec
+      OpenAPI.Generate.ModelDependenciesSpec
+      OpenAPI.Generate.MonadSpec
+      OpenAPI.Generate.OperationGetOperationDescriptionSpec
+      OpenAPI.Generate.OperationTHSpec
+      OpenAPI.Generate.ReferenceSpec
+      Paths_openapi3_code_generator
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      QuickCheck
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , genvalidity
+    , genvalidity-hspec
+    , genvalidity-text
+    , hashmap
+    , hspec
+    , http-client
+    , http-conduit
+    , http-types
+    , mtl
+    , openapi3-code-generator
+    , optparse-applicative
+    , scientific
+    , split
+    , template-haskell
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , validity
+    , validity-text
+    , vector
+    , yaml
+  default-language: Haskell2010

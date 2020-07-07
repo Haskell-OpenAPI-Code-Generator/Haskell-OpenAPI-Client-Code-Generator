@@ -10,6 +10,7 @@ import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -30,7 +31,7 @@ import qualified GHC.Types
 import qualified OpenAPI.Common
 import OpenAPI.TypeAlias
 
--- | Defines the data type for the schema PetByType
+-- | Defines the object schema located at @components.schemas.PetByType@ in the specification.
 -- 
 -- 
 data PetByType = PetByType {
@@ -41,25 +42,30 @@ data PetByType = PetByType {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "hunts" (petByTypeHunts obj) : (Data.Aeson..=) "pet_type" (petByTypePet_type obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "hunts" (petByTypeHunts obj) GHC.Base.<> (Data.Aeson..=) "pet_type" (petByTypePet_type obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByTypeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("hunts" Data.Aeson.Types.ToJSON..= petByTypeHunts obj) GHC.Base.<> ("pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))
--- | Defines the enum schema PetByTypePet_type
+-- | Create a new 'PetByType' with all required fields.
+mkPetByType :: PetByTypePet_type  -- ^ 'petByTypePet_type'
+  -> PetByType
+mkPetByType petByTypePet_type = PetByType{petByTypeHunts = GHC.Maybe.Nothing,
+                                          petByTypePet_type = petByTypePet_type}
+-- | Defines the enum schema located at @components.schemas.PetByType.properties.pet_type@ in the specification.
 -- 
 -- 
-data PetByTypePet_type
-    = PetByTypePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | PetByTypePet_typeEnumTyped Data.Text.Internal.Text
-    | PetByTypePet_typeEnumString_Cat
-    | PetByTypePet_typeEnumString_Dog
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByTypePet_type =                                   
+   PetByTypePet_typeOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PetByTypePet_typeTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PetByTypePet_typeEnumCat                               -- ^ Represents the JSON value @"Cat"@
+  | PetByTypePet_typeEnumDog                               -- ^ Represents the JSON value @"Dog"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByTypePet_type
-    where toJSON (PetByTypePet_typeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PetByTypePet_typeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PetByTypePet_typeEnumString_Cat) = "Cat"
-          toJSON (PetByTypePet_typeEnumString_Dog) = "Dog"
+    where toJSON (PetByTypePet_typeOther val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PetByTypePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PetByTypePet_typeEnumCat) = "Cat"
+          toJSON (PetByTypePet_typeEnumDog) = "Dog"
 instance Data.Aeson.Types.FromJSON.FromJSON PetByTypePet_type
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumString_Cat
-                                            | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumString_Dog
-                                            | GHC.Base.otherwise -> PetByTypePet_typeEnumOther val)
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumCat
+                                            | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumDog
+                                            | GHC.Base.otherwise -> PetByTypePet_typeOther val)

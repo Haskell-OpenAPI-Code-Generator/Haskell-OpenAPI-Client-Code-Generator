@@ -10,6 +10,7 @@ import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -34,7 +35,7 @@ import {-# SOURCE #-} OpenAPI.Types.Dog
 import {-# SOURCE #-} OpenAPI.Types.PetByAge
 import {-# SOURCE #-} OpenAPI.Types.PetByType
 
--- | Defines the data type for the schema Mischling
+-- | Defines the object schema located at @components.schemas.Mischling.allOf@ in the specification.
 -- 
 -- 
 data Mischling = Mischling {
@@ -94,11 +95,38 @@ data Mischling = Mischling {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Mischling
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "age" (mischlingAge obj) : (Data.Aeson..=) "ageThird" (mischlingAgeThird obj) : (Data.Aeson..=) "another_relative" (mischlingAnother_relative obj) : (Data.Aeson..=) "bark" (mischlingBark obj) : (Data.Aeson..=) "binary" (mischlingBinary obj) : (Data.Aeson..=) "breed" (mischlingBreed obj) : (Data.Aeson..=) "byte" (mischlingByte obj) : (Data.Aeson..=) "double" (mischlingDouble obj) : (Data.Aeson..=) "father" (mischlingFather obj) : (Data.Aeson..=) "first_relative" (mischlingFirst_relative obj) : (Data.Aeson..=) "float" (mischlingFloat obj) : (Data.Aeson..=) "huntssecond" (mischlingHuntssecond obj) : (Data.Aeson..=) "int32" (mischlingInt32 obj) : (Data.Aeson..=) "int64" (mischlingInt64 obj) : (Data.Aeson..=) "integer" (mischlingInteger obj) : (Data.Aeson..=) "nickname" (mischlingNickname obj) : (Data.Aeson..=) "number" (mischlingNumber obj) : (Data.Aeson..=) "pet_type" (mischlingPet_type obj) : (Data.Aeson..=) "relative" (mischlingRelative obj) : (Data.Aeson..=) "secondFather" (mischlingSecondFather obj) : (Data.Aeson..=) "str" (mischlingStr obj) : (Data.Aeson..=) "strDate" (mischlingStrDate obj) : (Data.Aeson..=) "strDateTime" (mischlingStrDateTime obj) : (Data.Aeson..=) "tags" (mischlingTags obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (mischlingAge obj) GHC.Base.<> ((Data.Aeson..=) "ageThird" (mischlingAgeThird obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (mischlingAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "bark" (mischlingBark obj) GHC.Base.<> ((Data.Aeson..=) "binary" (mischlingBinary obj) GHC.Base.<> ((Data.Aeson..=) "breed" (mischlingBreed obj) GHC.Base.<> ((Data.Aeson..=) "byte" (mischlingByte obj) GHC.Base.<> ((Data.Aeson..=) "double" (mischlingDouble obj) GHC.Base.<> ((Data.Aeson..=) "father" (mischlingFather obj) GHC.Base.<> ((Data.Aeson..=) "first_relative" (mischlingFirst_relative obj) GHC.Base.<> ((Data.Aeson..=) "float" (mischlingFloat obj) GHC.Base.<> ((Data.Aeson..=) "huntssecond" (mischlingHuntssecond obj) GHC.Base.<> ((Data.Aeson..=) "int32" (mischlingInt32 obj) GHC.Base.<> ((Data.Aeson..=) "int64" (mischlingInt64 obj) GHC.Base.<> ((Data.Aeson..=) "integer" (mischlingInteger obj) GHC.Base.<> ((Data.Aeson..=) "nickname" (mischlingNickname obj) GHC.Base.<> ((Data.Aeson..=) "number" (mischlingNumber obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (mischlingPet_type obj) GHC.Base.<> ((Data.Aeson..=) "relative" (mischlingRelative obj) GHC.Base.<> ((Data.Aeson..=) "secondFather" (mischlingSecondFather obj) GHC.Base.<> ((Data.Aeson..=) "str" (mischlingStr obj) GHC.Base.<> ((Data.Aeson..=) "strDate" (mischlingStrDate obj) GHC.Base.<> ((Data.Aeson..=) "strDateTime" (mischlingStrDateTime obj) GHC.Base.<> (Data.Aeson..=) "tags" (mischlingTags obj))))))))))))))))))))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= mischlingAge obj : "ageThird" Data.Aeson.Types.ToJSON..= mischlingAgeThird obj : "another_relative" Data.Aeson.Types.ToJSON..= mischlingAnother_relative obj : "bark" Data.Aeson.Types.ToJSON..= mischlingBark obj : "binary" Data.Aeson.Types.ToJSON..= mischlingBinary obj : "breed" Data.Aeson.Types.ToJSON..= mischlingBreed obj : "byte" Data.Aeson.Types.ToJSON..= mischlingByte obj : "double" Data.Aeson.Types.ToJSON..= mischlingDouble obj : "father" Data.Aeson.Types.ToJSON..= mischlingFather obj : "first_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relative obj : "float" Data.Aeson.Types.ToJSON..= mischlingFloat obj : "huntssecond" Data.Aeson.Types.ToJSON..= mischlingHuntssecond obj : "int32" Data.Aeson.Types.ToJSON..= mischlingInt32 obj : "int64" Data.Aeson.Types.ToJSON..= mischlingInt64 obj : "integer" Data.Aeson.Types.ToJSON..= mischlingInteger obj : "nickname" Data.Aeson.Types.ToJSON..= mischlingNickname obj : "number" Data.Aeson.Types.ToJSON..= mischlingNumber obj : "pet_type" Data.Aeson.Types.ToJSON..= mischlingPet_type obj : "relative" Data.Aeson.Types.ToJSON..= mischlingRelative obj : "secondFather" Data.Aeson.Types.ToJSON..= mischlingSecondFather obj : "str" Data.Aeson.Types.ToJSON..= mischlingStr obj : "strDate" Data.Aeson.Types.ToJSON..= mischlingStrDate obj : "strDateTime" Data.Aeson.Types.ToJSON..= mischlingStrDateTime obj : "tags" Data.Aeson.Types.ToJSON..= mischlingTags obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= mischlingAge obj) GHC.Base.<> (("ageThird" Data.Aeson.Types.ToJSON..= mischlingAgeThird obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= mischlingAnother_relative obj) GHC.Base.<> (("bark" Data.Aeson.Types.ToJSON..= mischlingBark obj) GHC.Base.<> (("binary" Data.Aeson.Types.ToJSON..= mischlingBinary obj) GHC.Base.<> (("breed" Data.Aeson.Types.ToJSON..= mischlingBreed obj) GHC.Base.<> (("byte" Data.Aeson.Types.ToJSON..= mischlingByte obj) GHC.Base.<> (("double" Data.Aeson.Types.ToJSON..= mischlingDouble obj) GHC.Base.<> (("father" Data.Aeson.Types.ToJSON..= mischlingFather obj) GHC.Base.<> (("first_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relative obj) GHC.Base.<> (("float" Data.Aeson.Types.ToJSON..= mischlingFloat obj) GHC.Base.<> (("huntssecond" Data.Aeson.Types.ToJSON..= mischlingHuntssecond obj) GHC.Base.<> (("int32" Data.Aeson.Types.ToJSON..= mischlingInt32 obj) GHC.Base.<> (("int64" Data.Aeson.Types.ToJSON..= mischlingInt64 obj) GHC.Base.<> (("integer" Data.Aeson.Types.ToJSON..= mischlingInteger obj) GHC.Base.<> (("nickname" Data.Aeson.Types.ToJSON..= mischlingNickname obj) GHC.Base.<> (("number" Data.Aeson.Types.ToJSON..= mischlingNumber obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= mischlingPet_type obj) GHC.Base.<> (("relative" Data.Aeson.Types.ToJSON..= mischlingRelative obj) GHC.Base.<> (("secondFather" Data.Aeson.Types.ToJSON..= mischlingSecondFather obj) GHC.Base.<> (("str" Data.Aeson.Types.ToJSON..= mischlingStr obj) GHC.Base.<> (("strDate" Data.Aeson.Types.ToJSON..= mischlingStrDate obj) GHC.Base.<> (("strDateTime" Data.Aeson.Types.ToJSON..= mischlingStrDateTime obj) GHC.Base.<> ("tags" Data.Aeson.Types.ToJSON..= mischlingTags obj))))))))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON Mischling
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "Mischling" (\obj -> (((((((((((((((((((((((GHC.Base.pure Mischling GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ageThird")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "bark")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "binary")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "breed")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "byte")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "double")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "father")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "first_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "float")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "huntssecond")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int32")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int64")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "integer")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "nickname")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "number")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "secondFather")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "str")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDateTime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tags"))
--- | Defines the data type for the schema MischlingAnother_relativeOneOf4
+-- | Create a new 'Mischling' with all required fields.
+mkMischling :: GHC.Types.Int  -- ^ 'mischlingAge'
+  -> Mischling
+mkMischling mischlingAge = Mischling{mischlingAge = mischlingAge,
+                                     mischlingAgeThird = GHC.Maybe.Nothing,
+                                     mischlingAnother_relative = GHC.Maybe.Nothing,
+                                     mischlingBark = GHC.Maybe.Nothing,
+                                     mischlingBinary = GHC.Maybe.Nothing,
+                                     mischlingBreed = GHC.Maybe.Nothing,
+                                     mischlingByte = GHC.Maybe.Nothing,
+                                     mischlingDouble = GHC.Maybe.Nothing,
+                                     mischlingFather = GHC.Maybe.Nothing,
+                                     mischlingFirst_relative = GHC.Maybe.Nothing,
+                                     mischlingFloat = GHC.Maybe.Nothing,
+                                     mischlingHuntssecond = GHC.Maybe.Nothing,
+                                     mischlingInt32 = GHC.Maybe.Nothing,
+                                     mischlingInt64 = GHC.Maybe.Nothing,
+                                     mischlingInteger = GHC.Maybe.Nothing,
+                                     mischlingNickname = GHC.Maybe.Nothing,
+                                     mischlingNumber = GHC.Maybe.Nothing,
+                                     mischlingPet_type = GHC.Maybe.Nothing,
+                                     mischlingRelative = GHC.Maybe.Nothing,
+                                     mischlingSecondFather = GHC.Maybe.Nothing,
+                                     mischlingStr = GHC.Maybe.Nothing,
+                                     mischlingStrDate = GHC.Maybe.Nothing,
+                                     mischlingStrDateTime = GHC.Maybe.Nothing,
+                                     mischlingTags = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data MischlingAnother_relativeOneOf4 = MischlingAnother_relativeOneOf4 {
@@ -109,11 +137,15 @@ data MischlingAnother_relativeOneOf4 = MischlingAnother_relativeOneOf4 {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeOneOf4
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "hunts" (mischlingAnother_relativeOneOf4Hunts obj) : (Data.Aeson..=) "pet_type" (mischlingAnother_relativeOneOf4Pet_type obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "hunts" (mischlingAnother_relativeOneOf4Hunts obj) GHC.Base.<> (Data.Aeson..=) "pet_type" (mischlingAnother_relativeOneOf4Pet_type obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeOneOf4Hunts obj : "pet_type" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeOneOf4Pet_type obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("hunts" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeOneOf4Hunts obj) GHC.Base.<> ("pet_type" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeOneOf4Pet_type obj))
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeOneOf4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingAnother_relativeOneOf4" (\obj -> (GHC.Base.pure MischlingAnother_relativeOneOf4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type"))
--- | Define the one-of schema MischlingAnother_relative
+-- | Create a new 'MischlingAnother_relativeOneOf4' with all required fields.
+mkMischlingAnother_relativeOneOf4 :: MischlingAnother_relativeOneOf4 
+mkMischlingAnother_relativeOneOf4 = MischlingAnother_relativeOneOf4{mischlingAnother_relativeOneOf4Hunts = GHC.Maybe.Nothing,
+                                                                    mischlingAnother_relativeOneOf4Pet_type = GHC.Maybe.Nothing}
+-- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data MischlingAnother_relativeVariants
@@ -133,31 +165,31 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeVariants
     where parseJSON val = case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Defines the enum schema MischlingBreed
+-- | Defines the enum schema located at @components.schemas.Mischling.allOf.properties.breed@ in the specification.
 -- 
 -- 
-data MischlingBreed
-    = MischlingBreedEnumOther Data.Aeson.Types.Internal.Value
-    | MischlingBreedEnumTyped Data.Text.Internal.Text
-    | MischlingBreedEnumString_Dingo
-    | MischlingBreedEnumString_Husky
-    | MischlingBreedEnumString_Retriever
-    | MischlingBreedEnumString_Shepherd
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingBreed =                                   
+   MischlingBreedOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | MischlingBreedTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | MischlingBreedEnumDingo                             -- ^ Represents the JSON value @"Dingo"@
+  | MischlingBreedEnumHusky                             -- ^ Represents the JSON value @"Husky"@
+  | MischlingBreedEnumRetriever                         -- ^ Represents the JSON value @"Retriever"@
+  | MischlingBreedEnumShepherd                          -- ^ Represents the JSON value @"Shepherd"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingBreed
-    where toJSON (MischlingBreedEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MischlingBreedEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MischlingBreedEnumString_Dingo) = "Dingo"
-          toJSON (MischlingBreedEnumString_Husky) = "Husky"
-          toJSON (MischlingBreedEnumString_Retriever) = "Retriever"
-          toJSON (MischlingBreedEnumString_Shepherd) = "Shepherd"
+    where toJSON (MischlingBreedOther val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (MischlingBreedTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (MischlingBreedEnumDingo) = "Dingo"
+          toJSON (MischlingBreedEnumHusky) = "Husky"
+          toJSON (MischlingBreedEnumRetriever) = "Retriever"
+          toJSON (MischlingBreedEnumShepherd) = "Shepherd"
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingBreed
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Dingo" -> MischlingBreedEnumString_Dingo
-                                            | val GHC.Classes.== "Husky" -> MischlingBreedEnumString_Husky
-                                            | val GHC.Classes.== "Retriever" -> MischlingBreedEnumString_Retriever
-                                            | val GHC.Classes.== "Shepherd" -> MischlingBreedEnumString_Shepherd
-                                            | GHC.Base.otherwise -> MischlingBreedEnumOther val)
--- | Defines the data type for the schema MischlingFirst_relative
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Dingo" -> MischlingBreedEnumDingo
+                                            | val GHC.Classes.== "Husky" -> MischlingBreedEnumHusky
+                                            | val GHC.Classes.== "Retriever" -> MischlingBreedEnumRetriever
+                                            | val GHC.Classes.== "Shepherd" -> MischlingBreedEnumShepherd
+                                            | GHC.Base.otherwise -> MischlingBreedOther val)
+-- | Defines the object schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf@ in the specification.
 -- 
 -- 
 data MischlingFirst_relative = MischlingFirst_relative {
@@ -176,11 +208,20 @@ data MischlingFirst_relative = MischlingFirst_relative {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relative
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "age" (mischlingFirst_relativeAge obj) : (Data.Aeson..=) "ananyoftype" (mischlingFirst_relativeAnanyoftype obj) : (Data.Aeson..=) "another_relative" (mischlingFirst_relativeAnother_relative obj) : (Data.Aeson..=) "hunts" (mischlingFirst_relativeHunts obj) : (Data.Aeson..=) "pet_type" (mischlingFirst_relativePet_type obj) : (Data.Aeson..=) "relative" (mischlingFirst_relativeRelative obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (mischlingFirst_relativeAge obj) GHC.Base.<> ((Data.Aeson..=) "ananyoftype" (mischlingFirst_relativeAnanyoftype obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (mischlingFirst_relativeAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "hunts" (mischlingFirst_relativeHunts obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (mischlingFirst_relativePet_type obj) GHC.Base.<> (Data.Aeson..=) "relative" (mischlingFirst_relativeRelative obj))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj : "ananyoftype" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnanyoftype obj : "another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj) GHC.Base.<> (("ananyoftype" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnanyoftype obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relative
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFirst_relative" (\obj -> (((((GHC.Base.pure MischlingFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Define the one-of schema MischlingFirst_relativeAnother_relative
+-- | Create a new 'MischlingFirst_relative' with all required fields.
+mkMischlingFirst_relative :: MischlingFirst_relativePet_type  -- ^ 'mischlingFirst_relativePet_type'
+  -> MischlingFirst_relative
+mkMischlingFirst_relative mischlingFirst_relativePet_type = MischlingFirst_relative{mischlingFirst_relativeAge = GHC.Maybe.Nothing,
+                                                                                    mischlingFirst_relativeAnanyoftype = GHC.Maybe.Nothing,
+                                                                                    mischlingFirst_relativeAnother_relative = GHC.Maybe.Nothing,
+                                                                                    mischlingFirst_relativeHunts = GHC.Maybe.Nothing,
+                                                                                    mischlingFirst_relativePet_type = mischlingFirst_relativePet_type,
+                                                                                    mischlingFirst_relativeRelative = GHC.Maybe.Nothing}
+-- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data MischlingFirst_relativeAnother_relativeVariants
@@ -196,25 +237,25 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeAnother_relat
     where parseJSON val = case (MischlingFirst_relativeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Defines the enum schema MischlingFirst_relativePet_type
+-- | Defines the enum schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf.properties.pet_type@ in the specification.
 -- 
 -- 
-data MischlingFirst_relativePet_type
-    = MischlingFirst_relativePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | MischlingFirst_relativePet_typeEnumTyped Data.Text.Internal.Text
-    | MischlingFirst_relativePet_typeEnumString_Cat
-    | MischlingFirst_relativePet_typeEnumString_Dog
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingFirst_relativePet_type =                                   
+   MischlingFirst_relativePet_typeOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | MischlingFirst_relativePet_typeTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | MischlingFirst_relativePet_typeEnumCat                               -- ^ Represents the JSON value @"Cat"@
+  | MischlingFirst_relativePet_typeEnumDog                               -- ^ Represents the JSON value @"Dog"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relativePet_type
-    where toJSON (MischlingFirst_relativePet_typeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MischlingFirst_relativePet_typeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (MischlingFirst_relativePet_typeEnumString_Cat) = "Cat"
-          toJSON (MischlingFirst_relativePet_typeEnumString_Dog) = "Dog"
+    where toJSON (MischlingFirst_relativePet_typeOther val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (MischlingFirst_relativePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (MischlingFirst_relativePet_typeEnumCat) = "Cat"
+          toJSON (MischlingFirst_relativePet_typeEnumDog) = "Dog"
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativePet_type
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> MischlingFirst_relativePet_typeEnumString_Cat
-                                            | val GHC.Classes.== "Dog" -> MischlingFirst_relativePet_typeEnumString_Dog
-                                            | GHC.Base.otherwise -> MischlingFirst_relativePet_typeEnumOther val)
--- | Define the one-of schema MischlingFirst_relativeRelative
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> MischlingFirst_relativePet_typeEnumCat
+                                            | val GHC.Classes.== "Dog" -> MischlingFirst_relativePet_typeEnumDog
+                                            | GHC.Base.otherwise -> MischlingFirst_relativePet_typeOther val)
+-- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
 data MischlingFirst_relativeRelativeVariants
@@ -230,7 +271,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeRelativeVaria
     where parseJSON val = case (MischlingFirst_relativeRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingFirst_relativeRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Define the one-of schema MischlingRelative
+-- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
 data MischlingRelativeVariants

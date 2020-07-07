@@ -10,9 +10,9 @@ module OpenAPI.Generate.Monad where
 
 import qualified Control.Monad.Reader as MR
 import qualified Control.Monad.Writer as MW
-import Data.List
 import Data.Text (Text)
-import qualified OpenAPI.Generate.Flags as OAF
+import qualified OpenAPI.Generate.Log as OAL
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
@@ -26,83 +26,65 @@ data GeneratorEnvironment
   = GeneratorEnvironment
       { currentPath :: [Text],
         references :: Ref.ReferenceMap,
-        flags :: OAF.Flags
+        options :: OAO.Options
       }
   deriving (Show, Eq)
-
--- | Data type representing the log severities
-data GeneratorLogSeverity = ErrorSeverity | WarningSeverity | InfoSeverity
-  deriving (Show, Eq)
-
--- | A log entry containing the location within the OpenAPI specification where the message was produced, a severity and the actual message.
-data GeneratorLogEntry
-  = GeneratorLogEntry
-      { path :: [Text],
-        severity :: GeneratorLogSeverity,
-        message :: Text
-      }
-  deriving (Show, Eq)
-
--- | The type contained in the writer of the 'Generator' used to collect log entries
-type GeneratorLogs = [GeneratorLogEntry]
 
 -- | The 'Generator' monad is used to pass a 'MR.Reader' environment to functions in need of resolving references
 -- and collects log messages.
-newtype Generator a = Generator {unGenerator :: MW.WriterT GeneratorLogs (MR.Reader GeneratorEnvironment) a}
-  deriving (Functor, Applicative, Monad, MR.MonadReader GeneratorEnvironment, MW.MonadWriter GeneratorLogs)
+newtype Generator a = Generator {unGenerator :: MW.WriterT OAL.LogEntries (MR.Reader GeneratorEnvironment) a}
+  deriving (Functor, Applicative, Monad, MR.MonadReader GeneratorEnvironment, MW.MonadWriter OAL.LogEntries)
 
 -- | Runs the generator monad within a provided environment.
-runGenerator :: GeneratorEnvironment -> Generator a -> (a, GeneratorLogs)
+runGenerator :: GeneratorEnvironment -> Generator a -> (a, OAL.LogEntries)
 runGenerator e (Generator g) = MR.runReader (MW.runWriterT g) e
 
--- | Create an environment based on a 'Ref.ReferenceMap' and 'OAF.Flags'
-createEnvironment :: OAF.Flags -> Ref.ReferenceMap -> GeneratorEnvironment
-createEnvironment flags references =
+-- | Create an environment based on a 'Ref.ReferenceMap' and 'OAO.Flags'
+createEnvironment :: OAO.Options -> Ref.ReferenceMap -> GeneratorEnvironment
+createEnvironment options references =
   GeneratorEnvironment
     { currentPath = [],
       references = references,
-      flags = flags
+      options = options
     }
 
 -- | Writes a log message to a 'Generator' monad
-logMessage :: GeneratorLogSeverity -> Text -> Generator ()
-logMessage severity message = do
-  path' <- MR.asks currentPath
-  MW.tell [GeneratorLogEntry {path = path', severity = severity, message = message}]
+logMessage :: OAL.LogSeverity -> Text -> Generator ()
+logMessage logEntrySeverity logEntryMessage = do
+  logEntryPath <- getCurrentPath
+  MW.tell [OAL.LogEntry {..}]
 
 -- | Writes an error to a 'Generator' monad
 logError :: Text -> Generator ()
-logError = logMessage ErrorSeverity
+logError = logMessage OAL.ErrorSeverity
 
 -- | Writes a warning to a 'Generator' monad
 logWarning :: Text -> Generator ()
-logWarning = logMessage WarningSeverity
+logWarning = logMessage OAL.WarningSeverity
 
 -- | Writes an info to a 'Generator' monad
 logInfo :: Text -> Generator ()
-logInfo = logMessage InfoSeverity
+logInfo = logMessage OAL.InfoSeverity
 
--- | Transforms a log returned from 'runGenerator' to a list of 'Text' values for easier printing.
-transformGeneratorLogs :: GeneratorLogs -> [Text]
-transformGeneratorLogs =
-  fmap
-    ( \GeneratorLogEntry {..} ->
-        transformSeverity severity <> " (" <> transformPath path <> "): " <> message
-    )
-
--- | Transforms the severity to a 'Text' representation
-transformSeverity :: GeneratorLogSeverity -> Text
-transformSeverity ErrorSeverity = "ERROR"
-transformSeverity WarningSeverity = "WARN"
-transformSeverity InfoSeverity = "INFO"
-
--- | Transforms the path to a 'Text' representation (parts are seperated with a dot)
-transformPath :: [Text] -> Text
-transformPath = mconcat . intersperse "."
+-- | Writes a trace to a 'Generator' monad
+logTrace :: Text -> Generator ()
+logTrace = logMessage OAL.TraceSeverity
 
 -- | This function can be used to tell the 'Generator' monad where in the OpenAPI specification the generator currently is
 nested :: Text -> Generator a -> Generator a
 nested pathItem = MR.local $ \g -> g {currentPath = currentPath g <> [pathItem]}
+
+-- | This function can be used to tell the 'Generator' monad where in the OpenAPI specification the generator currently is (ignoring any previous path changes)
+resetPath :: [Text] -> Generator a -> Generator a
+resetPath path = MR.local $ \g -> g {currentPath = path}
+
+getCurrentPath :: Generator [Text]
+getCurrentPath = MR.asks currentPath
+
+appendToPath :: [Text] -> Generator [Text]
+appendToPath path = do
+  p <- getCurrentPath
+  pure $ p <> path
 
 -- | Helper function to create a lookup function for a specific type
 createReferenceLookupM :: (Text -> Ref.ReferenceMap -> Maybe a) -> Text -> Generator (Maybe a)
@@ -137,9 +119,9 @@ getSecuritySchemeReferenceM :: Text -> Generator (Maybe OAT.SecuritySchemeObject
 getSecuritySchemeReferenceM = createReferenceLookupM Ref.getSecuritySchemeReference
 
 -- | Get all flags passed to the program
-getFlags :: Generator OAF.Flags
-getFlags = MR.asks flags
+getFlags :: Generator OAO.Flags
+getFlags = MR.asks $ OAO.optFlags . options
 
 -- | Get a specific flag selected by @f@
-getFlag :: (OAF.Flags -> a) -> Generator a
-getFlag f = MR.asks $ f . flags
+getFlag :: (OAO.Flags -> a) -> Generator a
+getFlag f = MR.asks $ f . OAO.optFlags . options

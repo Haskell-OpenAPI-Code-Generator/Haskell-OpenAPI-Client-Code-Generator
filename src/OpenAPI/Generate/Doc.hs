@@ -9,7 +9,8 @@ module OpenAPI.Generate.Doc
     generateHaddockComment,
     escapeText,
     breakOnTokens,
-    breakOnTokensWithReplacement,
+    reformatRecord,
+    reformatADT,
     sideComments,
     zipCodeAndComments,
     sideBySide,
@@ -115,6 +116,24 @@ breakOnTokensWithReplacement replaceFn tokens =
   let addLineBreaks = foldr (\token f -> T.replace token (replaceFn token) . f) id tokens
    in text . T.unpack . addLineBreaks . T.replace "\n" "" . removeDuplicateSpaces . T.pack . show
 
+reformatRecord :: Doc -> Doc
+reformatRecord =
+  breakOnTokensWithReplacement
+    ( \case
+        "{" -> "{\n  "
+        token -> "\n  " <> token
+    )
+    [",", "{", "}"]
+
+reformatADT :: Doc -> Doc
+reformatADT =
+  breakOnTokensWithReplacement
+    ( \case
+        "=" -> "=\n  "
+        token -> "\n  " <> token
+    )
+    ["=", "deriving", "|"]
+
 removeDuplicateSpaces :: Text -> Text
 removeDuplicateSpaces t =
   let t' = T.replace "  " " " t
@@ -174,6 +193,7 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "Control.Monad.Fail"
     . importQualified "Control.Monad.Trans.Reader"
     . importQualified "Data.Aeson"
+    . importQualified "Data.Aeson as Data.Aeson.Encoding.Internal"
     . importQualified "Data.Aeson as Data.Aeson.Types"
     . importQualified "Data.Aeson as Data.Aeson.Types.FromJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.ToJSON"
@@ -218,6 +238,7 @@ addModelModuleHeader mainModuleName moduleName modelModulesToImport description 
     . importQualified "Prelude as GHC.Maybe"
     . importQualified "Control.Monad.Fail"
     . importQualified "Data.Aeson"
+    . importQualified "Data.Aeson as Data.Aeson.Encoding.Internal"
     . importQualified "Data.Aeson as Data.Aeson.Types"
     . importQualified "Data.Aeson as Data.Aeson.Types.FromJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.ToJSON"
