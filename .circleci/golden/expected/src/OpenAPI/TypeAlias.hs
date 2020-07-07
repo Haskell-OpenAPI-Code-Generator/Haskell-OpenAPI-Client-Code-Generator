@@ -10,6 +10,7 @@ import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -31,27 +32,27 @@ import qualified OpenAPI.Common
 import {-# SOURCE #-} OpenAPI.Types.Dog
 
 
--- | Defines an alias for the schema Test5
+-- | Defines an alias for the schema located at @components.schemas.Test5@ in the specification.
 -- 
 -- 
 type Test5 = [Dog]
 
--- | Defines an alias for the schema Test4
+-- | Defines an alias for the schema located at @components.schemas.Test4@ in the specification.
 -- 
 -- 
 type Test4 = [Test2]
 
--- | Defines an alias for the schema Test3
+-- | Defines an alias for the schema located at @components.schemas.Test3@ in the specification.
 -- 
 -- No properties
 type Test3 = Data.Aeson.Types.Internal.Object
 
--- | Defines an alias for the schema Test2
+-- | Defines an alias for the schema located at @components.schemas.Test2@ in the specification.
 -- 
 -- 
 type Test2 = [Data.Text.Internal.Text]
 
--- | Defines an alias for the schema Test
+-- | Defines an alias for the schema located at @components.schemas.Test@ in the specification.
 -- 
 -- 
 type Test = Data.Text.Internal.Text

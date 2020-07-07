@@ -10,13 +10,8 @@ import OpenAPI.Common
 
 myPet :: Pet
 myPet =
-  Pet
-    { petCategory = Nothing,
-      petId = Nothing,
-      petName = Just "Harro",
-      petPhotoUrls = [],
-      petStatus = Nothing,
-      petTags = Nothing
+  (mkPet [])
+    { petName = Just "Harro"
     }
 
 myTag :: Tag

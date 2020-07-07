@@ -124,7 +124,7 @@ module "OpenAPI.Generate.Model" {
   tick function "==" on line 50;
   tick function "compare" on line 50;
 }
-module "OpenAPI.Generate.Flags" {
+module "OpenAPI.Generate.OptParse" {
   tick function "showsPrec" on line 38;
   tick function "==" on line 38;
 }

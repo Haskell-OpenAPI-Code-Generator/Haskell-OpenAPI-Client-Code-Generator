@@ -114,6 +114,11 @@ paths:
         description: Filter the entries?
         schema:
           type: boolean
+      - name: referenceParameter
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Cat'
       responses:
         '200':
           description: successful operation

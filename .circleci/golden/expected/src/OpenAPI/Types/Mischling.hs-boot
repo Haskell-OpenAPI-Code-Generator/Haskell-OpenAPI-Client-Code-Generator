@@ -16,11 +16,11 @@ instance Show MischlingAnother_relativeVariants
 instance Eq MischlingAnother_relativeVariants
 instance FromJSON MischlingAnother_relativeVariants
 instance ToJSON MischlingAnother_relativeVariants
-data MischlingBreed
-instance Show MischlingBreed
-instance Eq MischlingBreed
-instance FromJSON MischlingBreed
-instance ToJSON MischlingBreed
+data MischlingBreed 
+instance Show MischlingBreed 
+instance Eq MischlingBreed 
+instance FromJSON MischlingBreed 
+instance ToJSON MischlingBreed 
 data MischlingFirst_relative 
 instance Show MischlingFirst_relative 
 instance Eq MischlingFirst_relative 
@@ -31,11 +31,11 @@ instance Show MischlingFirst_relativeAnother_relativeVariants
 instance Eq MischlingFirst_relativeAnother_relativeVariants
 instance FromJSON MischlingFirst_relativeAnother_relativeVariants
 instance ToJSON MischlingFirst_relativeAnother_relativeVariants
-data MischlingFirst_relativePet_type
-instance Show MischlingFirst_relativePet_type
-instance Eq MischlingFirst_relativePet_type
-instance FromJSON MischlingFirst_relativePet_type
-instance ToJSON MischlingFirst_relativePet_type
+data MischlingFirst_relativePet_type 
+instance Show MischlingFirst_relativePet_type 
+instance Eq MischlingFirst_relativePet_type 
+instance FromJSON MischlingFirst_relativePet_type 
+instance ToJSON MischlingFirst_relativePet_type 
 data MischlingFirst_relativeRelativeVariants
 instance Show MischlingFirst_relativeRelativeVariants
 instance Eq MischlingFirst_relativeRelativeVariants

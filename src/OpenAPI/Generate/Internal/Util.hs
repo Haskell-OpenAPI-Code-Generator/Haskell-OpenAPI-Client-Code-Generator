@@ -21,8 +21,8 @@ import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
-import qualified OpenAPI.Generate.Flags as OAF
 import qualified OpenAPI.Generate.Monad as OAM
+import qualified OpenAPI.Generate.OptParse as OAO
 
 -- | Checks if the casing of a character can be changed.
 -- This is required to ensure the functions 'Char.toUpper' and 'Char.toLower' actually do something.
@@ -112,7 +112,7 @@ haskellifyName convertToCamelCase startWithUppercase name = mkName $ haskellifyT
 haskellifyNameM :: Bool -> Text -> OAM.Generator Name
 haskellifyNameM startWithUppercase name = do
   flags <- OAM.getFlags
-  pure $ haskellifyName (OAF.optConvertToCamelCase flags) startWithUppercase name
+  pure $ haskellifyName (OAO.flagConvertToCamelCase flags) startWithUppercase name
 
 -- | Transform a module name to ensure it is valid for file names
 transformToModuleName :: Text -> Text

@@ -10,6 +10,7 @@ import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -32,7 +33,7 @@ import OpenAPI.TypeAlias
 import {-# SOURCE #-} OpenAPI.Types.Cat
 import {-# SOURCE #-} OpenAPI.Types.PetByType
 
--- | Defines the data type for the schema PetByAge
+-- | Defines the object schema located at @components.schemas.PetByAge@ in the specification.
 -- 
 -- 
 data PetByAge = PetByAge {
@@ -49,11 +50,19 @@ data PetByAge = PetByAge {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAge
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "age" (petByAgeAge obj) : (Data.Aeson..=) "another_relative" (petByAgeAnother_relative obj) : (Data.Aeson..=) "first_relative" (petByAgeFirst_relative obj) : (Data.Aeson..=) "nickname" (petByAgeNickname obj) : (Data.Aeson..=) "relative" (petByAgeRelative obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (petByAgeAge obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (petByAgeAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "first_relative" (petByAgeFirst_relative obj) GHC.Base.<> ((Data.Aeson..=) "nickname" (petByAgeNickname obj) GHC.Base.<> (Data.Aeson..=) "relative" (petByAgeRelative obj)))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeAnother_relative obj : "first_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relative obj : "nickname" Data.Aeson.Types.ToJSON..= petByAgeNickname obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeRelative obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeAnother_relative obj) GHC.Base.<> (("first_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relative obj) GHC.Base.<> (("nickname" Data.Aeson.Types.ToJSON..= petByAgeNickname obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAge
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAge" (\obj -> ((((GHC.Base.pure PetByAge GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "first_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "nickname")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Defines the data type for the schema PetByAgeAnother_relativeOneOf4
+-- | Create a new 'PetByAge' with all required fields.
+mkPetByAge :: GHC.Types.Int  -- ^ 'petByAgeAge'
+  -> PetByAge
+mkPetByAge petByAgeAge = PetByAge{petByAgeAge = petByAgeAge,
+                                  petByAgeAnother_relative = GHC.Maybe.Nothing,
+                                  petByAgeFirst_relative = GHC.Maybe.Nothing,
+                                  petByAgeNickname = GHC.Maybe.Nothing,
+                                  petByAgeRelative = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @components.schemas.PetByAge.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data PetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4 {
@@ -64,11 +73,15 @@ data PetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4 {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeAnother_relativeOneOf4
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "hunts" (petByAgeAnother_relativeOneOf4Hunts obj) : (Data.Aeson..=) "pet_type" (petByAgeAnother_relativeOneOf4Pet_type obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "hunts" (petByAgeAnother_relativeOneOf4Hunts obj) GHC.Base.<> (Data.Aeson..=) "pet_type" (petByAgeAnother_relativeOneOf4Pet_type obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Hunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Pet_type obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("hunts" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Hunts obj) GHC.Base.<> ("pet_type" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Pet_type obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeOneOf4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeAnother_relativeOneOf4" (\obj -> (GHC.Base.pure PetByAgeAnother_relativeOneOf4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type"))
--- | Define the one-of schema PetByAgeAnother_relative
+-- | Create a new 'PetByAgeAnother_relativeOneOf4' with all required fields.
+mkPetByAgeAnother_relativeOneOf4 :: PetByAgeAnother_relativeOneOf4 
+mkPetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4{petByAgeAnother_relativeOneOf4Hunts = GHC.Maybe.Nothing,
+                                                                  petByAgeAnother_relativeOneOf4Pet_type = GHC.Maybe.Nothing}
+-- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data PetByAgeAnother_relativeVariants
@@ -88,7 +101,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeVariants
     where parseJSON val = case (PetByAgeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Defines the data type for the schema PetByAgeFirst_relative
+-- | Defines the object schema located at @components.schemas.PetByAge.properties.first_relative.allOf@ in the specification.
 -- 
 -- 
 data PetByAgeFirst_relative = PetByAgeFirst_relative {
@@ -107,11 +120,20 @@ data PetByAgeFirst_relative = PetByAgeFirst_relative {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relative
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "age" (petByAgeFirst_relativeAge obj) : (Data.Aeson..=) "ananyoftype" (petByAgeFirst_relativeAnanyoftype obj) : (Data.Aeson..=) "another_relative" (petByAgeFirst_relativeAnother_relative obj) : (Data.Aeson..=) "hunts" (petByAgeFirst_relativeHunts obj) : (Data.Aeson..=) "pet_type" (petByAgeFirst_relativePet_type obj) : (Data.Aeson..=) "relative" (petByAgeFirst_relativeRelative obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "age" (petByAgeFirst_relativeAge obj) GHC.Base.<> ((Data.Aeson..=) "ananyoftype" (petByAgeFirst_relativeAnanyoftype obj) GHC.Base.<> ((Data.Aeson..=) "another_relative" (petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> ((Data.Aeson..=) "hunts" (petByAgeFirst_relativeHunts obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (petByAgeFirst_relativePet_type obj) GHC.Base.<> (Data.Aeson..=) "relative" (petByAgeFirst_relativeRelative obj))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj : "ananyoftype" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnanyoftype obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj) GHC.Base.<> (("ananyoftype" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnanyoftype obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relative
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relative" (\obj -> (((((GHC.Base.pure PetByAgeFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
--- | Define the one-of schema PetByAgeFirst_relativeAnother_relative
+-- | Create a new 'PetByAgeFirst_relative' with all required fields.
+mkPetByAgeFirst_relative :: PetByAgeFirst_relativePet_type  -- ^ 'petByAgeFirst_relativePet_type'
+  -> PetByAgeFirst_relative
+mkPetByAgeFirst_relative petByAgeFirst_relativePet_type = PetByAgeFirst_relative{petByAgeFirst_relativeAge = GHC.Maybe.Nothing,
+                                                                                 petByAgeFirst_relativeAnanyoftype = GHC.Maybe.Nothing,
+                                                                                 petByAgeFirst_relativeAnother_relative = GHC.Maybe.Nothing,
+                                                                                 petByAgeFirst_relativeHunts = GHC.Maybe.Nothing,
+                                                                                 petByAgeFirst_relativePet_type = petByAgeFirst_relativePet_type,
+                                                                                 petByAgeFirst_relativeRelative = GHC.Maybe.Nothing}
+-- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.first_relative.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
 data PetByAgeFirst_relativeAnother_relativeVariants
@@ -127,25 +149,25 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativeAnother_relati
     where parseJSON val = case (PetByAgeFirst_relativeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeFirst_relativeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeFirst_relativeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Defines the enum schema PetByAgeFirst_relativePet_type
+-- | Defines the enum schema located at @components.schemas.PetByAge.properties.first_relative.allOf.properties.pet_type@ in the specification.
 -- 
 -- 
-data PetByAgeFirst_relativePet_type
-    = PetByAgeFirst_relativePet_typeEnumOther Data.Aeson.Types.Internal.Value
-    | PetByAgeFirst_relativePet_typeEnumTyped Data.Text.Internal.Text
-    | PetByAgeFirst_relativePet_typeEnumString_Cat
-    | PetByAgeFirst_relativePet_typeEnumString_Dog
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByAgeFirst_relativePet_type =                                   
+   PetByAgeFirst_relativePet_typeOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PetByAgeFirst_relativePet_typeTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PetByAgeFirst_relativePet_typeEnumCat                               -- ^ Represents the JSON value @"Cat"@
+  | PetByAgeFirst_relativePet_typeEnumDog                               -- ^ Represents the JSON value @"Dog"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relativePet_type
-    where toJSON (PetByAgeFirst_relativePet_typeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PetByAgeFirst_relativePet_typeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PetByAgeFirst_relativePet_typeEnumString_Cat) = "Cat"
-          toJSON (PetByAgeFirst_relativePet_typeEnumString_Dog) = "Dog"
+    where toJSON (PetByAgeFirst_relativePet_typeOther val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PetByAgeFirst_relativePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PetByAgeFirst_relativePet_typeEnumCat) = "Cat"
+          toJSON (PetByAgeFirst_relativePet_typeEnumDog) = "Dog"
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativePet_type
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByAgeFirst_relativePet_typeEnumString_Cat
-                                            | val GHC.Classes.== "Dog" -> PetByAgeFirst_relativePet_typeEnumString_Dog
-                                            | GHC.Base.otherwise -> PetByAgeFirst_relativePet_typeEnumOther val)
--- | Define the one-of schema PetByAgeFirst_relativeRelative
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByAgeFirst_relativePet_typeEnumCat
+                                            | val GHC.Classes.== "Dog" -> PetByAgeFirst_relativePet_typeEnumDog
+                                            | GHC.Base.otherwise -> PetByAgeFirst_relativePet_typeOther val)
+-- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.first_relative.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
 data PetByAgeFirst_relativeRelativeVariants
@@ -161,7 +183,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativeRelativeVarian
     where parseJSON val = case (PetByAgeFirst_relativeRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeFirst_relativeRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeFirst_relativeRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
--- | Define the one-of schema PetByAgeRelative
+-- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.relative.anyOf@ in the specification.
 -- 
 -- 
 data PetByAgeRelativeVariants

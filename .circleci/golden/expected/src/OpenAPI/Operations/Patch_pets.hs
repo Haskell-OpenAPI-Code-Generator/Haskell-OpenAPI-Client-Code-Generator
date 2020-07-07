@@ -12,6 +12,7 @@ import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -48,7 +49,7 @@ patch_pets :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Maybe.Maybe Patch_pet
   -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Patch_petsResponse)                 -- ^ Monadic computation which returns the result of the operation
 patch_pets body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either Patch_petsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right Patch_petsResponse200
                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PATCH") (Data.Text.pack "/pets") [] body OpenAPI.Common.RequestBodyEncodingJSON)
--- | Define the one-of schema patch_petsRequestBody
+-- | Defines the oneOf schema located at @paths.\/pets.PATCH.requestBody.content.application\/json.schema.oneOf@ in the specification.
 -- 
 -- 
 data Patch_petsRequestBodyVariants

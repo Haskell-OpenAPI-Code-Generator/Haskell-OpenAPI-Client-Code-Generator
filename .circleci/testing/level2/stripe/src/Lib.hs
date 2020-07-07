@@ -10,45 +10,28 @@ import OpenAPI.Common
 lineItemPeriod = InvoiceLineItemPeriod 10 80
 
 checkoutLineItem =
-  PostCheckoutSessionsRequestBodyLineItems'
+  (mkPostCheckoutSessionsRequestBodyLineItems' 4)
     { postCheckoutSessionsRequestBodyLineItems'Amount = Just 1000,
       postCheckoutSessionsRequestBodyLineItems'Currency = Just "CHF",
       postCheckoutSessionsRequestBodyLineItems'Description = Just "algebraic data types",
-      postCheckoutSessionsRequestBodyLineItems'Images = Nothing,
-      postCheckoutSessionsRequestBodyLineItems'Name = Just "static types",
-      postCheckoutSessionsRequestBodyLineItems'Quantity = 4,
-      postCheckoutSessionsRequestBodyLineItems'TaxRates = Nothing
+      postCheckoutSessionsRequestBodyLineItems'Name = Just "static types"
     }
 
 checkoutLineItem2 =
-  PostCheckoutSessionsRequestBodyLineItems'
+  (mkPostCheckoutSessionsRequestBodyLineItems' 2)
     { postCheckoutSessionsRequestBodyLineItems'Amount = Just 5000,
       postCheckoutSessionsRequestBodyLineItems'Currency = Just "CHF",
       postCheckoutSessionsRequestBodyLineItems'Description = Just "lambda calculus",
-      postCheckoutSessionsRequestBodyLineItems'Images = Nothing,
-      postCheckoutSessionsRequestBodyLineItems'Name = Just "Haskell",
-      postCheckoutSessionsRequestBodyLineItems'Quantity = 2,
-      postCheckoutSessionsRequestBodyLineItems'TaxRates = Nothing
+      postCheckoutSessionsRequestBodyLineItems'Name = Just "Haskell"
     }
 
 checkoutSession =
-  PostCheckoutSessionsRequestBody
-    { postCheckoutSessionsRequestBodyBillingAddressCollection = Nothing,
-      postCheckoutSessionsRequestBodyCancelUrl = "https://localhost:8080/payments/index.html?success=false&sessionId={CHECKOUT_SESSION_ID}",
-      postCheckoutSessionsRequestBodyClientReferenceId = Nothing,
-      postCheckoutSessionsRequestBodyCustomer = Nothing,
-      postCheckoutSessionsRequestBodyCustomerEmail = Nothing,
-      postCheckoutSessionsRequestBodyExpand = Nothing,
-      postCheckoutSessionsRequestBodyLineItems = Just [checkoutLineItem, checkoutLineItem2],
-      postCheckoutSessionsRequestBodyLocale = Nothing,
-      postCheckoutSessionsRequestBodyMetadata = Nothing,
-      postCheckoutSessionsRequestBodyMode = Nothing,
-      postCheckoutSessionsRequestBodyPaymentIntentData = Nothing,
-      postCheckoutSessionsRequestBodyPaymentMethodTypes = [PostCheckoutSessionsRequestBodyPaymentMethodTypes'EnumStringCard],
-      postCheckoutSessionsRequestBodySetupIntentData = Nothing,
-      postCheckoutSessionsRequestBodySubmitType = Nothing,
-      postCheckoutSessionsRequestBodySubscriptionData = Nothing,
-      postCheckoutSessionsRequestBodySuccessUrl = "https://localhost:8080/payments/index.html?success=true&sessionId={CHECKOUT_SESSION_ID}"
+  ( mkPostCheckoutSessionsRequestBody
+      "https://localhost:8080/payments/index.html?success=false&sessionId={CHECKOUT_SESSION_ID}"
+      [PostCheckoutSessionsRequestBodyPaymentMethodTypes'EnumCard]
+      "https://localhost:8080/payments/index.html?success=true&sessionId={CHECKOUT_SESSION_ID}"
+  )
+    { postCheckoutSessionsRequestBodyLineItems = Just [checkoutLineItem, checkoutLineItem2]
     }
 
 runCheckoutSession :: MonadHTTP m => m (Response PostCheckoutSessionsResponse)
@@ -81,33 +64,10 @@ runPostPaymentIntent :: MonadHTTP m => m (Response PostPaymentIntentsResponse)
 runPostPaymentIntent = postPaymentIntentsWithConfiguration defaultConfiguration myPaymentIntent
   where
     myPaymentIntent =
-      PostPaymentIntentsRequestBody
-        { postPaymentIntentsRequestBodyAmount = 171,
-          postPaymentIntentsRequestBodyApplicationFeeAmount = Just 7,
-          postPaymentIntentsRequestBodyCaptureMethod = Nothing,
-          postPaymentIntentsRequestBodyConfirm = Nothing,
-          postPaymentIntentsRequestBodyConfirmationMethod = Nothing,
-          postPaymentIntentsRequestBodyCurrency = "CHF",
-          postPaymentIntentsRequestBodyCustomer = Nothing,
-          postPaymentIntentsRequestBodyDescription = Nothing,
-          postPaymentIntentsRequestBodyErrorOnRequiresAction = Nothing,
-          postPaymentIntentsRequestBodyExpand = Nothing,
-          postPaymentIntentsRequestBodyMandate = Nothing,
-          postPaymentIntentsRequestBodyMandateData = Nothing,
-          postPaymentIntentsRequestBodyMetadata = Nothing,
-          postPaymentIntentsRequestBodyOffSession = Nothing,
-          postPaymentIntentsRequestBodyOnBehalfOf = Nothing,
-          postPaymentIntentsRequestBodyPaymentMethod = Nothing,
-          postPaymentIntentsRequestBodyPaymentMethodOptions = Nothing,
-          postPaymentIntentsRequestBodyPaymentMethodTypes = Just ["myType", "mySecondType"],
-          postPaymentIntentsRequestBodyReceiptEmail = Nothing,
-          postPaymentIntentsRequestBodyReturnUrl = Nothing,
-          postPaymentIntentsRequestBodySavePaymentMethod = Nothing,
-          postPaymentIntentsRequestBodySetupFutureUsage = Nothing,
-          postPaymentIntentsRequestBodyShipping = Nothing,
-          postPaymentIntentsRequestBodyStatementDescriptor = Nothing,
-          postPaymentIntentsRequestBodyStatementDescriptorSuffix = Nothing,
-          postPaymentIntentsRequestBodyTransferData = Nothing,
-          postPaymentIntentsRequestBodyTransferGroup = Nothing,
-          postPaymentIntentsRequestBodyUseStripeSdk = Nothing
+      ( mkPostPaymentIntentsRequestBody
+          171
+          "CHF"
+      )
+        { postPaymentIntentsRequestBodyApplicationFeeAmount = Just 7,
+          postPaymentIntentsRequestBodyPaymentMethodTypes = Just ["myType", "mySecondType"]
         }

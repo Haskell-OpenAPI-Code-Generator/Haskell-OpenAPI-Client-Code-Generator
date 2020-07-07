@@ -33,7 +33,7 @@ dependencies:
 - mtl
 - transformers
 - time
-- options
+- optparse-applicative
 - vector
 - hashmap
 

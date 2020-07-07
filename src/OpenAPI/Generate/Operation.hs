@@ -20,12 +20,12 @@ import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
-import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Operation
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Response as OAR
 import qualified OpenAPI.Generate.Types as OAT
 
@@ -73,14 +73,14 @@ defineModuleForOperation ::
   OAM.Generator (Q Dep.ModuleDefinition)
 defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
-  convertToCamelCase <- OAM.getFlag OAF.optConvertToCamelCase
+  convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
   let operationIdAsText = T.pack $ show operationIdName
       appendToOperationName = ((T.pack $ nameBase operationIdName) <>)
       moduleName = haskellifyText convertToCamelCase True operationIdAsText
-  OAM.logInfo $ "Generating operation with name: " <> operationIdAsText
-  bodySchema <- getBodySchemaFromOperation operation
+  OAM.logInfo $ "Generating operation with name '" <> operationIdAsText <> "'"
+  (bodySchema, bodyPath) <- getBodySchemaFromOperation operation
   (responseTypeName, responseTransformerExp, responseBodyDefinitions) <- OAR.getResponseDefinitions operation appendToOperationName
-  (bodyType, bodyDefinition) <- getBodyType bodySchema appendToOperationName
+  (bodyType, bodyDefinition) <- OAM.resetPath bodyPath $ getBodyType bodySchema appendToOperationName
   parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
   paramDescriptions <-
     (<> ["The request body to send" | not $ null bodyType])
@@ -139,7 +139,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
           pure [fmap addCommentsToFnSignature fnSignature `Doc.appendDoc` functionBody]
       )
       availableOperationCombinations
-  omitAdditionalFunctions <- OAM.getFlag OAF.optOmitAdditionalOperationFunctions
+  omitAdditionalFunctions <- OAM.getFlag OAO.flagOmitAdditionalOperationFunctions
   let content =
         concat $
           if omitAdditionalFunctions
@@ -167,6 +167,6 @@ getBodyType requestBody appendToOperationName = do
   case requestBody of
     Just RequestBodyDefinition {..} | generateBody -> do
       let transformType = pure . (if required then id else appT $ varT ''Maybe)
-      requestBodySuffix <- OAM.getFlag $ T.pack . OAF.optRequestBodyTypeSuffix
+      requestBodySuffix <- OAM.getFlag OAO.flagRequestBodyTypeSuffix
       BF.bimap transformType fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
     _ -> pure ([], Doc.emptyDoc)

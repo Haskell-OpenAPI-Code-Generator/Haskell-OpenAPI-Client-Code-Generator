@@ -11,13 +11,13 @@ import Embed
 import Language.Haskell.TH
 import OpenAPI.Generate
 import qualified OpenAPI.Generate.Doc as Doc
-import qualified OpenAPI.Generate.Flags as OAF
 import OpenAPI.Generate.Internal.Util
+import qualified OpenAPI.Generate.Log as OAL
 import qualified OpenAPI.Generate.Monad as OAM
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
-import Options
+import Options.Applicative
 import System.Directory
-import System.Exit
 import System.FilePath
 import System.IO.Error
 
@@ -106,102 +106,110 @@ permitProceed outputDirectory force = do
       pure True
 
 main :: IO ()
-main = runCommand $ \opts args -> case args of
-  [path] -> do
-    spec <- decodeOpenApi path
-    let env = OAM.createEnvironment opts $ Ref.buildReferenceMap spec
-        logMessages = mapM_ (putStrLn . T.unpack) . OAM.transformGeneratorLogs
-        moduleName = OAF.optModuleName opts
-        showAndReplace = replaceOpenAPI moduleName . show
-        (operationsQ, logs) = OAM.runGenerator env $ defineOperations (OAF.optModuleName opts) spec
-    logMessages logs
-    operationModules <- runQ operationsQ
-    configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
-    let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec
-    logMessages logsModels
-    modelModules <- fmap (BF.second showAndReplace) <$> runQ modelsQ
-    let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
-    logMessages logs'
-    securitySchemes' <- runQ securitySchemesQ
-    let outputDirectory = OAF.optOutputDir opts
-        modules =
-          fmap (BF.bimap ("Operations" :) showAndReplace) operationModules
-            <> modelModules
-            <> [ (["Configuration"], showAndReplace configurationInfo),
-                 (["SecuritySchemes"], showAndReplace securitySchemes'),
-                 (["Common"], replaceOpenAPI moduleName $(embedFile "src/OpenAPI/Common.hs"))
-               ]
-        modulesToExport =
-          fmap
-            ( (moduleName <>) . ("." <>)
-                . joinWithPoint
-                . fst
-            )
-            modules
-        mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
-        mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
-        hsBootFiles =
-          BF.bimap
-            ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs-boot") . foldr1 (</>))
-            ( T.unpack
-                . T.unlines
-                . ( \xs -> case xs of
-                      x : xs' -> x : "import Data.Aeson" : "import qualified Data.Aeson as Data.Aeson.Types.Internal" : xs'
-                      _ -> xs
-                  )
-                . ( >>=
-                      ( \l ->
-                          maybe
-                            [l]
-                            ( \suffix ->
-                                [ l,
-                                  "instance Show" <> suffix,
-                                  "instance Eq" <> suffix,
-                                  "instance FromJSON" <> suffix,
-                                  "instance ToJSON" <> suffix
-                                ]
-                            )
-                            $ T.stripPrefix "data" l
-                      )
-                  )
-                . fmap (\l -> if T.isPrefixOf "type" l then l else T.takeWhile (/= '=') l)
-                . filter (\line -> T.isPrefixOf "data" line || T.isPrefixOf "module" line || T.isPrefixOf "type" line)
-                . T.lines
-                . T.pack
-            )
-            <$> filter
-              ( \(p, _) -> case p of
-                  "Types" : _ : _ -> True
-                  _ -> False
-              )
-              modelModules
-        filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules) <> hsBootFiles
-    if OAF.optDryRun opts
-      then
-        mapM_
-          ( \(file, content) -> do
-              putStrLn $ "File: " <> file
-              putStrLn "---"
-              putStrLn content
-              putStrLn "---\n\n"
-          )
-          filesToCreate
-      else do
-        proceed <- permitProceed outputDirectory (OAF.optForce opts)
-        if proceed
-          then do
-            _ <- tryIOError (removeDirectoryRecursive outputDirectory)
-            createDirectoryIfMissing True (outputDirectory </> srcDirectory)
-            createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName)
-            createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
-            createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
-            mapM_ (uncurry writeFile) filesToCreate
-            when (OAF.optGenerateStackProject opts) $
-              mapM_
-                ( uncurry writeFile
-                    . BF.first (outputDirectory </>)
+main =
+  let opts =
+        info (OAO.parseOptions <**> helper) $
+          mconcat
+            [ fullDesc,
+              progDesc "This tool can be used to generate Haskell code from OpenAPI 3 specifications. For more information see https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator.",
+              header "Generate Haskell code from OpenAPI 3 specifications"
+            ]
+   in execParser opts >>= \options -> do
+        spec <- decodeOpenApi $ OAO.optSpecification options
+        let flags = OAO.optFlags options
+            outputDirectory = T.unpack $ OAO.flagOutputDir flags
+            moduleName = T.unpack $ OAO.flagModuleName flags
+            packageName = T.unpack $ OAO.flagPackageName flags
+            env = OAM.createEnvironment options $ Ref.buildReferenceMap spec
+            logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.flagLogLevel flags)
+            showAndReplace = replaceOpenAPI moduleName . show
+            (operationsQ, logs) = OAM.runGenerator env $ defineOperations moduleName spec
+        logMessages logs
+        operationModules <- runQ operationsQ
+        configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
+        let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec
+        logMessages logsModels
+        modelModules <- fmap (BF.second showAndReplace) <$> runQ modelsQ
+        let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
+        logMessages logs'
+        securitySchemes' <- runQ securitySchemesQ
+        let modules =
+              fmap (BF.bimap ("Operations" :) showAndReplace) operationModules
+                <> modelModules
+                <> [ (["Configuration"], showAndReplace configurationInfo),
+                     (["SecuritySchemes"], showAndReplace securitySchemes'),
+                     (["Common"], replaceOpenAPI moduleName $(embedFile "src/OpenAPI/Common.hs"))
+                   ]
+            modulesToExport =
+              fmap
+                ( (moduleName <>) . ("." <>)
+                    . joinWithPoint
+                    . fst
                 )
-                (stackProjectFiles (OAF.optPackageName opts) moduleName modulesToExport)
-            putStrLn "finished"
-          else putStrLn "aborted"
-  _ -> die "Failed to generate code because no OpenAPI specification was provided. Pass the location of the OpenAPI specification as CLI argument. Run the CLI with --help to see further options."
+                modules
+            mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
+            mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
+            hsBootFiles =
+              BF.bimap
+                ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs-boot") . foldr1 (</>))
+                ( T.unpack
+                    . T.unlines
+                    . ( \xs -> case xs of
+                          x : xs' -> x : "import Data.Aeson" : "import qualified Data.Aeson as Data.Aeson.Types.Internal" : xs'
+                          _ -> xs
+                      )
+                    . ( >>=
+                          ( \l ->
+                              maybe
+                                [l]
+                                ( \suffix ->
+                                    [ l,
+                                      "instance Show" <> suffix,
+                                      "instance Eq" <> suffix,
+                                      "instance FromJSON" <> suffix,
+                                      "instance ToJSON" <> suffix
+                                    ]
+                                )
+                                $ T.stripPrefix "data" l
+                          )
+                      )
+                    . fmap (\l -> if T.isPrefixOf "type" l then l else T.takeWhile (/= '=') l)
+                    . filter (\line -> T.isPrefixOf "data" line || T.isPrefixOf "module" line || T.isPrefixOf "type" line)
+                    . T.lines
+                    . T.pack
+                )
+                <$> filter
+                  ( \(p, _) -> case p of
+                      "Types" : _ : _ -> True
+                      _ -> False
+                  )
+                  modelModules
+            filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules) <> hsBootFiles
+        if OAO.flagDryRun flags
+          then
+            mapM_
+              ( \(file, content) -> do
+                  putStrLn $ "File: " <> file
+                  putStrLn "---"
+                  putStrLn content
+                  putStrLn "---\n\n"
+              )
+              filesToCreate
+          else do
+            proceed <- permitProceed outputDirectory (OAO.flagForce flags)
+            if proceed
+              then do
+                _ <- tryIOError (removeDirectoryRecursive outputDirectory)
+                createDirectoryIfMissing True (outputDirectory </> srcDirectory)
+                createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName)
+                createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
+                createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
+                mapM_ (uncurry writeFile) filesToCreate
+                unless (OAO.flagDoNotGenerateStackProject flags) $
+                  mapM_
+                    ( uncurry writeFile
+                        . BF.first (outputDirectory </>)
+                    )
+                    (stackProjectFiles packageName moduleName modulesToExport)
+                putStrLn "finished"
+              else putStrLn "aborted"

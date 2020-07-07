@@ -13,43 +13,17 @@ import Test.Hspec
 import Test.MonadHTTP
 
 paymentIntent =
-  PaymentIntent
-    { paymentIntentAmount = 23,
-      paymentIntentAmountCapturable = Nothing,
-      paymentIntentAmountReceived = Nothing,
-      paymentIntentApplication = Nothing,
-      paymentIntentApplicationFeeAmount = Nothing,
-      paymentIntentCanceledAt = Nothing,
-      paymentIntentCancellationReason = Nothing,
-      paymentIntentCaptureMethod = PaymentIntentCaptureMethod'EnumStringAutomatic,
-      paymentIntentCharges = Nothing,
-      paymentIntentClientSecret = Nothing,
-      paymentIntentConfirmationMethod = PaymentIntentConfirmationMethod'EnumOther (Aeson.String "bar"),
-      paymentIntentCreated = 45,
-      paymentIntentCurrency = "CHF",
-      paymentIntentCustomer = Nothing,
-      paymentIntentDescription = Nothing,
-      paymentIntentId = "123",
-      paymentIntentInvoice = Nothing,
-      paymentIntentLastPaymentError = Nothing,
-      paymentIntentLivemode = False,
-      paymentIntentMetadata = Nothing,
-      paymentIntentNextAction = Nothing,
-      paymentIntentObject = PaymentIntentObject'EnumStringPaymentIntent,
-      paymentIntentOnBehalfOf = Nothing,
-      paymentIntentPaymentMethod = Nothing,
-      paymentIntentPaymentMethodOptions = Nothing,
-      paymentIntentPaymentMethodTypes = [],
-      paymentIntentReceiptEmail = Nothing,
-      paymentIntentReview = Nothing,
-      paymentIntentSetupFutureUsage = Nothing,
-      paymentIntentShipping = Nothing,
-      paymentIntentStatementDescriptor = Nothing,
-      paymentIntentStatementDescriptorSuffix = Nothing,
-      paymentIntentStatus = PaymentIntentStatus'EnumStringSucceeded,
-      paymentIntentTransferData = Nothing,
-      paymentIntentTransferGroup = Nothing
-    }
+  mkPaymentIntent
+    23
+    PaymentIntentCaptureMethod'EnumAutomatic
+    (PaymentIntentConfirmationMethod'Other $ Aeson.String "bar")
+    45
+    "CHF"
+    "123"
+    False
+    PaymentIntentObject'EnumPaymentIntent
+    []
+    PaymentIntentStatus'EnumSucceeded
 
 succeededResponseBody :: ByteString
 succeededResponseBody =
@@ -92,7 +66,7 @@ successResponseGetExpected =
   GetPaymentIntentsResponseBody200
     { getPaymentIntentsResponseBody200Data = [paymentIntent],
       getPaymentIntentsResponseBody200HasMore = False,
-      getPaymentIntentsResponseBody200Object = GetPaymentIntentsResponseBody200Object'EnumStringList,
+      getPaymentIntentsResponseBody200Object = GetPaymentIntentsResponseBody200Object'EnumList,
       getPaymentIntentsResponseBody200Url = "http://example.org"
     }
 

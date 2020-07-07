@@ -23,11 +23,11 @@ import qualified OpenAPI.Generate.Types as OAT
 import System.Exit
 
 -- | Decodes an OpenAPI File
-decodeOpenApi :: String -> IO OAT.OpenApiSpecification
+decodeOpenApi :: Text -> IO OAT.OpenApiSpecification
 decodeOpenApi fileName = do
-  res <- decodeFileEither fileName
+  res <- decodeFileEither $ T.unpack fileName
   case res of
-    Left exc -> die $ "Could not parse OpenAPI specification '" <> fileName <> "': " <> show exc
+    Left exc -> die $ "Could not parse OpenAPI specification '" <> T.unpack fileName <> "': " <> show exc
     Right o -> pure o
 
 -- | Defines all the operations as functions and the common imports
@@ -60,7 +60,7 @@ defineConfigurationInformation moduleName spec =
                     "@" <> defaultURL <> "@"
                   ],
               ppr
-                <$> [d|$(varP defaultURLName) = T.pack $(litE $ stringL $ T.unpack defaultURL)|],
+                <$> [d|$(varP defaultURLName) = T.pack $(stringE $ T.unpack defaultURL)|],
               pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
               ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
             ]
@@ -69,7 +69,7 @@ defineConfigurationInformation moduleName spec =
 defineModels :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition])
 defineModels moduleName spec =
   let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
-   in OAM.nested "schemas" $ do
+   in OAM.nested "components" $ OAM.nested "schemas" $ do
         models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
         pure $ Dep.getModelModulesFromModelsWithDependencies moduleName models
 

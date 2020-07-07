@@ -10,6 +10,7 @@ import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -30,7 +31,7 @@ import qualified GHC.Types
 import qualified OpenAPI.Common
 import OpenAPI.TypeAlias
 
--- | Defines the data type for the schema Dog
+-- | Defines the object schema located at @components.schemas.Dog@ in the specification.
 -- 
 -- 
 data Dog = Dog {
@@ -76,31 +77,50 @@ data Dog = Dog {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Dog
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "bark" (dogBark obj) : (Data.Aeson..=) "binary" (dogBinary obj) : (Data.Aeson..=) "breed" (dogBreed obj) : (Data.Aeson..=) "byte" (dogByte obj) : (Data.Aeson..=) "double" (dogDouble obj) : (Data.Aeson..=) "father" (dogFather obj) : (Data.Aeson..=) "float" (dogFloat obj) : (Data.Aeson..=) "int32" (dogInt32 obj) : (Data.Aeson..=) "int64" (dogInt64 obj) : (Data.Aeson..=) "integer" (dogInteger obj) : (Data.Aeson..=) "number" (dogNumber obj) : (Data.Aeson..=) "pet_type" (dogPet_type obj) : (Data.Aeson..=) "secondFather" (dogSecondFather obj) : (Data.Aeson..=) "str" (dogStr obj) : (Data.Aeson..=) "strDate" (dogStrDate obj) : (Data.Aeson..=) "strDateTime" (dogStrDateTime obj) : (Data.Aeson..=) "tags" (dogTags obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "bark" (dogBark obj) GHC.Base.<> ((Data.Aeson..=) "binary" (dogBinary obj) GHC.Base.<> ((Data.Aeson..=) "breed" (dogBreed obj) GHC.Base.<> ((Data.Aeson..=) "byte" (dogByte obj) GHC.Base.<> ((Data.Aeson..=) "double" (dogDouble obj) GHC.Base.<> ((Data.Aeson..=) "father" (dogFather obj) GHC.Base.<> ((Data.Aeson..=) "float" (dogFloat obj) GHC.Base.<> ((Data.Aeson..=) "int32" (dogInt32 obj) GHC.Base.<> ((Data.Aeson..=) "int64" (dogInt64 obj) GHC.Base.<> ((Data.Aeson..=) "integer" (dogInteger obj) GHC.Base.<> ((Data.Aeson..=) "number" (dogNumber obj) GHC.Base.<> ((Data.Aeson..=) "pet_type" (dogPet_type obj) GHC.Base.<> ((Data.Aeson..=) "secondFather" (dogSecondFather obj) GHC.Base.<> ((Data.Aeson..=) "str" (dogStr obj) GHC.Base.<> ((Data.Aeson..=) "strDate" (dogStrDate obj) GHC.Base.<> ((Data.Aeson..=) "strDateTime" (dogStrDateTime obj) GHC.Base.<> (Data.Aeson..=) "tags" (dogTags obj)))))))))))))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("bark" Data.Aeson.Types.ToJSON..= dogBark obj : "binary" Data.Aeson.Types.ToJSON..= dogBinary obj : "breed" Data.Aeson.Types.ToJSON..= dogBreed obj : "byte" Data.Aeson.Types.ToJSON..= dogByte obj : "double" Data.Aeson.Types.ToJSON..= dogDouble obj : "father" Data.Aeson.Types.ToJSON..= dogFather obj : "float" Data.Aeson.Types.ToJSON..= dogFloat obj : "int32" Data.Aeson.Types.ToJSON..= dogInt32 obj : "int64" Data.Aeson.Types.ToJSON..= dogInt64 obj : "integer" Data.Aeson.Types.ToJSON..= dogInteger obj : "number" Data.Aeson.Types.ToJSON..= dogNumber obj : "pet_type" Data.Aeson.Types.ToJSON..= dogPet_type obj : "secondFather" Data.Aeson.Types.ToJSON..= dogSecondFather obj : "str" Data.Aeson.Types.ToJSON..= dogStr obj : "strDate" Data.Aeson.Types.ToJSON..= dogStrDate obj : "strDateTime" Data.Aeson.Types.ToJSON..= dogStrDateTime obj : "tags" Data.Aeson.Types.ToJSON..= dogTags obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("bark" Data.Aeson.Types.ToJSON..= dogBark obj) GHC.Base.<> (("binary" Data.Aeson.Types.ToJSON..= dogBinary obj) GHC.Base.<> (("breed" Data.Aeson.Types.ToJSON..= dogBreed obj) GHC.Base.<> (("byte" Data.Aeson.Types.ToJSON..= dogByte obj) GHC.Base.<> (("double" Data.Aeson.Types.ToJSON..= dogDouble obj) GHC.Base.<> (("father" Data.Aeson.Types.ToJSON..= dogFather obj) GHC.Base.<> (("float" Data.Aeson.Types.ToJSON..= dogFloat obj) GHC.Base.<> (("int32" Data.Aeson.Types.ToJSON..= dogInt32 obj) GHC.Base.<> (("int64" Data.Aeson.Types.ToJSON..= dogInt64 obj) GHC.Base.<> (("integer" Data.Aeson.Types.ToJSON..= dogInteger obj) GHC.Base.<> (("number" Data.Aeson.Types.ToJSON..= dogNumber obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= dogPet_type obj) GHC.Base.<> (("secondFather" Data.Aeson.Types.ToJSON..= dogSecondFather obj) GHC.Base.<> (("str" Data.Aeson.Types.ToJSON..= dogStr obj) GHC.Base.<> (("strDate" Data.Aeson.Types.ToJSON..= dogStrDate obj) GHC.Base.<> (("strDateTime" Data.Aeson.Types.ToJSON..= dogStrDateTime obj) GHC.Base.<> ("tags" Data.Aeson.Types.ToJSON..= dogTags obj)))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON Dog
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "Dog" (\obj -> ((((((((((((((((GHC.Base.pure Dog GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "bark")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "binary")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "breed")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "byte")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "double")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "father")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "float")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int32")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int64")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "integer")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "number")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "secondFather")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "str")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDateTime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tags"))
--- | Defines the enum schema DogBreed
+-- | Create a new 'Dog' with all required fields.
+mkDog :: Dog 
+mkDog = Dog{dogBark = GHC.Maybe.Nothing,
+            dogBinary = GHC.Maybe.Nothing,
+            dogBreed = GHC.Maybe.Nothing,
+            dogByte = GHC.Maybe.Nothing,
+            dogDouble = GHC.Maybe.Nothing,
+            dogFather = GHC.Maybe.Nothing,
+            dogFloat = GHC.Maybe.Nothing,
+            dogInt32 = GHC.Maybe.Nothing,
+            dogInt64 = GHC.Maybe.Nothing,
+            dogInteger = GHC.Maybe.Nothing,
+            dogNumber = GHC.Maybe.Nothing,
+            dogPet_type = GHC.Maybe.Nothing,
+            dogSecondFather = GHC.Maybe.Nothing,
+            dogStr = GHC.Maybe.Nothing,
+            dogStrDate = GHC.Maybe.Nothing,
+            dogStrDateTime = GHC.Maybe.Nothing,
+            dogTags = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @components.schemas.Dog.properties.breed@ in the specification.
 -- 
 -- 
-data DogBreed
-    = DogBreedEnumOther Data.Aeson.Types.Internal.Value
-    | DogBreedEnumTyped Data.Text.Internal.Text
-    | DogBreedEnumString_Dingo
-    | DogBreedEnumString_Husky
-    | DogBreedEnumString_Retriever
-    | DogBreedEnumString_Shepherd
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data DogBreed =                                   
+   DogBreedOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | DogBreedTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | DogBreedEnumDingo                             -- ^ Represents the JSON value @"Dingo"@
+  | DogBreedEnumHusky                             -- ^ Represents the JSON value @"Husky"@
+  | DogBreedEnumRetriever                         -- ^ Represents the JSON value @"Retriever"@
+  | DogBreedEnumShepherd                          -- ^ Represents the JSON value @"Shepherd"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON DogBreed
-    where toJSON (DogBreedEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (DogBreedEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (DogBreedEnumString_Dingo) = "Dingo"
-          toJSON (DogBreedEnumString_Husky) = "Husky"
-          toJSON (DogBreedEnumString_Retriever) = "Retriever"
-          toJSON (DogBreedEnumString_Shepherd) = "Shepherd"
+    where toJSON (DogBreedOther val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (DogBreedTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (DogBreedEnumDingo) = "Dingo"
+          toJSON (DogBreedEnumHusky) = "Husky"
+          toJSON (DogBreedEnumRetriever) = "Retriever"
+          toJSON (DogBreedEnumShepherd) = "Shepherd"
 instance Data.Aeson.Types.FromJSON.FromJSON DogBreed
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Dingo" -> DogBreedEnumString_Dingo
-                                            | val GHC.Classes.== "Husky" -> DogBreedEnumString_Husky
-                                            | val GHC.Classes.== "Retriever" -> DogBreedEnumString_Retriever
-                                            | val GHC.Classes.== "Shepherd" -> DogBreedEnumString_Shepherd
-                                            | GHC.Base.otherwise -> DogBreedEnumOther val)
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Dingo" -> DogBreedEnumDingo
+                                            | val GHC.Classes.== "Husky" -> DogBreedEnumHusky
+                                            | val GHC.Classes.== "Retriever" -> DogBreedEnumRetriever
+                                            | val GHC.Classes.== "Shepherd" -> DogBreedEnumShepherd
+                                            | GHC.Base.otherwise -> DogBreedOther val)

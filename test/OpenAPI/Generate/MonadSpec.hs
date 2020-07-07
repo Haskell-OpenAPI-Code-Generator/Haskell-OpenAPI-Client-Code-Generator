@@ -9,16 +9,20 @@ import Data.List
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import Data.Validity.Text ()
-import qualified OpenAPI.Generate.Flags as OAF
+import qualified OpenAPI.Generate.Log as OAL
 import OpenAPI.Generate.Monad
+import qualified OpenAPI.Generate.OptParse as OAO
 import OpenAPI.Generate.Reference
 import OpenAPI.Generate.Types as OAT
+import qualified Options.Applicative as O
+import System.Environment
 import Test.Hspec
 import Test.Validity
 
 spec :: Spec
 spec = do
-  let run = runGenerator (createEnvironment OAF.defaultFlags Map.empty)
+  defaultFlags <- runIO $ withArgs ["spec.yaml"] $ O.execParser $ O.info OAO.parseOptions mempty
+  let run = runGenerator (createEnvironment defaultFlags Map.empty)
   describe "nested" $ do
     it "should nest path correct with simple example" $ do
       let (currentPath', _) = run $ nested "a" $ nested "b" $ nested "c" $ asks currentPath
@@ -34,7 +38,7 @@ spec = do
               nested "c" $ logInfo "3"
               logInfo "4"
             logInfo "5"
-       in fmap (\l -> (path l, message l)) logs
+       in fmap (\l -> (OAL.logEntryPath l, OAL.logEntryMessage l)) logs
             `shouldBe` [ (["a"], "1"),
                          (["a", "b"], "2"),
                          (["a", "b", "c"], "3"),
@@ -42,7 +46,7 @@ spec = do
                          (["a"], "5")
                        ]
   describe "logs" $ do
-    let msgAndLogToTupleList list logs = bimap T.unpack T.unpack <$> zip list (transformGeneratorLogs logs)
+    let msgAndLogToTupleList list logs = bimap T.unpack T.unpack <$> zip list (OAL.transformLogs logs)
         logContainsMsgPredicate = all $ uncurry isInfixOf
     it "should contain all logged info messages" $ forAllValid $ \list -> do
       let (_, logs) = run $ foldr ((>>) . logInfo) (pure ()) list
@@ -58,7 +62,7 @@ spec = do
         b = OAT.RequestBodyObject Map.empty Nothing False
         runWithEnv =
           runGenerator
-            $ createEnvironment OAF.defaultFlags
+            $ createEnvironment defaultFlags
             $ Map.fromList
               [ ("#/components/examples/example1", ExampleReference e),
                 ("#/components/requestBodies/body1", RequestBodyReference b)
