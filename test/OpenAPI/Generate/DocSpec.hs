@@ -3,11 +3,11 @@
 
 module OpenAPI.Generate.DocSpec where
 
+import Data.List
 import GHC.Generics
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib
 import OpenAPI.Generate.Doc
-import OpenAPI.Generate.Internal.Util
 import Test.Hspec
 import Test.QuickCheck
 import Test.Validity
@@ -44,7 +44,7 @@ spec = do
             )
             (text "b" $$ text "d" $$ text "e")
         )
-        `shouldBe` show (text "a b" $$ text "c d" $$ text "  e")
+        `shouldBe` show (text "a b" $$ text "c d" $$ text "e")
     it "should not indent if left doc is longer" $
       show
         ( sideBySide
@@ -54,7 +54,7 @@ spec = do
         )
         `shouldBe` show (text "a b" $$ text "c d" $$ text "e")
     it "should have the length of the longer document" $ do
-      let numberOfLinesOfDoc = length . splitOn '\n' . show
+      let numberOfLinesOfDoc = length . dropWhileEnd null . lines . show
       forAllValid $ \(MultiLineString doc1, MultiLineString doc2) ->
         numberOfLinesOfDoc
           ( sideBySide
@@ -94,23 +94,19 @@ spec = do
     $ it "place a line feed before the tokens and add an indentation"
     $ show
       ( breakOnTokens [",", "}"] $ text $
-          init
-            ( unlines
-                [ "foo = {",
-                  "  a = 123, b = 321,",
-                  "  c = A",
-                  "  } deriving Foo"
-                ]
-            )
-      )
-      `shouldBe` init
-        ( unlines
-            [ "foo = { a = 123",
-              "  , b = 321",
-              "  , c = A ",
+          unlines
+            [ "foo = {",
+              "  a = 123, b = 321,",
+              "  c = A",
               "  } deriving Foo"
             ]
-        )
+      )
+      `shouldBe` unlines
+        [ "foo = { a = 123",
+          "  , b = 321",
+          "  , c = A",
+          "  } deriving Foo"
+        ]
   describe "zipCodeAndComments"
     $ it "should intertwine code and comments"
     $ show

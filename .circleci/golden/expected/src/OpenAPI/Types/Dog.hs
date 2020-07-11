@@ -82,7 +82,7 @@ instance Data.Aeson.Types.ToJSON.ToJSON Dog
 instance Data.Aeson.Types.FromJSON.FromJSON Dog
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "Dog" (\obj -> ((((((((((((((((GHC.Base.pure Dog GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "bark")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "binary")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "breed")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "byte")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "double")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "father")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "float")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int32")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "int64")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "integer")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "number")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "secondFather")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "str")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "strDateTime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tags"))
 -- | Create a new 'Dog' with all required fields.
-mkDog :: Dog 
+mkDog :: Dog
 mkDog = Dog{dogBark = GHC.Maybe.Nothing,
             dogBinary = GHC.Maybe.Nothing,
             dogBreed = GHC.Maybe.Nothing,
@@ -103,16 +103,16 @@ mkDog = Dog{dogBark = GHC.Maybe.Nothing,
 -- | Defines the enum schema located at @components.schemas.Dog.properties.breed@ in the specification.
 -- 
 -- 
-data DogBreed =                                   
-   DogBreedOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
-  | DogBreedTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
-  | DogBreedEnumDingo                             -- ^ Represents the JSON value @"Dingo"@
-  | DogBreedEnumHusky                             -- ^ Represents the JSON value @"Husky"@
-  | DogBreedEnumRetriever                         -- ^ Represents the JSON value @"Retriever"@
-  | DogBreedEnumShepherd                          -- ^ Represents the JSON value @"Shepherd"@
+data DogBreed =
+   DogBreedOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | DogBreedTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | DogBreedEnumDingo -- ^ Represents the JSON value @"Dingo"@
+  | DogBreedEnumHusky -- ^ Represents the JSON value @"Husky"@
+  | DogBreedEnumRetriever -- ^ Represents the JSON value @"Retriever"@
+  | DogBreedEnumShepherd -- ^ Represents the JSON value @"Shepherd"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON DogBreed
-    where toJSON (DogBreedOther val) = Data.Aeson.Types.ToJSON.toJSON val
+    where toJSON (DogBreedOther val) = val
           toJSON (DogBreedTyped val) = Data.Aeson.Types.ToJSON.toJSON val
           toJSON (DogBreedEnumDingo) = "Dingo"
           toJSON (DogBreedEnumHusky) = "Husky"

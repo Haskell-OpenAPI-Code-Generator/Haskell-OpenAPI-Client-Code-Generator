@@ -54,7 +54,7 @@ instance Data.Aeson.Types.ToJSON.ToJSON Cat
 instance Data.Aeson.Types.FromJSON.FromJSON Cat
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> ((((GHC.Base.pure Cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
 -- | Create a new 'Cat' with all required fields.
-mkCat :: Cat 
+mkCat :: Cat
 mkCat = Cat{catAge = GHC.Maybe.Nothing,
             catAnanyoftype = GHC.Maybe.Nothing,
             catAnother_relative = GHC.Maybe.Nothing,

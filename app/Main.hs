@@ -173,7 +173,7 @@ main =
                                 $ T.stripPrefix "data" l
                           )
                       )
-                    . fmap (\l -> if T.isPrefixOf "type" l then l else T.takeWhile (/= '=') l)
+                    . fmap (\l -> if T.isPrefixOf "type" l then l else T.strip (T.takeWhile (/= '=') l))
                     . filter (\line -> T.isPrefixOf "data" line || T.isPrefixOf "module" line || T.isPrefixOf "type" line)
                     . T.lines
                     . T.pack
@@ -184,7 +184,11 @@ main =
                       _ -> False
                   )
                   modelModules
-            filesToCreate = (mainFile, mainModuleContent) : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules) <> hsBootFiles
+            filesToCreate =
+              BF.second (unlines . lines)
+                <$> (mainFile, mainModuleContent)
+                  : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+                  <> hsBootFiles
         if OAO.flagDryRun flags
           then
             mapM_

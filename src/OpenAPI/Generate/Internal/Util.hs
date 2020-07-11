@@ -10,7 +10,6 @@ module OpenAPI.Generate.Internal.Util
     uppercaseFirstText,
     mapMaybeM,
     liftedAppend,
-    splitOn,
     joinWithPoint,
     joinWith,
   )
@@ -163,17 +162,6 @@ joinWith separator xs =
     ( \part1 part2 -> part1 <> separator <> part2
     )
     xs
-
--- | Split a list on on a given element
-splitOn :: Eq a => a -> [a] -> [[a]]
-splitOn x =
-  foldr
-    ( \element (currentAcc : acc) ->
-        if element == x
-          then [] : currentAcc : acc
-          else (element : currentAcc) : acc
-    )
-    [[]]
 
 -- | A version of 'Data.Maybe.mapMaybe' that works with a monadic predicate.
 -- from https://hackage.haskell.org/package/extra-1.7.1/docs/src/Control.Monad.Extra.html#mapMaybeM copied

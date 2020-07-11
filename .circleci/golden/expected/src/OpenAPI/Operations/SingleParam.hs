@@ -45,7 +45,7 @@ import OpenAPI.Types
 -- | > GET /pet/singleparam
 -- 
 -- Operation with a single parameter
-singleParam :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus    -- ^ status: Status values that need to be considered for filter
+singleParam :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
   -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response SingleParamResponse) -- ^ Monadic computation which returns the result of the operation
 singleParam status = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                       Dog)
@@ -55,15 +55,15 @@ singleParam status = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.ei
 -- Represents the parameter named \'status\'
 -- 
 -- Status values that need to be considered for filter
-data SingleParamParametersStatus =                                   
-   SingleParamParametersStatusOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
-  | SingleParamParametersStatusTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
-  | SingleParamParametersStatusEnumAvailable                         -- ^ Represents the JSON value @"available"@
-  | SingleParamParametersStatusEnumPending                           -- ^ Represents the JSON value @"pending"@
-  | SingleParamParametersStatusEnumSold                              -- ^ Represents the JSON value @"sold"@
+data SingleParamParametersStatus =
+   SingleParamParametersStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | SingleParamParametersStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | SingleParamParametersStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | SingleParamParametersStatusEnumPending -- ^ Represents the JSON value @"pending"@
+  | SingleParamParametersStatusEnumSold -- ^ Represents the JSON value @"sold"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON SingleParamParametersStatus
-    where toJSON (SingleParamParametersStatusOther val) = Data.Aeson.Types.ToJSON.toJSON val
+    where toJSON (SingleParamParametersStatusOther val) = val
           toJSON (SingleParamParametersStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
           toJSON (SingleParamParametersStatusEnumAvailable) = "available"
           toJSON (SingleParamParametersStatusEnumPending) = "pending"
@@ -76,16 +76,16 @@ instance Data.Aeson.Types.FromJSON.FromJSON SingleParamParametersStatus
 -- | Represents a response of the operation 'singleParam'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'SingleParamResponseError' is used.
-data SingleParamResponse =                   
-   SingleParamResponseError GHC.Base.String  -- ^ Means either no matching case available or a parse error
-  | SingleParamResponse200 Dog               -- ^ successful operation
+data SingleParamResponse =
+   SingleParamResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | SingleParamResponse200 Dog -- ^ successful operation
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 -- | > GET /pet/singleparam
 -- 
 -- The same as 'singleParam' but accepts an explicit configuration.
-singleParamWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
-  -> SingleParamParametersStatus                                                                       -- ^ status: Status values that need to be considered for filter
-  -> m (Network.HTTP.Client.Types.Response SingleParamResponse)                                        -- ^ Monadic computation which returns the result of the operation
+singleParamWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
+  -> SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
+  -> m (Network.HTTP.Client.Types.Response SingleParamResponse) -- ^ Monadic computation which returns the result of the operation
 singleParamWithConfiguration config
                              status = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either SingleParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> SingleParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                                        Dog)
@@ -93,14 +93,14 @@ singleParamWithConfiguration config
 -- | > GET /pet/singleparam
 -- 
 -- The same as 'singleParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
-singleParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus                 -- ^ status: Status values that need to be considered for filter
+singleParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
   -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamRaw status = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
 -- | > GET /pet/singleparam
 -- 
 -- The same as 'singleParam' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
-singleParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
-  -> SingleParamParametersStatus                                                                          -- ^ status: Status values that need to be considered for filter
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString)                           -- ^ Monadic computation which returns the result of the operation
+singleParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
+  -> SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamWithConfigurationRaw config
                                 status = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])

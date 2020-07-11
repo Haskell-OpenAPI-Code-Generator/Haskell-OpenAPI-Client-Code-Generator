@@ -45,7 +45,7 @@ import OpenAPI.Types
 -- | > GET /pet/multiparam/{status}
 -- 
 -- Operation with multiple parameters
-multiParam :: forall m . OpenAPI.Common.MonadHTTP m => MultiParamParameters           -- ^ Contains all available parameters of this operation (query and path parameters)
+multiParam :: forall m . OpenAPI.Common.MonadHTTP m => MultiParamParameters -- ^ Contains all available parameters of this operation (query and path parameters)
   -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response MultiParamResponse) -- ^ Monadic computation which returns the result of the operation
 multiParam parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either MultiParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> MultiParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                        Dog)
@@ -78,9 +78,9 @@ instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParameters
 instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParameters
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "MultiParamParameters" (\obj -> (((GHC.Base.pure MultiParamParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathStatus")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryFilter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryReferenceParameter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryStatus"))
 -- | Create a new 'MultiParamParameters' with all required fields.
-mkMultiParamParameters :: MultiParamParametersPathStatus  -- ^ 'multiParamParametersPathStatus'
-  -> Cat                                                  -- ^ 'multiParamParametersQueryReferenceParameter'
-  -> MultiParamParametersQueryStatus                      -- ^ 'multiParamParametersQueryStatus'
+mkMultiParamParameters :: MultiParamParametersPathStatus -- ^ 'multiParamParametersPathStatus'
+  -> Cat -- ^ 'multiParamParametersQueryReferenceParameter'
+  -> MultiParamParametersQueryStatus -- ^ 'multiParamParametersQueryStatus'
   -> MultiParamParameters
 mkMultiParamParameters multiParamParametersPathStatus multiParamParametersQueryReferenceParameter multiParamParametersQueryStatus = MultiParamParameters{multiParamParametersPathStatus = multiParamParametersPathStatus,
                                                                                                                                                          multiParamParametersQueryFilter = GHC.Maybe.Nothing,
@@ -91,15 +91,15 @@ mkMultiParamParameters multiParamParametersPathStatus multiParamParametersQueryR
 -- Represents the parameter named \'status\'
 -- 
 -- Status in path
-data MultiParamParametersPathStatus =                                   
-   MultiParamParametersPathStatusOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
-  | MultiParamParametersPathStatusTyped GHC.Types.Int                   -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
-  | MultiParamParametersPathStatusEnum1                                 -- ^ Represents the JSON value @1@
-  | MultiParamParametersPathStatusEnum3                                 -- ^ Represents the JSON value @3@
-  | MultiParamParametersPathStatusEnum5                                 -- ^ Represents the JSON value @5@
+data MultiParamParametersPathStatus =
+   MultiParamParametersPathStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | MultiParamParametersPathStatusTyped GHC.Types.Int -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | MultiParamParametersPathStatusEnum1 -- ^ Represents the JSON value @1@
+  | MultiParamParametersPathStatusEnum3 -- ^ Represents the JSON value @3@
+  | MultiParamParametersPathStatusEnum5 -- ^ Represents the JSON value @5@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParametersPathStatus
-    where toJSON (MultiParamParametersPathStatusOther val) = Data.Aeson.Types.ToJSON.toJSON val
+    where toJSON (MultiParamParametersPathStatusOther val) = val
           toJSON (MultiParamParametersPathStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
           toJSON (MultiParamParametersPathStatusEnum1) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0)
           toJSON (MultiParamParametersPathStatusEnum3) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0)
@@ -114,15 +114,15 @@ instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParametersPathStatus
 -- Represents the parameter named \'status\'
 -- 
 -- Status in query
-data MultiParamParametersQueryStatus =                                   
-   MultiParamParametersQueryStatusOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
-  | MultiParamParametersQueryStatusTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
-  | MultiParamParametersQueryStatusEnumAvailable                         -- ^ Represents the JSON value @"available"@
-  | MultiParamParametersQueryStatusEnumPending                           -- ^ Represents the JSON value @"pending"@
-  | MultiParamParametersQueryStatusEnumSold                              -- ^ Represents the JSON value @"sold"@
+data MultiParamParametersQueryStatus =
+   MultiParamParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | MultiParamParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | MultiParamParametersQueryStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | MultiParamParametersQueryStatusEnumPending -- ^ Represents the JSON value @"pending"@
+  | MultiParamParametersQueryStatusEnumSold -- ^ Represents the JSON value @"sold"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParametersQueryStatus
-    where toJSON (MultiParamParametersQueryStatusOther val) = Data.Aeson.Types.ToJSON.toJSON val
+    where toJSON (MultiParamParametersQueryStatusOther val) = val
           toJSON (MultiParamParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
           toJSON (MultiParamParametersQueryStatusEnumAvailable) = "available"
           toJSON (MultiParamParametersQueryStatusEnumPending) = "pending"
@@ -135,16 +135,16 @@ instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParametersQueryStatus
 -- | Represents a response of the operation 'multiParam'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'MultiParamResponseError' is used.
-data MultiParamResponse =                   
-   MultiParamResponseError GHC.Base.String  -- ^ Means either no matching case available or a parse error
-  | MultiParamResponse200 Dog               -- ^ successful operation
+data MultiParamResponse =
+   MultiParamResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | MultiParamResponse200 Dog -- ^ successful operation
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 -- | > GET /pet/multiparam/{status}
 -- 
 -- The same as 'multiParam' but accepts an explicit configuration.
-multiParamWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
-  -> MultiParamParameters                                                                             -- ^ Contains all available parameters of this operation (query and path parameters)
-  -> m (Network.HTTP.Client.Types.Response MultiParamResponse)                                        -- ^ Monadic computation which returns the result of the operation
+multiParamWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
+  -> MultiParamParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response MultiParamResponse) -- ^ Monadic computation which returns the result of the operation
 multiParamWithConfiguration config
                             parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either MultiParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> MultiParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                                         Dog)
@@ -154,7 +154,7 @@ multiParamWithConfiguration config
 -- | > GET /pet/multiparam/{status}
 -- 
 -- The same as 'multiParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
-multiParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => MultiParamParameters                         -- ^ Contains all available parameters of this operation (query and path parameters)
+multiParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => MultiParamParameters -- ^ Contains all available parameters of this operation (query and path parameters)
   -> OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
 multiParamRaw parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pet/multiparam/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel (multiParamParametersPathStatus parameters))) GHC.Base.++ ""))) [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (multiParamParametersQueryStatus parameters)) (Data.Text.pack "form") GHC.Types.False,
                                                                                                                                                                                                                                                                                                                                                                                                                     OpenAPI.Common.QueryParameter (Data.Text.pack "filter") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> multiParamParametersQueryFilter parameters) (Data.Text.pack "form") GHC.Types.False,
@@ -162,9 +162,9 @@ multiParamRaw parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM 
 -- | > GET /pet/multiparam/{status}
 -- 
 -- The same as 'multiParam' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
-multiParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration  -- ^ The configuration to use in the request
-  -> MultiParamParameters                                                                                -- ^ Contains all available parameters of this operation (query and path parameters)
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString)                          -- ^ Monadic computation which returns the result of the operation
+multiParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
+  -> MultiParamParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
 multiParamWithConfigurationRaw config
                                parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pet/multiparam/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel (multiParamParametersPathStatus parameters))) GHC.Base.++ ""))) [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (multiParamParametersQueryStatus parameters)) (Data.Text.pack "form") GHC.Types.False,
                                                                                                                                                                                                                                                                                                                                                                                                                                            OpenAPI.Common.QueryParameter (Data.Text.pack "filter") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> multiParamParametersQueryFilter parameters) (Data.Text.pack "form") GHC.Types.False,
