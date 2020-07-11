@@ -49,14 +49,6 @@ isValidSuffix = all (\x -> isValidSmall x || isValidLarge x || Char.isDigit x ||
 
 spec :: Spec
 spec = do
-  describe "splitOn" $ do
-    it "should split string into pieces" $
-      splitOn 'a' "abcabca" `shouldBe` ["", "bc", "bc", ""]
-    it "should have one split more than elements to split on"
-      $ forAllValid
-      $ \(x, list) ->
-        length (splitOn (x :: Char) list)
-          == length (filter (== x) list) + 1
   describe "haskellifyText" $ do
     it "uppercase without CamelCase"
       $ forAllValid

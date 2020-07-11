@@ -47,21 +47,21 @@ instance Data.Aeson.Types.ToJSON.ToJSON PetByType
 instance Data.Aeson.Types.FromJSON.FromJSON PetByType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))
 -- | Create a new 'PetByType' with all required fields.
-mkPetByType :: PetByTypePet_type  -- ^ 'petByTypePet_type'
+mkPetByType :: PetByTypePet_type -- ^ 'petByTypePet_type'
   -> PetByType
 mkPetByType petByTypePet_type = PetByType{petByTypeHunts = GHC.Maybe.Nothing,
                                           petByTypePet_type = petByTypePet_type}
 -- | Defines the enum schema located at @components.schemas.PetByType.properties.pet_type@ in the specification.
 -- 
 -- 
-data PetByTypePet_type =                                   
-   PetByTypePet_typeOther Data.Aeson.Types.Internal.Value  -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
-  | PetByTypePet_typeTyped Data.Text.Internal.Text         -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
-  | PetByTypePet_typeEnumCat                               -- ^ Represents the JSON value @"Cat"@
-  | PetByTypePet_typeEnumDog                               -- ^ Represents the JSON value @"Dog"@
+data PetByTypePet_type =
+   PetByTypePet_typeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PetByTypePet_typeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PetByTypePet_typeEnumCat -- ^ Represents the JSON value @"Cat"@
+  | PetByTypePet_typeEnumDog -- ^ Represents the JSON value @"Dog"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByTypePet_type
-    where toJSON (PetByTypePet_typeOther val) = Data.Aeson.Types.ToJSON.toJSON val
+    where toJSON (PetByTypePet_typeOther val) = val
           toJSON (PetByTypePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
           toJSON (PetByTypePet_typeEnumCat) = "Cat"
           toJSON (PetByTypePet_typeEnumDog) = "Dog"

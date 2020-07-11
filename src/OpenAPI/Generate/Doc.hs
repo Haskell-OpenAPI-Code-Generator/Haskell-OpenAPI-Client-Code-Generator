@@ -26,7 +26,6 @@ import qualified Control.Applicative as Applicative
 import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH.PprLib hiding ((<>))
-import OpenAPI.Generate.Internal.Util
 
 -- | The name of the module which contains all type aliases which would be in their own module otherwise
 typeAliasModule :: String
@@ -114,7 +113,15 @@ breakOnTokens = breakOnTokensWithReplacement ("\n  " <>)
 breakOnTokensWithReplacement :: (Text -> Text) -> [Text] -> Doc -> Doc
 breakOnTokensWithReplacement replaceFn tokens =
   let addLineBreaks = foldr (\token f -> T.replace token (replaceFn token) . f) id tokens
-   in text . T.unpack . addLineBreaks . T.replace "\n" "" . removeDuplicateSpaces . T.pack . show
+   in text . T.unpack
+        . T.unlines
+        . fmap T.stripEnd
+        . T.lines
+        . addLineBreaks
+        . T.replace "\n" ""
+        . removeDuplicateSpaces
+        . T.pack
+        . show
 
 reformatRecord :: Doc -> Doc
 reformatRecord =
@@ -155,27 +162,20 @@ zipCodeAndComments (x : xs) (y : ys) = textToDoc x $$ nest 2 (generateHaddockCom
 -- | Place two documents side-by-side, aligned at the top line
 --
 -- If one of the documents is longer than the other, the shorter one is extended with empty lines.
--- The lines of the right document are aligned in the same column, no matter if the left document is shorter or longer
 --
 -- Example usage:
 --
 -- >>> show $ sideBySide (text "a") (text "b" $$ text "c")
 -- a b
---   c
+-- c
 sideBySide :: Doc -> Doc -> Doc
 sideBySide leftDoc rightDoc =
-  let splitDoc = splitOn '\n' . show
-      leftDocLines = splitDoc leftDoc
-      leftDoc' = map text leftDocLines
-      maxLength = foldr max 0 (fmap length leftDocLines) + 1
-      rightDoc' = map (nest maxLength . text) . splitDoc $ rightDoc
-      isLeftLonger = length leftDoc' > length rightDoc'
-      isRightLonger = length leftDoc' < length rightDoc'
+  let splitDoc = fmap (\l -> if null l then empty else text l) . lines . show
+      (leftDoc', rightDoc') = case (splitDoc leftDoc, splitDoc rightDoc) of
+        (l, r) | length l < length r -> (l <> repeat empty, r)
+        (l, r) -> (l, r <> repeat empty)
    in foldl ($$) empty $
-        zipWith
-          ($$)
-          (if isRightLonger then leftDoc' <> repeat empty else leftDoc')
-          (if isLeftLonger then rightDoc' <> repeat empty else rightDoc')
+        zipWith (\l r -> if null (show l) && null (show r) then text "" else l <+> r) leftDoc' rightDoc'
 
 -- | Add the module header to a module of an operation
 addOperationsModuleHeader :: String -> String -> String -> Doc -> Doc

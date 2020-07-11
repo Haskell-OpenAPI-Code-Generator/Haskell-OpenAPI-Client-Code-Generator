@@ -176,7 +176,7 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
         pure (normalC cname [], cname, value)
   (typ, (content, dependencies)) <- defineModelForSchemaConcreteIgnoreEnum strategy (schemaName <> "EnumValue") schema
   constructorsInfo <- mapM getValueInfo enumValues
-  otherName <- haskellifyNameM True $ schemaName <> "Other"
+  fallbackName <- haskellifyNameM True $ schemaName <> "Other"
   typedName <- haskellifyNameM True $ schemaName <> "Typed"
   path <- getCurrentPathEscaped
   let nameValuePairs = fmap (\(_, a, b) -> (a, b)) constructorsInfo
@@ -184,9 +184,9 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
         ban <- bang noSourceUnpackedness noSourceStrictness
         banT <- t
         pure (ban, banT)
-      otherC = normalC otherName [toBangType (varT ''Aeson.Value)]
+      fallbackC = normalC fallbackName [toBangType (varT ''Aeson.Value)]
       typedC = normalC typedName [toBangType typ]
-      jsonImplementation = defineJsonImplementationForEnum name otherName [otherName, typedName] nameValuePairs
+      jsonImplementation = defineJsonImplementationForEnum name fallbackName typedName nameValuePairs
       comments = fmap (("Represents the JSON value @" <>) . (<> "@") . showValue) enumValues
       newType =
         ( Doc.generateHaddockComment
@@ -212,12 +212,12 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
             name
             []
             Nothing
-            (otherC : typedC : (getConstructor <$> constructorsInfo))
+            (fallbackC : typedC : (getConstructor <$> constructorsInfo))
             objectDeriveClause
   pure (varT name, (content `appendDoc` newType `appendDoc` jsonImplementation, dependencies))
 
-defineJsonImplementationForEnum :: Name -> Name -> [Name] -> [(Name, Aeson.Value)] -> Q Doc
-defineJsonImplementationForEnum name fallbackName specialCons nameValues =
+defineJsonImplementationForEnum :: Name -> Name -> Name -> [(Name, Aeson.Value)] -> Q Doc
+defineJsonImplementationForEnum name fallbackName typedName nameValues =
   -- without this function, a N long string takes up N lines, as every
   -- new character starts on a new line
   let nicifyValue (Aeson.String a) = [|$(stringE $ T.unpack a)|]
@@ -235,18 +235,20 @@ defineJsonImplementationForEnum name fallbackName specialCons nameValues =
           (mkName "parseJSON")
           [clause [p] (normalB [|pure $fromJsonCases|]) []]
       fromJson = instanceD (cxt []) [t|Aeson.FromJSON $(varT name)|] [fromJsonFn]
-      toJsonClause (name', value) =
-        let jsonValue = Aeson.toJSON value
-         in clause [conP name' []] (normalB $ nicifyValue jsonValue) []
-      toSpecialCons name' =
-        clause
-          [conP name' [p]]
-          (normalB [|Aeson.toJSON $e|])
-          []
+      toJsonClause (name', value) = clause [conP name' []] (normalB $ nicifyValue $ Aeson.toJSON value) []
       toJsonFn =
         funD
           (mkName "toJSON")
-          ((toSpecialCons <$> specialCons) <> (toJsonClause <$> nameValues))
+          ( clause
+              [conP fallbackName [p]]
+              (normalB e)
+              []
+              : clause
+                [conP typedName [p]]
+                (normalB [|Aeson.toJSON $e|])
+                []
+              : (toJsonClause <$> nameValues)
+          )
       toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
    in fmap ppr toJson `appendDoc` fmap ppr fromJson
 
