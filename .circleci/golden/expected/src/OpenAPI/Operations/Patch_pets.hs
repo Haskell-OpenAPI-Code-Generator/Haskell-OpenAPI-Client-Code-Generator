@@ -52,9 +52,10 @@ patch_pets body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.eithe
 -- | Defines the oneOf schema located at @paths.\/pets.PATCH.requestBody.content.application\/json.schema.oneOf@ in the specification.
 -- 
 -- 
-data Patch_petsRequestBodyVariants
-    = Patch_petsRequestBodyCat Cat | Patch_petsRequestBodyDog Dog
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data Patch_petsRequestBodyVariants =
+   Patch_petsRequestBodyCat Cat
+  | Patch_petsRequestBodyDog Dog
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Patch_petsRequestBodyVariants
     where toJSON (Patch_petsRequestBodyCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (Patch_petsRequestBodyDog a) = Data.Aeson.Types.ToJSON.toJSON a

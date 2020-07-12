@@ -20,6 +20,8 @@ import Control.Applicative
 import Control.Monad
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Text as Aeson
+import qualified Data.Bifunctor as BF
+import qualified Data.Either as E
 import qualified Data.Int as Int
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
@@ -65,6 +67,30 @@ objectDeriveClause =
         conT ''Eq
       ]
   ]
+
+liftAesonValueWithOverloadedStrings :: Bool -> Aeson.Value -> Q Exp
+liftAesonValueWithOverloadedStrings useOverloadedStrings (Aeson.String a) =
+  let s = stringE $ T.unpack a
+   in if useOverloadedStrings
+        then [|$s|]
+        else [|Aeson.String $s|]
+liftAesonValueWithOverloadedStrings _ a = [|a|]
+
+liftAesonValue :: Aeson.Value -> Q Exp
+liftAesonValue = liftAesonValueWithOverloadedStrings True
+
+aesonValueToName :: Aeson.Value -> Text
+aesonValueToName =
+  ( \case
+      "" -> "EmptyString"
+      x -> x
+  )
+    . uppercaseFirstText
+    . T.replace "\"" ""
+    . showAesonValue
+
+showAesonValue :: Aeson.Value -> Text
+showAesonValue = LT.toStrict . Aeson.encodeToLazyText
 
 -- | Defines all the models for a schema
 defineModelForSchema :: Text -> OAS.Schema -> OAM.Generator Dep.ModelWithDependencies
@@ -170,9 +196,8 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
   OAM.logInfo $ "Define as enum named '" <> T.pack (nameBase name) <> "'"
   let enumValues = Set.toList enumValuesSet
       getConstructor (a, _, _) = a
-      showValue = LT.toStrict . Aeson.encodeToLazyText
       getValueInfo value = do
-        cname <- haskellifyNameM True (schemaName <> T.pack "Enum" <> uppercaseFirstText (T.replace "\"" "" (showValue value)))
+        cname <- haskellifyNameM True (schemaName <> T.pack "Enum" <> aesonValueToName value)
         pure (normalC cname [], cname, value)
   (typ, (content, dependencies)) <- defineModelForSchemaConcreteIgnoreEnum strategy (schemaName <> "EnumValue") schema
   constructorsInfo <- mapM getValueInfo enumValues
@@ -187,7 +212,7 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
       fallbackC = normalC fallbackName [toBangType (varT ''Aeson.Value)]
       typedC = normalC typedName [toBangType typ]
       jsonImplementation = defineJsonImplementationForEnum name fallbackName typedName nameValuePairs
-      comments = fmap (("Represents the JSON value @" <>) . (<> "@") . showValue) enumValues
+      comments = fmap (("Represents the JSON value @" <>) . (<> "@") . showAesonValue) enumValues
       newType =
         ( Doc.generateHaddockComment
             [ "Defines the enum schema located at @" <> path <> "@ in the specification.",
@@ -220,13 +245,11 @@ defineJsonImplementationForEnum :: Name -> Name -> Name -> [(Name, Aeson.Value)]
 defineJsonImplementationForEnum name fallbackName typedName nameValues =
   -- without this function, a N long string takes up N lines, as every
   -- new character starts on a new line
-  let nicifyValue (Aeson.String a) = [|$(stringE $ T.unpack a)|]
-      nicifyValue a = [|a|]
-      (e, p) = (\n -> (varE n, varP n)) $ mkName "val"
+  let (e, p) = (\n -> (varE n, varP n)) $ mkName "val"
       fromJsonCases =
         multiIfE $
           fmap
-            ( \(name', value) -> normalGE [|$e == $(nicifyValue value)|] (varE name')
+            ( \(name', value) -> normalGE [|$e == $(liftAesonValue value)|] (varE name')
             )
             nameValues
             <> [normalGE [|otherwise|] [|$(varE fallbackName) $e|]]
@@ -235,7 +258,7 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           (mkName "parseJSON")
           [clause [p] (normalB [|pure $fromJsonCases|]) []]
       fromJson = instanceD (cxt []) [t|Aeson.FromJSON $(varT name)|] [fromJsonFn]
-      toJsonClause (name', value) = clause [conP name' []] (normalB $ nicifyValue $ Aeson.toJSON value) []
+      toJsonClause (name', value) = clause [conP name' []] (normalB $ liftAesonValue $ Aeson.toJSON value) []
       toJsonFn =
         funD
           (mkName "toJSON")
@@ -293,7 +316,8 @@ defineOneOfSchema schemaName description schemas = do
   when (null schemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
   flags <- OAM.getFlags
   let name = haskellifyName (OAO.flagConvertToCamelCase flags) True $ schemaName <> "Variants"
-      indexedSchemas = zip schemas ([1 ..] :: [Integer])
+      (schemas', schemasWithFixedValues) = extractSchemasWithFixedValues schemas
+      indexedSchemas = zip schemas' ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
   OAM.logInfo $ "Define as oneOf named '" <> T.pack (nameBase name) <> "'"
   variants <- mapM (uncurry defineIndexed) indexedSchemas
@@ -302,16 +326,25 @@ defineOneOfSchema schemaName description schemas = do
       dependencies = Set.unions $ fmap (snd . snd) variants
       types = fmap fst variants
       indexedTypes = zip types ([1 ..] :: [Integer])
+      haskellifyConstructor = haskellifyName (OAO.flagConvertToCamelCase flags) True
       getConstructorName (typ, n) = do
         t <- typ
         let suffix = if OAO.flagUseNumberedVariantConstructors flags then "Variant" <> T.pack (show n) else typeToSuffix t
-        pure $ haskellifyName (OAO.flagConvertToCamelCase flags) True $ schemaName <> suffix
+        pure $ haskellifyConstructor $ schemaName <> suffix
       constructorNames = fmap getConstructorName indexedTypes
       createTypeConstruct (typ, n) = do
         t <- typ
         bang' <- bang noSourceUnpackedness noSourceStrictness
         haskellifiedName <- getConstructorName (typ, n)
         normalC haskellifiedName [pure (bang', t)]
+      createConstructorNameForSchemaWithFixedValue =
+        haskellifyConstructor
+          . (schemaName <>)
+          . aesonValueToName
+      createConstructorForSchemaWithFixedValue =
+        (\cName -> normalC cName [])
+          . createConstructorNameForSchemaWithFixedValue
+      fixedValueComments = fmap (("Represents the JSON value @" <>) . (<> "@") . showAesonValue) schemasWithFixedValues
       emptyCtx = pure []
       patternName = mkName "a"
       p = varP patternName
@@ -327,11 +360,23 @@ defineOneOfSchema schemaName description schemas = do
                       )
                       [|Aeson.Error "No variant matched"|]
                       constructorNames'
-              [|
-                case $resultExpr of
-                  Aeson.Success $p -> pure $e
-                  Aeson.Error $p -> fail $e
-                |]
+                  parserExpr =
+                    [|
+                      case $resultExpr of
+                        Aeson.Success $p -> pure $e
+                        Aeson.Error $p -> fail $e
+                      |]
+              case schemasWithFixedValues of
+                [] -> parserExpr
+                _ ->
+                  multiIfE $
+                    fmap
+                      ( \value ->
+                          let constructorName = createConstructorNameForSchemaWithFixedValue value
+                           in normalGE [|$(varE paramName) == $(liftAesonValue value)|] [|pure $(varE constructorName)|]
+                      )
+                      schemasWithFixedValues
+                      <> [normalGE [|otherwise|] parserExpr]
          in funD
               (mkName "parseJSON")
               [ clause
@@ -351,6 +396,15 @@ defineOneOfSchema schemaName description schemas = do
                     []
               )
               constructorNames
+              <> fmap
+                ( \value ->
+                    let constructorName = createConstructorNameForSchemaWithFixedValue value
+                     in clause
+                          [conP constructorName []]
+                          (normalB $ liftAesonValue value)
+                          []
+                )
+                schemasWithFixedValues
           )
       dataDefinition =
         ( Doc.generateHaddockComment
@@ -360,13 +414,15 @@ defineOneOfSchema schemaName description schemas = do
             ]
             $$
         )
+          . (`Doc.sideBySide` (text "" $$ Doc.sideComments fixedValueComments))
+          . Doc.reformatADT
           . ppr
           <$> dataD
             emptyCtx
             name
             []
             Nothing
-            (createTypeConstruct <$> indexedTypes)
+            (fmap createConstructorForSchemaWithFixedValue schemasWithFixedValues <> fmap createTypeConstruct indexedTypes)
             [ derivClause
                 Nothing
                 [ conT ''Show,
@@ -469,7 +525,7 @@ defineArrayModelForSchema strategy schemaName schema = do
       )
     )
 
--- | Defines a Record
+-- | Defines a record
 defineObjectModelForSchema :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
 defineObjectModelForSchema strategy schemaName schema =
   if OAS.isSchemaEmpty schema
@@ -479,7 +535,7 @@ defineObjectModelForSchema strategy schemaName schema =
       path <- getCurrentPathEscaped
       let convertToCamelCase = OAO.flagConvertToCamelCase flags
           name = haskellifyName convertToCamelCase True schemaName
-          props = Map.toList $ OAS.properties schema
+          (props, propsWithFixedValues) = extractPropertiesWithFixedValues $ Map.toList $ OAS.properties schema
           propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
           emptyCtx = pure []
           required = OAS.required schema
@@ -495,7 +551,7 @@ defineObjectModelForSchema strategy schemaName schema =
               . show
               . Doc.reformatRecord
               . ppr <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
-          toJsonInstance = createToJSONImplementation name propsWithNames
+          toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues
           fromJsonInstance = createFromJSONImplementation name propsWithNames required
           mkFunction = createMkFunction name propsWithNames required bangTypes
       pure
@@ -515,6 +571,21 @@ defineObjectModelForSchema strategy schemaName schema =
             propertyDependencies
           )
         )
+
+extractPropertiesWithFixedValues :: [(Text, OAS.Schema)] -> ([(Text, OAS.Schema)], [(Text, Aeson.Value)])
+extractPropertiesWithFixedValues =
+  E.partitionEithers
+    . fmap
+      (\(name, schema) -> BF.bimap (name,) (name,) $ extractSchemaWithFixedValue schema)
+
+extractSchemasWithFixedValues :: [OAS.Schema] -> ([OAS.Schema], [Aeson.Value])
+extractSchemasWithFixedValues = E.partitionEithers . fmap extractSchemaWithFixedValue
+
+extractSchemaWithFixedValue :: OAS.Schema -> Either OAS.Schema Aeson.Value
+extractSchemaWithFixedValue schema@(OAT.Concrete OAS.SchemaObject {..}) = case Set.toList enum of
+  [value] -> Right value
+  _ -> Left schema
+extractSchemaWithFixedValue schema = Left schema
 
 createMkFunction :: Name -> [(Text, Name)] -> Set.Set Text -> Q [VarBangType] -> Q Doc
 createMkFunction name propsWithNames required bangTypes = do
@@ -547,12 +618,15 @@ createMkFunction name propsWithNames required bangTypes = do
     `appendDoc` fmap ppr (funD fnName [clause parameterPatterns (normalB expr) []])
 
 -- | create toJSON implementation for an object
-createToJSONImplementation :: Name -> [(Text, Name)] -> Q Doc
-createToJSONImplementation objectName recordNames =
+createToJSONImplementation :: Name -> [(Text, Name)] -> [(Text, Aeson.Value)] -> Q Doc
+createToJSONImplementation objectName recordNames propsWithFixedValues =
   let emptyDefs = pure []
       fnArgName = mkName "obj"
       toAssertion (jsonName, hsName) =
         [|$(stringE $ T.unpack jsonName) Aeson..= $(varE hsName) $(varE fnArgName)|]
+      toFixedAssertion (jsonName, value) =
+        [|$(stringE $ T.unpack jsonName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)|]
+      assertions = fmap toAssertion recordNames <> fmap toFixedAssertion propsWithFixedValues
       toExprList = foldr (\x expr -> uInfixE x (varE $ mkName ":") expr) [|[]|]
       toExprCombination [] = [|[]|]
       toExprCombination [x] = x
@@ -563,7 +637,7 @@ createToJSONImplementation objectName recordNames =
             [ clause
                 [varP fnArgName]
                 ( normalB
-                    [|Aeson.object $(toExprList $ toAssertion <$> recordNames)|]
+                    [|Aeson.object $(toExprList assertions)|]
                 )
                 []
             ],
@@ -572,7 +646,7 @@ createToJSONImplementation objectName recordNames =
             [ clause
                 [varP fnArgName]
                 ( normalB
-                    [|Aeson.pairs $(toExprCombination $ toAssertion <$> recordNames)|]
+                    [|Aeson.pairs $(toExprCombination assertions)|]
                 )
                 []
             ]
@@ -617,22 +691,19 @@ propertiesToBangTypes _ [] _ = pure (pure [], emptyDoc, Set.empty)
 propertiesToBangTypes schemaName props required = OAM.nested "properties" $ do
   propertySuffix <- OAM.getFlag OAO.flagPropertyTypeSuffix
   convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
-  let createBang :: Text -> Text -> Q Type -> OAM.Generator (Q VarBangType)
-      createBang recordName propName myType =
-        let qVar :: Q VarBangType
-            qVar = do
-              bang' <- bang noSourceUnpackedness noSourceStrictness
-              type' <-
-                if recordName `elem` required
-                  then myType
-                  else appT (varT ''Maybe) myType
-              pure (haskellifyName convertToCamelCase False propName, bang', type')
-         in pure qVar
+  let createBang :: Text -> Text -> Q Type -> Q VarBangType
+      createBang recordName propName myType = do
+        bang' <- bang noSourceUnpackedness noSourceStrictness
+        type' <-
+          if recordName `elem` required
+            then myType
+            else appT (varT ''Maybe) myType
+        pure (haskellifyName convertToCamelCase False propName, bang', type')
       propToBangType :: (Text, OAS.Schema) -> OAM.Generator (Q VarBangType, Q Doc, Dep.Models)
       propToBangType (recordName, schema) = do
         let propName = schemaName <> uppercaseFirstText recordName
         (myType, (content, depenencies)) <- OAM.nested recordName $ defineModelForSchemaNamed (propName <> propertySuffix) schema
-        myBang <- createBang recordName propName myType
+        let myBang = createBang recordName propName myType
         pure (myBang, content, depenencies)
       foldFn :: OAM.Generator BangTypesSelfDefined -> (Text, OAS.Schema) -> OAM.Generator BangTypesSelfDefined
       foldFn accHolder next = do

@@ -141,6 +141,12 @@ components:
             - $ref: '#/components/schemas/Cat'
             - $ref: '#/components/schemas/PetByType'
             - type: string
+            - type: string
+              enum:
+                - ''
+            - type: string
+              enum:
+                - test
             - type: array
               items:
                 type: string

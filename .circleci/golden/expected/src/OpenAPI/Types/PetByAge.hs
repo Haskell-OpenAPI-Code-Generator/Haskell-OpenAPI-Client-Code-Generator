@@ -84,23 +84,29 @@ mkPetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4{petByAgeAnothe
 -- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
-data PetByAgeAnother_relativeVariants
-    = PetByAgeAnother_relativeCat Cat
-    | PetByAgeAnother_relativePetByType PetByType
-    | PetByAgeAnother_relativeText Data.Text.Internal.Text
-    | PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 PetByAgeAnother_relativeOneOf4
-    | PetByAgeAnother_relativeListTText ([Data.Text.Internal.Text])
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByAgeAnother_relativeVariants =
+   PetByAgeAnother_relativeEmptyString -- ^ Represents the JSON value @""@
+  | PetByAgeAnother_relativeTest -- ^ Represents the JSON value @"test"@
+  | PetByAgeAnother_relativeCat Cat
+  | PetByAgeAnother_relativePetByType PetByType
+  | PetByAgeAnother_relativeText Data.Text.Internal.Text
+  | PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 PetByAgeAnother_relativeOneOf4
+  | PetByAgeAnother_relativeListTText ([Data.Text.Internal.Text])
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeAnother_relativeVariants
     where toJSON (PetByAgeAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeAnother_relativeListTText a) = Data.Aeson.Types.ToJSON.toJSON a
+          toJSON (PetByAgeAnother_relativeEmptyString) = ""
+          toJSON (PetByAgeAnother_relativeTest) = "test"
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeVariants
-    where parseJSON val = case (PetByAgeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
-                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = if | val GHC.Classes.== "" -> GHC.Base.pure PetByAgeAnother_relativeEmptyString
+                             | val GHC.Classes.== "test" -> GHC.Base.pure PetByAgeAnother_relativeTest
+                             | GHC.Base.otherwise -> case (PetByAgeAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativePetByAgeAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((PetByAgeAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
+                                                         Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                                                         Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Defines the object schema located at @components.schemas.PetByAge.properties.first_relative.allOf@ in the specification.
 -- 
 -- 
@@ -136,11 +142,11 @@ mkPetByAgeFirst_relative petByAgeFirst_relativePet_type = PetByAgeFirst_relative
 -- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.first_relative.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
-data PetByAgeFirst_relativeAnother_relativeVariants
-    = PetByAgeFirst_relativeAnother_relativeCat Cat
-    | PetByAgeFirst_relativeAnother_relativePetByType PetByType
-    | PetByAgeFirst_relativeAnother_relativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByAgeFirst_relativeAnother_relativeVariants =
+   PetByAgeFirst_relativeAnother_relativeCat Cat
+  | PetByAgeFirst_relativeAnother_relativePetByType PetByType
+  | PetByAgeFirst_relativeAnother_relativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relativeAnother_relativeVariants
     where toJSON (PetByAgeFirst_relativeAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeFirst_relativeAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
@@ -170,11 +176,11 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativePet_type
 -- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.first_relative.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
-data PetByAgeFirst_relativeRelativeVariants
-    = PetByAgeFirst_relativeRelativeCat Cat
-    | PetByAgeFirst_relativeRelativePetByType PetByType
-    | PetByAgeFirst_relativeRelativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByAgeFirst_relativeRelativeVariants =
+   PetByAgeFirst_relativeRelativeCat Cat
+  | PetByAgeFirst_relativeRelativePetByType PetByType
+  | PetByAgeFirst_relativeRelativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relativeRelativeVariants
     where toJSON (PetByAgeFirst_relativeRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeFirst_relativeRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
@@ -186,11 +192,11 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relativeRelativeVarian
 -- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.relative.anyOf@ in the specification.
 -- 
 -- 
-data PetByAgeRelativeVariants
-    = PetByAgeRelativeCat Cat
-    | PetByAgeRelativePetByType PetByType
-    | PetByAgeRelativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data PetByAgeRelativeVariants =
+   PetByAgeRelativeCat Cat
+  | PetByAgeRelativePetByType PetByType
+  | PetByAgeRelativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeRelativeVariants
     where toJSON (PetByAgeRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (PetByAgeRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
