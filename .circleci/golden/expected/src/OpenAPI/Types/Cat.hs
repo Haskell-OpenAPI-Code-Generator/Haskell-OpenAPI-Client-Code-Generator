@@ -63,11 +63,11 @@ mkCat = Cat{catAge = GHC.Maybe.Nothing,
 -- | Defines the oneOf schema located at @components.schemas.Cat.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
-data CatAnother_relativeVariants
-    = CatAnother_relativeCat Cat
-    | CatAnother_relativePetByType PetByType
-    | CatAnother_relativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data CatAnother_relativeVariants =
+   CatAnother_relativeCat Cat
+  | CatAnother_relativePetByType PetByType
+  | CatAnother_relativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CatAnother_relativeVariants
     where toJSON (CatAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (CatAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
@@ -79,11 +79,11 @@ instance Data.Aeson.Types.FromJSON.FromJSON CatAnother_relativeVariants
 -- | Defines the oneOf schema located at @components.schemas.Cat.properties.relative.anyOf@ in the specification.
 -- 
 -- 
-data CatRelativeVariants
-    = CatRelativeCat Cat
-    | CatRelativePetByType PetByType
-    | CatRelativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data CatRelativeVariants =
+   CatRelativeCat Cat
+  | CatRelativePetByType PetByType
+  | CatRelativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CatRelativeVariants
     where toJSON (CatRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (CatRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a

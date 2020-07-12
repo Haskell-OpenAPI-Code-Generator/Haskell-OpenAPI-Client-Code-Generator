@@ -21,7 +21,6 @@ paymentIntent =
     "CHF"
     "123"
     False
-    PaymentIntentObject'EnumPaymentIntent
     []
     PaymentIntentStatus'EnumSucceeded
 
@@ -66,7 +65,6 @@ successResponseGetExpected =
   GetPaymentIntentsResponseBody200
     { getPaymentIntentsResponseBody200Data = [paymentIntent],
       getPaymentIntentsResponseBody200HasMore = False,
-      getPaymentIntentsResponseBody200Object = GetPaymentIntentsResponseBody200Object'EnumList,
       getPaymentIntentsResponseBody200Url = "http://example.org"
     }
 

@@ -148,23 +148,29 @@ mkMischlingAnother_relativeOneOf4 = MischlingAnother_relativeOneOf4{mischlingAno
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
-data MischlingAnother_relativeVariants
-    = MischlingAnother_relativeCat Cat
-    | MischlingAnother_relativePetByType PetByType
-    | MischlingAnother_relativeText Data.Text.Internal.Text
-    | MischlingAnother_relativeMischlingAnother_relativeOneOf4 MischlingAnother_relativeOneOf4
-    | MischlingAnother_relativeListTText ([Data.Text.Internal.Text])
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingAnother_relativeVariants =
+   MischlingAnother_relativeEmptyString -- ^ Represents the JSON value @""@
+  | MischlingAnother_relativeTest -- ^ Represents the JSON value @"test"@
+  | MischlingAnother_relativeCat Cat
+  | MischlingAnother_relativePetByType PetByType
+  | MischlingAnother_relativeText Data.Text.Internal.Text
+  | MischlingAnother_relativeMischlingAnother_relativeOneOf4 MischlingAnother_relativeOneOf4
+  | MischlingAnother_relativeListTText ([Data.Text.Internal.Text])
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeVariants
     where toJSON (MischlingAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingAnother_relativeMischlingAnother_relativeOneOf4 a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingAnother_relativeListTText a) = Data.Aeson.Types.ToJSON.toJSON a
+          toJSON (MischlingAnother_relativeEmptyString) = ""
+          toJSON (MischlingAnother_relativeTest) = "test"
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeVariants
-    where parseJSON val = case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
-                              Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
-                              Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
+    where parseJSON val = if | val GHC.Classes.== "" -> GHC.Base.pure MischlingAnother_relativeEmptyString
+                             | val GHC.Classes.== "test" -> GHC.Base.pure MischlingAnother_relativeTest
+                             | GHC.Base.otherwise -> case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
+                                                         Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
+                                                         Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Defines the enum schema located at @components.schemas.Mischling.allOf.properties.breed@ in the specification.
 -- 
 -- 
@@ -224,11 +230,11 @@ mkMischlingFirst_relative mischlingFirst_relativePet_type = MischlingFirst_relat
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
-data MischlingFirst_relativeAnother_relativeVariants
-    = MischlingFirst_relativeAnother_relativeCat Cat
-    | MischlingFirst_relativeAnother_relativePetByType PetByType
-    | MischlingFirst_relativeAnother_relativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingFirst_relativeAnother_relativeVariants =
+   MischlingFirst_relativeAnother_relativeCat Cat
+  | MischlingFirst_relativeAnother_relativePetByType PetByType
+  | MischlingFirst_relativeAnother_relativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relativeAnother_relativeVariants
     where toJSON (MischlingFirst_relativeAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingFirst_relativeAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
@@ -258,11 +264,11 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativePet_type
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.first_relative.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
-data MischlingFirst_relativeRelativeVariants
-    = MischlingFirst_relativeRelativeCat Cat
-    | MischlingFirst_relativeRelativePetByType PetByType
-    | MischlingFirst_relativeRelativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingFirst_relativeRelativeVariants =
+   MischlingFirst_relativeRelativeCat Cat
+  | MischlingFirst_relativeRelativePetByType PetByType
+  | MischlingFirst_relativeRelativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relativeRelativeVariants
     where toJSON (MischlingFirst_relativeRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingFirst_relativeRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
@@ -274,11 +280,11 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relativeRelativeVaria
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.relative.anyOf@ in the specification.
 -- 
 -- 
-data MischlingRelativeVariants
-    = MischlingRelativeCat Cat
-    | MischlingRelativePetByType PetByType
-    | MischlingRelativeText Data.Text.Internal.Text
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
+data MischlingRelativeVariants =
+   MischlingRelativeCat Cat
+  | MischlingRelativePetByType PetByType
+  | MischlingRelativeText Data.Text.Internal.Text
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingRelativeVariants
     where toJSON (MischlingRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (MischlingRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a
