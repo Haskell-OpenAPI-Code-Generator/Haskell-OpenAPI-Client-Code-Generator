@@ -10,6 +10,7 @@ module OpenAPI (
   module OpenAPI.Types,
   module OpenAPI.TypeAlias,
   module OpenAPI.Types.Cat,
+  module OpenAPI.Types.CoverType,
   module OpenAPI.Types.Dog,
   module OpenAPI.Types.Mischling,
   module OpenAPI.Types.PetByAge,
@@ -27,6 +28,7 @@ import OpenAPI.Operations.ShowPetById
 import OpenAPI.Types
 import OpenAPI.TypeAlias
 import OpenAPI.Types.Cat
+import OpenAPI.Types.CoverType
 import OpenAPI.Types.Dog
 import OpenAPI.Types.Mischling
 import OpenAPI.Types.PetByAge

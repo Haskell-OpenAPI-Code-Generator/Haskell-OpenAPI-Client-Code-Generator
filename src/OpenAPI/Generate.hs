@@ -5,8 +5,11 @@
 -- | Functionality to Generate Haskell Code out of an OpenAPI definition File
 module OpenAPI.Generate where
 
+import Control.Monad
+import qualified Data.Bifunctor as BF
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
@@ -31,15 +34,17 @@ decodeOpenApi fileName = do
     Right o -> pure o
 
 -- | Defines all the operations as functions and the common imports
-defineOperations :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition])
+defineOperations :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
 defineOperations moduleName =
   OAM.nested "paths"
     . fmap
-      ( fmap
-          concat
-          . sequence
+      ( BF.bimap
+          ( fmap concat
+              . sequence
+          )
+          Set.unions
       )
-    . mapM (uncurry $ Operation.defineOperationsForPath moduleName)
+    . mapAndUnzipM (uncurry $ Operation.defineOperationsForPath moduleName)
     . Map.toList
     . OAT.paths
 
@@ -66,12 +71,12 @@ defineConfigurationInformation moduleName spec =
             ]
 
 -- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'
-defineModels :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition])
-defineModels moduleName spec =
+defineModels :: String -> OAT.OpenApiSpecification -> Dep.Models -> OAM.Generator (Q [Dep.ModuleDefinition])
+defineModels moduleName spec operationDependencies =
   let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
    in OAM.nested "components" $ OAM.nested "schemas" $ do
         models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
-        pure $ Dep.getModelModulesFromModelsWithDependencies moduleName models
+        pure $ Dep.getModelModulesFromModelsWithDependencies moduleName operationDependencies models
 
 -- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
 defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)

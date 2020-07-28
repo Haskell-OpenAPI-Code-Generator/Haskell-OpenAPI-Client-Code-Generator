@@ -11,9 +11,11 @@ module OpenAPI.Generate.Operation
 where
 
 import qualified Control.Applicative as Applicative
+import Control.Monad
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
@@ -30,29 +32,30 @@ import qualified OpenAPI.Generate.Response as OAR
 import qualified OpenAPI.Generate.Types as OAT
 
 -- | Defines the operations for all paths and their methods
-defineOperationsForPath :: String -> Text -> OAT.PathItemObject -> OAM.Generator (Q [Dep.ModuleDefinition])
-defineOperationsForPath mainModuleName requestPath =
-  OAM.nested requestPath
-    . fmap sequence
-    . mapM
+defineOperationsForPath :: String -> Text -> OAT.PathItemObject -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
+defineOperationsForPath mainModuleName requestPath pathItemObject = OAM.nested requestPath $ do
+  operationsToGenerate <- OAM.getFlag OAO.flagOperationsToGenerate
+  fmap (BF.bimap sequence Set.unions)
+    . mapAndUnzipM
       (uncurry (defineModuleForOperation mainModuleName requestPath))
-    . ( \pathItemObject ->
-          filterEmptyOperations
-            [ ("GET", OAT.get pathItemObject),
-              ("PUT", OAT.put pathItemObject),
-              ("POST", OAT.post pathItemObject),
-              ("DELETE", OAT.delete pathItemObject),
-              ("OPTIONS", OAT.options pathItemObject),
-              ("HEAD", OAT.head pathItemObject),
-              ("PATCH", OAT.patch pathItemObject),
-              ("TRACE", OAT.trace pathItemObject)
-            ]
-      )
+    $ filterEmptyAndOmittedOperations
+      operationsToGenerate
+      [ ("GET", OAT.get pathItemObject),
+        ("PUT", OAT.put pathItemObject),
+        ("POST", OAT.post pathItemObject),
+        ("DELETE", OAT.delete pathItemObject),
+        ("OPTIONS", OAT.options pathItemObject),
+        ("HEAD", OAT.head pathItemObject),
+        ("PATCH", OAT.patch pathItemObject),
+        ("TRACE", OAT.trace pathItemObject)
+      ]
 
--- | A path may define n methods
---   This function filters out the empy not defined methods
-filterEmptyOperations :: [(Text, Maybe OAT.OperationObject)] -> [(Text, OAT.OperationObject)]
-filterEmptyOperations xs = [(method, operation) | (method, Just operation) <- xs]
+filterEmptyAndOmittedOperations :: [Text] -> [(Text, Maybe OAT.OperationObject)] -> [(Text, OAT.OperationObject)]
+filterEmptyAndOmittedOperations operationsToGenerate xs =
+  [ (method, operation)
+    | (method, Just operation) <- xs,
+      null operationsToGenerate || OAT.operationId operation `elem` fmap Just operationsToGenerate
+  ]
 
 -- |
 --  Defines an Operation for a Method and a Path
@@ -70,7 +73,7 @@ defineModuleForOperation ::
   -- | The Operation Object
   OAT.OperationObject ->
   -- | commented function definition and implementation
-  OAM.Generator (Q Dep.ModuleDefinition)
+  OAM.Generator (Q Dep.ModuleDefinition, Dep.Models)
 defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
   convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
@@ -79,20 +82,24 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       moduleName = haskellifyText convertToCamelCase True operationIdAsText
   OAM.logInfo $ "Generating operation with name '" <> operationIdAsText <> "'"
   (bodySchema, bodyPath) <- getBodySchemaFromOperation operation
-  (responseTypeName, responseTransformerExp, responseBodyDefinitions) <- OAR.getResponseDefinitions operation appendToOperationName
-  (bodyType, bodyDefinition) <- OAM.resetPath bodyPath $ getBodyType bodySchema appendToOperationName
+  (responseTypeName, responseTransformerExp, responseBodyDefinitions, responseBodyDependencies) <- OAR.getResponseDefinitions operation appendToOperationName
+  (bodyType, (bodyDefinition, bodyDependencies)) <- OAM.resetPath bodyPath $ getBodyType bodySchema appendToOperationName
   parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
   paramDescriptions <-
     (<> ["The request body to send" | not $ null bodyType])
       <$> ( case parameterCardinality of
               NoParameters -> pure []
-              SingleParameter (_, _, parameter) -> pure <$> getParameterDescription parameter
+              SingleParameter _ _ parameter -> pure <$> getParameterDescription parameter
               MultipleParameters _ -> pure ["Contains all available parameters of this operation (query and path parameters)"]
           )
-  let (paramType, paramDoc) = case parameterCardinality of
-        NoParameters -> ([], Doc.emptyDoc)
-        SingleParameter (paramType', doc, _) -> ([paramType'], doc)
-        MultipleParameters paramDefinition -> ([parameterTypeDefinitionType paramDefinition], parameterTypeDefinitionDoc paramDefinition)
+  let (paramType, paramDoc, paramDependencies) = case parameterCardinality of
+        NoParameters -> ([], Doc.emptyDoc, Set.empty)
+        SingleParameter paramType' (doc, deps) _ -> ([paramType'], doc, deps)
+        MultipleParameters paramDefinition ->
+          ( [parameterTypeDefinitionType paramDefinition],
+            parameterTypeDefinitionDoc paramDefinition,
+            parameterTypeDefinitionDependencies paramDefinition
+          )
       types = paramType <> bodyType
       monadName = mkName "m"
       createFunSignature operationName fnType' =
@@ -153,20 +160,23 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
                 $ maybe [] pure
                 $ Maybe.listToMaybe functionDefinitions
             else zipWith (<>) comments functionDefinitions
-  pure $
-    ([moduleName],)
-      . Doc.addOperationsModuleHeader mainModuleName moduleName operationNameAsString
-      . ($$ text "")
-      <$> ( vcat
-              <$> sequence content
-          )
+  OAM.logTrace $ T.intercalate ", " $ Set.toList $ Set.unions [paramDependencies, bodyDependencies, responseBodyDependencies]
+  pure
+    ( ([moduleName],)
+        . Doc.addOperationsModuleHeader mainModuleName moduleName operationNameAsString
+        . ($$ text "")
+        <$> ( vcat
+                <$> sequence content
+            ),
+      Set.unions [paramDependencies, bodyDependencies, responseBodyDependencies]
+    )
 
-getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Q Doc)
+getBodyType :: Maybe RequestBodyDefinition -> (Text -> Text) -> OAM.Generator ([Q Type], Dep.ModelContentWithDependencies)
 getBodyType requestBody appendToOperationName = do
   generateBody <- shouldGenerateRequestBody requestBody
   case requestBody of
     Just RequestBodyDefinition {..} | generateBody -> do
       let transformType = pure . (if required then id else appT $ varT ''Maybe)
       requestBodySuffix <- OAM.getFlag OAO.flagRequestBodyTypeSuffix
-      BF.bimap transformType fst <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
-    _ -> pure ([], Doc.emptyDoc)
+      BF.first transformType <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
+    _ -> pure ([], (Doc.emptyDoc, Set.empty))

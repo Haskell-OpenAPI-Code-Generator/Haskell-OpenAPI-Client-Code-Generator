@@ -11,6 +11,7 @@ module OpenAPI.Generate.ModelDependencies
 where
 
 import Data.List
+import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Text (Text)
@@ -37,9 +38,10 @@ typesModule = "Types"
 
 -- | Analyzes the dependencies of the provided models and splits them into modules.
 -- All models which would form an own module but only consist of a type alias are put in a module named by 'Doc.typeAliasModule'.
-getModelModulesFromModelsWithDependencies :: String -> [ModelWithDependencies] -> Q [ModuleDefinition]
-getModelModulesFromModelsWithDependencies mainModuleName models = do
-  let prependTypesModule = ((typesModule <> ".") <>) . T.unpack
+getModelModulesFromModelsWithDependencies :: String -> Models -> [ModelWithDependencies] -> Q [ModuleDefinition]
+getModelModulesFromModelsWithDependencies mainModuleName operationDependencies models = do
+  let modelsToGenerate = filterRequiredModels operationDependencies models
+      prependTypesModule = ((typesModule <> ".") <>) . T.unpack
       prependMainModule = ((mainModuleName <> ".") <>)
   modelsWithResolvedContent <-
     mapM
@@ -47,7 +49,7 @@ getModelModulesFromModelsWithDependencies mainModuleName models = do
           content <- contentQ
           pure (name, (content, dependencies))
       )
-      models
+      modelsToGenerate
   let (typeAliasModels, modelsWithContent) = partition (\(_, (content, _)) -> isTypeAliasModule content) modelsWithResolvedContent
       (typeAliasModuleNames, typeAliasContent, typeAliasDependencies) =
         foldr
@@ -97,3 +99,15 @@ isTypeAliasModule =
     )
     . lines
     . show
+
+filterRequiredModels :: Models -> [ModelWithDependencies] -> [ModelWithDependencies]
+filterRequiredModels deps models =
+  let namesOfRequiredModels = resolveRequiredModels deps models
+   in filter ((`Set.member` namesOfRequiredModels) . fst) models
+
+resolveRequiredModels :: Models -> [ModelWithDependencies] -> Models
+resolveRequiredModels deps models =
+  let newDeps = Set.unions $ snd . snd <$> Maybe.mapMaybe (\dep -> find ((== dep) . fst) models) (Set.toList deps)
+   in if newDeps `Set.isSubsetOf` deps
+        then deps
+        else resolveRequiredModels (Set.union deps newDeps) models

@@ -201,8 +201,6 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingBreed
 data MischlingFirst_relative = MischlingFirst_relative {
   -- | age
   mischlingFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
-  -- | ananyoftype
-  , mischlingFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | another_relative
   , mischlingFirst_relativeAnother_relative :: (GHC.Maybe.Maybe MischlingFirst_relativeAnother_relativeVariants)
   -- | hunts
@@ -214,15 +212,14 @@ data MischlingFirst_relative = MischlingFirst_relative {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingFirst_relative
-    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj : "ananyoftype" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnanyoftype obj : "another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj : [])
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj) GHC.Base.<> (("ananyoftype" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnanyoftype obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= mischlingFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= mischlingFirst_relativeRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingFirst_relative
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFirst_relative" (\obj -> (((((GHC.Base.pure MischlingFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingFirst_relative" (\obj -> ((((GHC.Base.pure MischlingFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
 -- | Create a new 'MischlingFirst_relative' with all required fields.
 mkMischlingFirst_relative :: MischlingFirst_relativePet_type -- ^ 'mischlingFirst_relativePet_type'
   -> MischlingFirst_relative
 mkMischlingFirst_relative mischlingFirst_relativePet_type = MischlingFirst_relative{mischlingFirst_relativeAge = GHC.Maybe.Nothing,
-                                                                                    mischlingFirst_relativeAnanyoftype = GHC.Maybe.Nothing,
                                                                                     mischlingFirst_relativeAnother_relative = GHC.Maybe.Nothing,
                                                                                     mischlingFirst_relativeHunts = GHC.Maybe.Nothing,
                                                                                     mischlingFirst_relativePet_type = mischlingFirst_relativePet_type,
