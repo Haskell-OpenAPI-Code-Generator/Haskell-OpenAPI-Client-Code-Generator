@@ -342,7 +342,7 @@ defineOneOfSchema schemaName description schemas = do
           . (schemaName <>)
           . aesonValueToName
       createConstructorForSchemaWithFixedValue =
-        (\cName -> normalC cName [])
+        (`normalC` [])
           . createConstructorNameForSchemaWithFixedValue
       fixedValueComments = fmap (("Represents the JSON value @" <>) . (<> "@") . showAesonValue) schemasWithFixedValues
       emptyCtx = pure []

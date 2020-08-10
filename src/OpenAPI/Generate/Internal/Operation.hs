@@ -45,6 +45,7 @@ import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
+import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
@@ -63,6 +64,7 @@ data ParameterTypeDefinition
   = ParameterTypeDefinition
       { parameterTypeDefinitionType :: Q Type,
         parameterTypeDefinitionDoc :: Q Doc,
+        parameterTypeDefinitionDependencies :: Dep.Models,
         parameterTypeDefinitionQueryParams :: [(Name, OAT.ParameterObject)],
         parameterTypeDefinitionPathParams :: [(Name, OAT.ParameterObject)]
       }
@@ -74,7 +76,7 @@ data ParameterTypeDefinition
 -- * A combined parameter type is generated for multiple parameters
 data ParameterCardinality
   = NoParameters
-  | SingleParameter (Q Type, Q Doc, OAT.ParameterObject)
+  | SingleParameter (Q Type) Dep.ModelContentWithDependencies OAT.ParameterObject
   | MultipleParameters ParameterTypeDefinition
 
 -- | wrapper for ambigious usage
@@ -108,15 +110,15 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
   case parametersWithSchemas of
     [] -> pure NoParameters
     [((parameter, path), schema)] -> do
-      (paramType, (doc, _)) <- OAM.resetPath (path <> ["schema"]) $ Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (getNameFromParameter parameter)) schema
+      (paramType, model) <- OAM.resetPath (path <> ["schema"]) $ Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (getNameFromParameter parameter)) schema
       pure $
         SingleParameter
           ( if getRequiredFromParameter parameter
               then paramType
-              else [t|Maybe $(paramType)|],
-            doc,
-            parameter
+              else [t|Maybe $(paramType)|]
           )
+          model
+          parameter
     _ -> do
       properties <-
         mapM
@@ -129,7 +131,7 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
           requiredProperties =
             Set.fromList $
               fst <$> filter ((OAT.required :: OAT.ParameterObject -> Bool) . fst . snd) parametersWithNames
-      (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, _)) <-
+      (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, parameterTypeDefinitionDependencies)) <-
         Model.defineModelForSchemaNamed schemaName
           $ OAT.Concrete
           $ OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
@@ -262,13 +264,13 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
       bodyName = mkName "body"
   paraPattern <- case parameterCardinality of
     NoParameters -> pure []
-    SingleParameter (_, _, parameter) -> do
+    SingleParameter _ _ parameter -> do
       paramName' <- getParameterName parameter
       pure [varP paramName']
     MultipleParameters _ -> pure [varP paramName]
   (pathParameters, queryParameters) <- case parameterCardinality of
     NoParameters -> pure ([], [])
-    SingleParameter (_, _, parameter) -> do
+    SingleParameter _ _ parameter -> do
       paramName' <- getParameterName parameter
       let paramExpr = (varE paramName', parameter)
       pure $

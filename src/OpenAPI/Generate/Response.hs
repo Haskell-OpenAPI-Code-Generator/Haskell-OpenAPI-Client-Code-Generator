@@ -26,6 +26,7 @@ import qualified OpenAPI.Generate.Doc as Doc
 import OpenAPI.Generate.Internal.Operation
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
+import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
@@ -40,7 +41,7 @@ getResponseDefinitions ::
   (Text -> Text) ->
   -- | Returns the name of the reponse data type, the response transformation function and the document containing
   -- the definitions of all response types.
-  OAM.Generator (Name, Q Exp, Q Doc)
+  OAM.Generator (Name, Q Exp, Q Doc, Dep.Models)
 getResponseDefinitions operation appendToOperationName = OAM.nested "responses" $ do
   convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
   responseSuffix <- OAM.getFlag OAO.flagResponseTypeSuffix
@@ -53,7 +54,8 @@ getResponseDefinitions operation appendToOperationName = OAM.nested "responses" 
   responseCases <- resolveResponseReferences responseReferenceCases
   let responseDescriptions = getResponseDescription . (\(_, _, (r, _)) -> r) <$> responseCases
   schemas <- generateResponseCaseDefinitions createBodyName responseCases
-  pure $ (responseName,createResponseTransformerFn createName schemas,) $
+  let dependencies = Set.unions $ snd . snd <$> Maybe.mapMaybe (\(_, _, x) -> x) schemas
+  pure $ (responseName,createResponseTransformerFn createName schemas,,dependencies) $
     vcat
       <$> sequence
         [ pure $

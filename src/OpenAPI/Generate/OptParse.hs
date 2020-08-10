@@ -79,7 +79,9 @@ data Flags
         -- | The prefix which is added to cookie parameters
         flagParameterCookiePrefix :: Text,
         -- | The prefix which is added to header parameters
-        flagParameterHeaderPrefix :: Text
+        flagParameterHeaderPrefix :: Text,
+        -- | The operations to generate (if empty all operations are generated)
+        flagOperationsToGenerate :: [Text]
       }
   deriving (Show, Eq)
 
@@ -109,6 +111,7 @@ parseFlags =
     <*> parseFlagParameterPathPrefix
     <*> parseFlagParameterCookiePrefix
     <*> parseFlagParameterHeaderPrefix
+    <*> parseFlagOperationsToGenerate
 
 parseFlagOutputDir :: Parser Text
 parseFlagOutputDir =
@@ -333,4 +336,13 @@ parseFlagParameterHeaderPrefix =
         long "parameter-header-prefix",
         value "header",
         showDefault
+      ]
+
+parseFlagOperationsToGenerate :: Parser [Text]
+parseFlagOperationsToGenerate =
+  many $ strOption $
+    mconcat
+      [ metavar "OPERATIONID",
+        help "If not all operations should be generated, this option can be used to specify all of them which should be generated. The value has to correspond to the value in the 'operationId' field in the OpenAPI 3 specification.",
+        long "operation-to-generate"
       ]

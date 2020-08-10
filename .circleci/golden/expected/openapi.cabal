@@ -15,6 +15,7 @@ library
       OpenAPI.Types
       OpenAPI.TypeAlias
       OpenAPI.Types.Cat
+      OpenAPI.Types.CoverType
       OpenAPI.Types.Dog
       OpenAPI.Types.Mischling
       OpenAPI.Types.PetByAge

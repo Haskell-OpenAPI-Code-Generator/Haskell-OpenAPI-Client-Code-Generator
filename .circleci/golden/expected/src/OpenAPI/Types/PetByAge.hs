@@ -113,8 +113,6 @@ instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeVariants
 data PetByAgeFirst_relative = PetByAgeFirst_relative {
   -- | age
   petByAgeFirst_relativeAge :: (GHC.Maybe.Maybe GHC.Types.Int)
-  -- | ananyoftype
-  , petByAgeFirst_relativeAnanyoftype :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | another_relative
   , petByAgeFirst_relativeAnother_relative :: (GHC.Maybe.Maybe PetByAgeFirst_relativeAnother_relativeVariants)
   -- | hunts
@@ -126,15 +124,14 @@ data PetByAgeFirst_relative = PetByAgeFirst_relative {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relative
-    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj : "ananyoftype" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnanyoftype obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj : [])
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj) GHC.Base.<> (("ananyoftype" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnanyoftype obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj : [])
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relative
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relative" (\obj -> (((((GHC.Base.pure PetByAgeFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ananyoftype")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relative" (\obj -> ((((GHC.Base.pure PetByAgeFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
 -- | Create a new 'PetByAgeFirst_relative' with all required fields.
 mkPetByAgeFirst_relative :: PetByAgeFirst_relativePet_type -- ^ 'petByAgeFirst_relativePet_type'
   -> PetByAgeFirst_relative
 mkPetByAgeFirst_relative petByAgeFirst_relativePet_type = PetByAgeFirst_relative{petByAgeFirst_relativeAge = GHC.Maybe.Nothing,
-                                                                                 petByAgeFirst_relativeAnanyoftype = GHC.Maybe.Nothing,
                                                                                  petByAgeFirst_relativeAnother_relative = GHC.Maybe.Nothing,
                                                                                  petByAgeFirst_relativeHunts = GHC.Maybe.Nothing,
                                                                                  petByAgeFirst_relativePet_type = petByAgeFirst_relativePet_type,

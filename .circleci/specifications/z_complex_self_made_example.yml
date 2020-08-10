@@ -35,6 +35,7 @@ paths:
               oneOf:
                 - $ref: '#/components/schemas/Cat'
                 - $ref: '#/components/schemas/Dog'
+                - $ref: '#/components/schemas/CoverType'
       responses:
         '200':
           description: Updated
@@ -255,11 +256,6 @@ components:
           type: boolean
         age:
           type: integer
-        ananyoftype:
-          schema:
-            anyOf:
-              - $ref: '#/components/schemas/PetByAge'
-              - $ref: '#/components/schemas/PetByType'
     Mischling:
       allOf: # Combines the main `Pet` schema with `Cat`-specific properties
         - $ref: '#/components/schemas/Dog'
@@ -288,6 +284,18 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Dog'
+    CoverType:
+      type: object
+      properties:
+        cover:
+          oneOf:
+            - $ref: '#/components/schemas/PetByAge'
+            - $ref: '#/components/schemas/Mischling'
+            - $ref: '#/components/schemas/Test'
+            - $ref: '#/components/schemas/Test2'
+            - $ref: '#/components/schemas/Test3'
+            - $ref: '#/components/schemas/Test4'
+            - $ref: '#/components/schemas/Test5'
   parameters:
     PetParameters:
       name: petId

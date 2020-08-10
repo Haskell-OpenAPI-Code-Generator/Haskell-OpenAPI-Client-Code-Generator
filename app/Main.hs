@@ -123,11 +123,11 @@ main =
             env = OAM.createEnvironment options $ Ref.buildReferenceMap spec
             logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.flagLogLevel flags)
             showAndReplace = replaceOpenAPI moduleName . show
-            (operationsQ, logs) = OAM.runGenerator env $ defineOperations moduleName spec
+            ((operationsQ, operationDependencies), logs) = OAM.runGenerator env $ defineOperations moduleName spec
         logMessages logs
         operationModules <- runQ operationsQ
         configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
-        let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec
+        let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec operationDependencies
         logMessages logsModels
         modelModules <- fmap (BF.second showAndReplace) <$> runQ modelsQ
         let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
