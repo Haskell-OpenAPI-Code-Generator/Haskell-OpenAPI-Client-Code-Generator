@@ -15,6 +15,7 @@ import qualified OpenAPI.Generate.Log as OAL
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
+import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import qualified OpenAPI.Generate.Types.Schema as OAS
 
 -- | The reader environment of the 'Generator' monad
@@ -22,12 +23,12 @@ import qualified OpenAPI.Generate.Types.Schema as OAS
 -- The 'currentPath' is updated using the 'nested' function to track the current position within the specification.
 -- This is used to produce tracable log messages.
 -- The 'references' map is a lookup table for references within the OpenAPI specification.
-data GeneratorEnvironment
-  = GeneratorEnvironment
-      { currentPath :: [Text],
-        references :: Ref.ReferenceMap,
-        options :: OAO.Options
-      }
+data GeneratorEnvironment = GeneratorEnvironment
+  { currentPath :: [Text],
+    references :: Ref.ReferenceMap,
+    options :: OAO.Options,
+    generatorConfiguration :: Maybe OAG.GeneratorConfiguration
+  }
   deriving (Show, Eq)
 
 -- | The 'Generator' monad is used to pass a 'MR.Reader' environment to functions in need of resolving references
@@ -40,12 +41,13 @@ runGenerator :: GeneratorEnvironment -> Generator a -> (a, OAL.LogEntries)
 runGenerator e (Generator g) = MR.runReader (MW.runWriterT g) e
 
 -- | Create an environment based on a 'Ref.ReferenceMap' and 'OAO.Flags'
-createEnvironment :: OAO.Options -> Ref.ReferenceMap -> GeneratorEnvironment
-createEnvironment options references =
+createEnvironment :: OAO.Options -> Maybe OAG.GeneratorConfiguration -> Ref.ReferenceMap -> GeneratorEnvironment
+createEnvironment options generatorConfiguration references =
   GeneratorEnvironment
     { currentPath = [],
       references = references,
-      options = options
+      options = options,
+      generatorConfiguration = generatorConfiguration
     }
 
 -- | Writes a log message to a 'Generator' monad
@@ -80,6 +82,9 @@ resetPath path = MR.local $ \g -> g {currentPath = path}
 
 getCurrentPath :: Generator [Text]
 getCurrentPath = MR.asks currentPath
+
+getFromGeneratorConfiguration :: (OAG.GeneratorConfiguration -> a) -> Generator (Maybe a)
+getFromGeneratorConfiguration f = MR.asks (fmap f . generatorConfiguration)
 
 appendToPath :: [Text] -> Generator [Text]
 appendToPath path = do

@@ -34,7 +34,6 @@ For large specifications some modules (CyclicTypes.hs for example) can get prett
 All symbols are globally unique and are reexported in the module `OpenAPI` (Module name can be changed with `--module-name`).
 To reduce compile time, the code is split up into multiple modules.
 Mainly for every operation and for every schema.
-Schemas with cyclic dependencies are are in the module `OpenAPI.CyclicTypes`.
 
 ## Troubleshooting naming conflicts
 Naming conflicts can happen, sometimes a little manual adjustment is needed.

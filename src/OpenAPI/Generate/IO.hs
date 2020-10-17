@@ -19,6 +19,7 @@ import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
+import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import System.Directory
 import System.FilePath
 import System.IO.Error
@@ -84,10 +85,10 @@ stackProjectFiles packageName moduleName modulesToExport =
 
 replaceOpenAPI :: String -> String -> String
 replaceOpenAPI moduleName contents =
-  T.unpack
-    $ T.replace (T.pack "OpenAPI.Common") (T.pack $ moduleName ++ ".Common")
-    $ T.replace (T.pack "OpenAPI.Configuration") (T.pack $ moduleName ++ ".Configuration")
-    $ T.pack contents
+  T.unpack $
+    T.replace (T.pack "OpenAPI.Common") (T.pack $ moduleName ++ ".Common") $
+      T.replace (T.pack "OpenAPI.Configuration") (T.pack $ moduleName ++ ".Configuration") $
+        T.pack contents
 
 permitProceed :: OAO.Flags -> IO Bool
 permitProceed flags = do
@@ -151,13 +152,13 @@ getHsBootFiles flags modelModules =
           )
           modelModules
 
-generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Options -> IO (FilesWithContent, FilesWithContent)
-generateFilesToCreate spec options = do
+generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Options -> Maybe OAG.GeneratorConfiguration -> IO (FilesWithContent, FilesWithContent)
+generateFilesToCreate spec options generatorConfiguration = do
   let flags = OAO.optFlags options
       outputDirectory = T.unpack $ OAO.flagOutputDir flags
       moduleName = T.unpack $ OAO.flagModuleName flags
       packageName = T.unpack $ OAO.flagPackageName flags
-      env = OAM.createEnvironment options $ Ref.buildReferenceMap spec
+      env = OAM.createEnvironment options generatorConfiguration $ Ref.buildReferenceMap spec
       logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.flagLogLevel flags)
       showAndReplace = replaceOpenAPI moduleName . show
       ((operationsQ, operationDependencies), logs) = OAM.runGenerator env $ defineOperations moduleName spec
@@ -189,9 +190,9 @@ generateFilesToCreate spec options = do
       hsBootFiles = getHsBootFiles flags modelModules
   pure
     ( BF.second (unlines . lines)
-        <$> (mainFile, mainModuleContent)
-          : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
-          <> hsBootFiles,
+        <$> (mainFile, mainModuleContent) :
+      (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+        <> hsBootFiles,
       BF.first (outputDirectory </>) <$> stackProjectFiles packageName moduleName modulesToExport
     )
 
