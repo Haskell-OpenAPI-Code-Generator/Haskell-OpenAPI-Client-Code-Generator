@@ -27,8 +27,8 @@ import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
 import qualified Data.Set as Set
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import qualified Data.Text.Lazy as LT
 import Data.Time.Calendar
 import Language.Haskell.TH
@@ -42,6 +42,7 @@ import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
+import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import qualified OpenAPI.Generate.Types.Schema as OAS
 import Prelude hiding (maximum, minimum, not)
 
@@ -95,7 +96,13 @@ showAesonValue = LT.toStrict . Aeson.encodeToLazyText
 -- | Defines all the models for a schema
 defineModelForSchema :: Text -> OAS.Schema -> OAM.Generator Dep.ModelWithDependencies
 defineModelForSchema schemaName schema = do
-  namedSchema <- OAM.nested schemaName $ defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema
+  opaqueSchemasM <- OAM.getFromGeneratorConfiguration OAG.generatorConfigurationOpaqueSchemas
+  namedSchema <- OAM.nested schemaName $ case opaqueSchemasM of
+    Just opaqueSchemas
+      | schemaName `elem` opaqueSchemas ->
+        createAlias schemaName "This alias is created because of the generator configuration and possibly could have a more precise type." CreateTypeAlias $
+          pure ([t|Aeson.Value|], (emptyDoc, Set.empty))
+    _ -> defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema
   pure (transformToModuleName schemaName, snd namedSchema)
 
 -- | Defines all the models for a schema and returns the declarations with the type of the root model
@@ -132,10 +139,11 @@ resolveSchemaReference schemaName schema =
     OAT.Concrete concrete -> pure $ Just (concrete, Set.empty)
     OAT.Reference ref -> do
       p <- OAM.getSchemaReferenceM ref
-      when (Maybe.isNothing p) $ OAM.logWarning $
-        "Reference '" <> ref <> "' to schema from '"
-          <> schemaName
-          <> "' could not be found and therefore will be skipped."
+      when (Maybe.isNothing p) $
+        OAM.logWarning $
+          "Reference '" <> ref <> "' to schema from '"
+            <> schemaName
+            <> "' could not be found and therefore will be skipped."
       pure $ (,transformReferenceToDependency ref) <$> p
 
 -- | creates an alias depending on the strategy
@@ -155,7 +163,8 @@ createAlias schemaName description strategy res = do
                               ]
                               $$
                           )
-                            . ppr <$> tySynD schemaName' [] type'
+                            . ppr
+                            <$> tySynD schemaName' [] type'
                         ),
           dependencies
         )
@@ -224,9 +233,9 @@ defineEnumModel strategy schemaName schema enumValuesSet = do
           . ( `Doc.sideBySide`
                 ( text ""
                     $$ Doc.sideComments
-                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification."
-                          : "This constructor can be used to send values to the server which are not present in the specification yet."
-                          : comments
+                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification." :
+                        "This constructor can be used to send values to the server which are not present in the specification yet." :
+                        comments
                       )
                 )
             )
@@ -265,12 +274,12 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           ( clause
               [conP fallbackName [p]]
               (normalB e)
-              []
-              : clause
-                [conP typedName [p]]
-                (normalB [|Aeson.toJSON $e|])
-                []
-              : (toJsonClause <$> nameValues)
+              [] :
+            clause
+              [conP typedName [p]]
+              (normalB [|Aeson.toJSON $e|])
+              [] :
+            (toJsonClause <$> nameValues)
           )
       toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
    in fmap ppr toJson `appendDoc` fmap ppr fromJson
@@ -550,7 +559,8 @@ defineObjectModelForSchema strategy schemaName schema =
               . T.pack
               . show
               . Doc.reformatRecord
-              . ppr <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
+              . ppr
+              <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
           toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues
           fromJsonInstance = createFromJSONImplementation name propsWithNames required
           mkFunction = createMkFunction name propsWithNames required bangTypes
@@ -750,7 +760,7 @@ getConstraintDescriptionsOfSchema schema =
                     True -> Just "Must have unique items"
                     False -> Nothing
                 )
-            . OAS.uniqueItems,
+              . OAS.uniqueItems,
           showConstraintSurrounding "Must have a maximum of " " properties" $ schema >>= OAS.maxProperties,
           showConstraintSurrounding "Must have a minimum of " " properties" $ schema >>= OAS.minProperties
         ]

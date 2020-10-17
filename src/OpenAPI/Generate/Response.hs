@@ -55,22 +55,23 @@ getResponseDefinitions operation appendToOperationName = OAM.nested "responses" 
   let responseDescriptions = getResponseDescription . (\(_, _, (r, _)) -> r) <$> responseCases
   schemas <- generateResponseCaseDefinitions createBodyName responseCases
   let dependencies = Set.unions $ snd . snd <$> Maybe.mapMaybe (\(_, _, x) -> x) schemas
-  pure $ (responseName,createResponseTransformerFn createName schemas,,dependencies) $
-    vcat
-      <$> sequence
-        [ pure $
-            Doc.generateHaddockComment
-              [ "Represents a response of the operation '" <> appendToOperationName "" <> "'.",
-                "",
-                "The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), '"
-                  <> createResponseNameAsText convertToCamelCase appendToOperationName (responseSuffix <> errorSuffix)
-                  <> "' is used."
-              ],
-          ( `Doc.sideBySide`
-              (text "" $$ Doc.sideComments ("Means either no matching case available or a parse error" : responseDescriptions))
-          )
-            . Doc.reformatADT
-            . ppr
+  pure $
+    (responseName,createResponseTransformerFn createName schemas,,dependencies) $
+      vcat
+        <$> sequence
+          [ pure $
+              Doc.generateHaddockComment
+                [ "Represents a response of the operation '" <> appendToOperationName "" <> "'.",
+                  "",
+                  "The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), '"
+                    <> createResponseNameAsText convertToCamelCase appendToOperationName (responseSuffix <> errorSuffix)
+                    <> "' is used."
+                ],
+            ( `Doc.sideBySide`
+                (text "" $$ Doc.sideComments ("Means either no matching case available or a parse error" : responseDescriptions))
+            )
+              . Doc.reformatADT
+              . ppr
               <$> dataD
                 (cxt [])
                 responseName
@@ -88,8 +89,8 @@ getResponseDefinitions operation appendToOperationName = OAM.nested "responses" 
                     ((errorSuffix, [||const True||], Just ([t|String|], (Doc.emptyDoc, Set.empty))) : schemas)
                 )
                 [derivClause Nothing [conT ''Show, conT ''Eq]],
-          printSchemaDefinitions schemas
-        ]
+            printSchemaDefinitions schemas
+          ]
 
 -- | First: suffix to append to the data constructor name
 -- Second: an expression which can be used to determine if this case should be used in regard to the response status

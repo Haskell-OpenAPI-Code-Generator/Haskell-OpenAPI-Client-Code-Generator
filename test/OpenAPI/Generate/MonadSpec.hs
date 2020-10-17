@@ -22,22 +22,24 @@ import Test.Validity
 spec :: Spec
 spec = do
   defaultFlags <- runIO $ withArgs ["spec.yaml"] $ O.execParser $ O.info OAO.parseOptions mempty
-  let run = runGenerator (createEnvironment defaultFlags Map.empty)
+  let run = runGenerator (createEnvironment defaultFlags Nothing Map.empty)
   describe "nested" $ do
     it "should nest path correct with simple example" $ do
       let (currentPath', _) = run $ nested "a" $ nested "b" $ nested "c" $ asks currentPath
       currentPath' `shouldBe` ["a", "b", "c"]
-    it "should nest path correct with property" $ forAllValid $ \list -> do
-      let (currentPath', _) = run $ foldr nested (asks currentPath) list
-      currentPath' `shouldBe` list
+    it "should nest path correct with property" $
+      forAllValid $ \list -> do
+        let (currentPath', _) = run $ foldr nested (asks currentPath) list
+        currentPath' `shouldBe` list
     it "should save path with logs" $
-      let (_, logs) = run $ nested "a" $ do
-            logInfo "1"
-            nested "b" $ do
-              logInfo "2"
-              nested "c" $ logInfo "3"
-              logInfo "4"
-            logInfo "5"
+      let (_, logs) = run $
+            nested "a" $ do
+              logInfo "1"
+              nested "b" $ do
+                logInfo "2"
+                nested "c" $ logInfo "3"
+                logInfo "4"
+              logInfo "5"
        in fmap (\l -> (OAL.logEntryPath l, OAL.logEntryMessage l)) logs
             `shouldBe` [ (["a"], "1"),
                          (["a", "b"], "2"),
@@ -48,25 +50,28 @@ spec = do
   describe "logs" $ do
     let msgAndLogToTupleList list logs = bimap T.unpack T.unpack <$> zip list (OAL.transformLogs logs)
         logContainsMsgPredicate = all $ uncurry isInfixOf
-    it "should contain all logged info messages" $ forAllValid $ \list -> do
-      let (_, logs) = run $ foldr ((>>) . logInfo) (pure ()) list
-      shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
-    it "should contain all logged warn messages" $ forAllValid $ \list -> do
-      let (_, logs) = run $ foldr ((>>) . logWarning) (pure ()) list
-      shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
-    it "should contain all logged error messages" $ forAllValid $ \list -> do
-      let (_, logs) = run $ foldr ((>>) . logError) (pure ()) list
-      shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
+    it "should contain all logged info messages" $
+      forAllValid $ \list -> do
+        let (_, logs) = run $ foldr ((>>) . logInfo) (pure ()) list
+        shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
+    it "should contain all logged warn messages" $
+      forAllValid $ \list -> do
+        let (_, logs) = run $ foldr ((>>) . logWarning) (pure ()) list
+        shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
+    it "should contain all logged error messages" $
+      forAllValid $ \list -> do
+        let (_, logs) = run $ foldr ((>>) . logError) (pure ()) list
+        shouldSatisfy (msgAndLogToTupleList list logs) logContainsMsgPredicate
   describe "reference lookup" $ do
     let e = OAT.ExampleObject (Just "foo") Nothing Nothing (Just "http://example.com")
         b = OAT.RequestBodyObject Map.empty Nothing False
         runWithEnv =
-          runGenerator
-            $ createEnvironment defaultFlags
-            $ Map.fromList
-              [ ("#/components/examples/example1", ExampleReference e),
-                ("#/components/requestBodies/body1", RequestBodyReference b)
-              ]
+          runGenerator $
+            createEnvironment defaultFlags Nothing $
+              Map.fromList
+                [ ("#/components/examples/example1", ExampleReference e),
+                  ("#/components/requestBodies/body1", RequestBodyReference b)
+                ]
     it "should find existing reference to example" $ do
       let (maybeExample, _) = runWithEnv $ getExampleReferenceM "#/components/examples/example1"
       maybeExample `shouldBe` Just e

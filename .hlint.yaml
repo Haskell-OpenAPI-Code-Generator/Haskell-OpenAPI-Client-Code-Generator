@@ -7,7 +7,6 @@
 
 
 # Warnings currently triggered by your code
-- ignore: {name: "Parse error"}
 
 
 # Specify additional command line arguments

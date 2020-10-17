@@ -4,12 +4,14 @@
 -- | Functionality to Generate Haskell Code out of an OpenAPI definition File
 module OpenAPI.Generate where
 
+import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
 import qualified OpenAPI.Generate.IO as OAI
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
+import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import Options.Applicative
 import System.Exit
 
@@ -19,6 +21,14 @@ decodeOpenApi fileName = do
   res <- decodeFileEither $ T.unpack fileName
   case res of
     Left exc -> die $ "Could not parse OpenAPI specification '" <> T.unpack fileName <> "': " <> show exc
+    Right o -> pure o
+
+-- | Decodes a generator configuration
+decodeGeneratorConfiguration :: Text -> IO OAG.GeneratorConfiguration
+decodeGeneratorConfiguration fileName = do
+  res <- decodeFileEither $ T.unpack fileName
+  case res of
+    Left exc -> die $ "Could not parse generator configuration '" <> T.unpack fileName <> "': " <> show exc
     Right o -> pure o
 
 -- | Run the generator as CLI
@@ -34,7 +44,8 @@ runGenerator =
    in execParser opts >>= \options -> do
         let flags = OAO.optFlags options
         spec <- decodeOpenApi $ OAO.optSpecification options
-        (moduleFiles, projectFiles) <- OAI.generateFilesToCreate spec options
+        generatorConfiguration <- maybe (pure Nothing) ((pure . Just) <=< decodeGeneratorConfiguration) $ OAO.flagGeneratorConfigurationFile flags
+        (moduleFiles, projectFiles) <- OAI.generateFilesToCreate spec options generatorConfiguration
         if OAO.flagDryRun flags
           then
             mapM_
