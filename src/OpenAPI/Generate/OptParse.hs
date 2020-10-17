@@ -44,6 +44,8 @@ data Flags
         flagLogLevel :: OAL.LogSeverity,
         -- | Overwrite output directory without question
         flagForce :: Bool,
+        -- | Only write new/changed files
+        flagIncremental :: Bool,
         -- | Do not generate the output files but only print the generated code
         flagDryRun :: Bool,
         -- | Do not generate a stack project alongside the raw Haskell files
@@ -93,6 +95,7 @@ parseFlags =
     <*> parseFlagModuleName
     <*> parseFlagLogLevel
     <*> parseFlagForce
+    <*> parseFlagIncremental
     <*> parseFlagDryRun
     <*> parseFlagDoNotGenerateStackProject
     <*> parseFlagOmitAdditionalOperationFunctions
@@ -166,6 +169,15 @@ parseFlagForce =
       [ help "Overwrite output directory without question",
         long "force",
         short 'f'
+      ]
+
+parseFlagIncremental :: Parser Bool
+parseFlagIncremental =
+  switch $
+    mconcat
+      [ help "Only write new/changed files. Does not need --force flag to overwrite files.",
+        long "incremental",
+        short 'i'
       ]
 
 parseFlagDryRun :: Parser Bool

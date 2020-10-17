@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a15b70445f58580ef040cd136bb8005fd94d720d7736b374cceb2729c88e0509
+-- hash: 1d10bee40dfe5e1d3e0f3ef0c85023877e2419de4c246520f792b2618a814a83
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -33,9 +33,12 @@ library
       OpenAPI.Common
       OpenAPI.Generate
       OpenAPI.Generate.Doc
+      OpenAPI.Generate.Internal.Embed
       OpenAPI.Generate.Internal.Operation
       OpenAPI.Generate.Internal.Util
+      OpenAPI.Generate.IO
       OpenAPI.Generate.Log
+      OpenAPI.Generate.Main
       OpenAPI.Generate.Model
       OpenAPI.Generate.ModelDependencies
       OpenAPI.Generate.Monad
@@ -58,6 +61,8 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
+    , filepath
     , hashmap
     , http-client
     , http-conduit
@@ -78,7 +83,6 @@ library
 executable openapi3-code-generator-exe
   main-is: Main.hs
   other-modules:
-      Embed
       Paths_openapi3_code_generator
   hs-source-dirs:
       app
@@ -129,6 +133,8 @@ test-suite openapi3-code-generator-test
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
+    , filepath
     , genvalidity
     , genvalidity-hspec
     , genvalidity-text

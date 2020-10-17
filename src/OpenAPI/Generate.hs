@@ -1,28 +1,16 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 -- | Functionality to Generate Haskell Code out of an OpenAPI definition File
 module OpenAPI.Generate where
 
-import Control.Monad
-import qualified Data.Bifunctor as BF
-import qualified Data.Map as Map
-import qualified Data.Maybe as Maybe
-import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
-import Language.Haskell.TH
-import Language.Haskell.TH.PprLib hiding ((<>))
-import qualified OpenAPI.Common as OC
-import qualified OpenAPI.Generate.Doc as Doc
-import qualified OpenAPI.Generate.Model as Model
-import qualified OpenAPI.Generate.ModelDependencies as Dep
-import qualified OpenAPI.Generate.Monad as OAM
-import qualified OpenAPI.Generate.Operation as Operation
-import qualified OpenAPI.Generate.SecurityScheme as SecurityScheme
+import qualified OpenAPI.Generate.IO as OAI
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
+import Options.Applicative
 import System.Exit
 
 -- | Decodes an OpenAPI File
@@ -33,62 +21,34 @@ decodeOpenApi fileName = do
     Left exc -> die $ "Could not parse OpenAPI specification '" <> T.unpack fileName <> "': " <> show exc
     Right o -> pure o
 
--- | Defines all the operations as functions and the common imports
-defineOperations :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
-defineOperations moduleName =
-  OAM.nested "paths"
-    . fmap
-      ( BF.bimap
-          ( fmap concat
-              . sequence
-          )
-          Set.unions
-      )
-    . mapAndUnzipM (uncurry $ Operation.defineOperationsForPath moduleName)
-    . Map.toList
-    . OAT.paths
-
--- | Defines the @defaultURL@ and the @defaultConfiguration@ containing this URL.
-defineConfigurationInformation :: String -> OAT.OpenApiSpecification -> Q Doc
-defineConfigurationInformation moduleName spec =
-  let servers' = (OAT.servers :: OAT.OpenApiSpecification -> [OAT.ServerObject]) spec
-      defaultURL = getServerURL servers'
-      defaultURLName = mkName "defaultURL"
-      getServerURL = maybe "/" (OAT.url :: OAT.ServerObject -> Text) . Maybe.listToMaybe
-   in Doc.addConfigurationModuleHeader moduleName
-        . vcat
-          <$> sequence
-            [ pure $
-                Doc.generateHaddockComment
-                  [ "The default url specified by the OpenAPI specification",
-                    "",
-                    "@" <> defaultURL <> "@"
-                  ],
-              ppr
-                <$> [d|$(varP defaultURLName) = T.pack $(stringE $ T.unpack defaultURL)|],
-              pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
-              ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
+-- | Run the generator as CLI
+runGenerator :: IO ()
+runGenerator =
+  let opts =
+        info (OAO.parseOptions <**> helper) $
+          mconcat
+            [ fullDesc,
+              progDesc "This tool can be used to generate Haskell code from OpenAPI 3 specifications. For more information see https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator.",
+              header "Generate Haskell code from OpenAPI 3 specifications"
             ]
-
--- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'
-defineModels :: String -> OAT.OpenApiSpecification -> Dep.Models -> OAM.Generator (Q [Dep.ModuleDefinition])
-defineModels moduleName spec operationDependencies =
-  let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
-   in OAM.nested "components" $ OAM.nested "schemas" $ do
-        models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
-        pure $ Dep.getModelModulesFromModelsWithDependencies moduleName operationDependencies models
-
--- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
-defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)
-defineSecuritySchemes moduleName =
-  OAM.nested "components"
-    . fmap (fmap $ Doc.addSecuritySchemesModuleHeader moduleName)
-    . SecurityScheme.defineSupportedSecuritySchemes (T.pack moduleName)
-    . Maybe.mapMaybe
-      ( \(name', scheme') -> case scheme' of
-          OAT.Concrete s -> Just (name', s)
-          OAT.Reference _ -> Nothing
-      )
-    . Map.toList
-    . OAT.securitySchemes
-    . OAT.components
+   in execParser opts >>= \options -> do
+        let flags = OAO.optFlags options
+        spec <- decodeOpenApi $ OAO.optSpecification options
+        (moduleFiles, projectFiles) <- OAI.generateFilesToCreate spec options
+        if OAO.flagDryRun flags
+          then
+            mapM_
+              ( \(file, content) -> do
+                  putStrLn $ "File: " <> file
+                  putStrLn "---"
+                  putStrLn content
+                  putStrLn "---\n\n"
+              )
+              moduleFiles
+          else do
+            proceed <- OAI.permitProceed flags
+            if proceed
+              then do
+                OAI.writeFiles flags moduleFiles projectFiles
+                putStrLn "finished"
+              else putStrLn "aborted"

@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Embed where
+module OpenAPI.Generate.Internal.Embed where
 
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
