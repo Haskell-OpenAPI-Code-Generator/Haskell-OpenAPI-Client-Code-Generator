@@ -36,6 +36,8 @@ dependencies:
 - optparse-applicative
 - vector
 - hashmap
+- directory
+- filepath
 
 library:
   source-dirs: src
@@ -57,8 +59,6 @@ executables:
     - -Wall
     dependencies:
     - openapi3-code-generator
-    - directory
-    - filepath
 
 tests:
   openapi3-code-generator-test:
