@@ -12,11 +12,10 @@ with pkgs.lib;
 with pkgs.haskell.lib;
 let
   localPkgs = import ./pkgs.nix;
-  extraFlagsStr = concatStringsSep "\\\n" extraFlags;
-  operationFlag = operation: "--operation-to-generate \"${operation}\" \\";
+  extraFlagsStr = concatStringsSep " " extraFlags;
+  operationFlag = operation: "--operation-to-generate '${operation}'";
   operationsFlags = optionalString (operations != [ ]) ''
-    --omit-additional-operation-functions \
-    ${concatStringsSep "\n" (map operationFlag operations)}
+    --omit-additional-operation-functions ${concatStringsSep " " (map operationFlag operations)}
   '';
   generatedCode = pkgs.stdenv.mkDerivation {
     name = "generated-${name}";
@@ -28,13 +27,16 @@ let
       export LANG=C.utf8
       export LC_ALL=C.utf8
 
+      set -x
+
       openapi3-code-generator-exe ${src}  \
         --module-name "${moduleName}" \
         --package-name "${packageName}" \
         --output-dir "$out" \
         ${extraFlagsStr} \
-        \
         ${operationsFlags}
+
+      set +x
     '';
   };
   generatedPackage = dontHaddock (disableLibraryProfiling (pkgs.haskellPackages.callCabal2nix name generatedCode { }));
