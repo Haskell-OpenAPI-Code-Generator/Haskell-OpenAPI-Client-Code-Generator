@@ -62,76 +62,77 @@ spec = do
               (text doc2)
           )
           == max (numberOfLinesOfDoc $ text doc1) (numberOfLinesOfDoc $ text doc2)
-  describe "generateHaddockComment"
-    $ it "should place every item on a new line and respect newline characters"
-    $ show (generateHaddockComment ["Line 1", "Line 2", "", "Line 3\nLine 4"])
-      `shouldBe` init
-        ( unlines
-            [ "-- | Line 1",
-              "-- Line 2",
-              "-- ",
-              "-- Line 3",
-              "-- Line 4"
-            ]
+  describe "generateHaddockComment" $
+    it "should place every item on a new line and respect newline characters" $
+      show (generateHaddockComment ["Line 1", "Line 2", "", "Line 3\nLine 4"])
+        `shouldBe` init
+          ( unlines
+              [ "-- | Line 1",
+                "-- Line 2",
+                "-- ",
+                "-- Line 3",
+                "-- Line 4"
+              ]
+          )
+  describe "sideComments" $
+    it "should convert every item to a side comment and replace newlines with spaces" $
+      show (sideComments ["Line 1", "Line 2", "", "Line 3\nLine 4"])
+        `shouldBe` init
+          ( unlines
+              [ "-- ^ Line 1",
+                "-- ^ Line 2",
+                "-- ^ ",
+                "-- ^ Line 3 Line 4"
+              ]
+          )
+  describe "appendDoc" $
+    it "should append two docs" $
+      do
+        content <- runQ $ pure (text "a") `appendDoc` pure (text "b")
+        show content `shouldBe` "a\nb"
+  describe "breakOnTokens" $
+    it "place a line feed before the tokens and add an indentation" $
+      show
+        ( breakOnTokens [",", "}"] $
+            text $
+              unlines
+                [ "foo = {",
+                  "  a = 123, b = 321,",
+                  "  c = A",
+                  "  } deriving Foo"
+                ]
         )
-  describe "sideComments"
-    $ it "should convert every item to a side comment and replace newlines with spaces"
-    $ show (sideComments ["Line 1", "Line 2", "", "Line 3\nLine 4"])
-      `shouldBe` init
-        ( unlines
-            [ "-- ^ Line 1",
-              "-- ^ Line 2",
-              "-- ^ ",
-              "-- ^ Line 3 Line 4"
-            ]
-        )
-  describe "appendDoc"
-    $ it "should append two docs"
-    $ do
-      content <- runQ $ pure (text "a") `appendDoc` pure (text "b")
-      show content `shouldBe` "a\nb"
-  describe "breakOnTokens"
-    $ it "place a line feed before the tokens and add an indentation"
-    $ show
-      ( breakOnTokens [",", "}"] $ text $
-          unlines
-            [ "foo = {",
-              "  a = 123, b = 321,",
-              "  c = A",
-              "  } deriving Foo"
-            ]
-      )
-      `shouldBe` unlines
-        [ "foo = { a = 123",
-          "  , b = 321",
-          "  , c = A",
-          "  } deriving Foo"
-        ]
-  describe "zipCodeAndComments"
-    $ it "should intertwine code and comments"
-    $ show
-      ( zipCodeAndComments
-          [ "foo = {",
-            "  a = 123",
+        `shouldBe` unlines
+          [ "foo = { a = 123",
             "  , b = 321",
-            "  , c = A ",
+            "  , c = A",
             "  } deriving Foo"
           ]
-          [ "a is foo",
-            "b is bar\nbut remember the line feed",
-            "c is A"
-          ]
-      )
-      `shouldBe` init
-        ( unlines
+  describe "zipCodeAndComments" $
+    it "should intertwine code and comments" $
+      show
+        ( zipCodeAndComments
             [ "foo = {",
-              "  -- | a is foo",
               "  a = 123",
-              "  -- | b is bar",
-              "  -- but remember the line feed",
               "  , b = 321",
-              "  -- | c is A",
               "  , c = A ",
               "  } deriving Foo"
             ]
+            [ "a is foo",
+              "b is bar\nbut remember the line feed",
+              "c is A"
+            ]
         )
+        `shouldBe` init
+          ( unlines
+              [ "foo = {",
+                "  -- | a is foo",
+                "  a = 123",
+                "  -- | b is bar",
+                "  -- but remember the line feed",
+                "  , b = 321",
+                "  -- | c is A",
+                "  , c = A ",
+                "  } deriving Foo"
+              ]
+          )

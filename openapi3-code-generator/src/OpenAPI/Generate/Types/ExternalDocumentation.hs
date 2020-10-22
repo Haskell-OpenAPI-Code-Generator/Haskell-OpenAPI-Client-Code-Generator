@@ -7,11 +7,10 @@ import Data.Text (Text)
 import Data.Yaml
 import GHC.Generics
 
-data ExternalDocumentationObject
-  = ExternalDocumentationObject
-      { url :: Text,
-        description :: Maybe Text
-      }
+data ExternalDocumentationObject = ExternalDocumentationObject
+  { url :: Text,
+    description :: Maybe Text
+  }
   deriving (Show, Ord, Eq, Generic)
 
 instance FromJSON ExternalDocumentationObject

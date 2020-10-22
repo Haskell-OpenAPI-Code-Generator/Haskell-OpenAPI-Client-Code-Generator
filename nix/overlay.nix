@@ -21,7 +21,7 @@ in
             (
               self: super:
                 {
-                  openapi3-code-generator = final.haskellPackages.callCabal2nix "openapi3-code-generator" (final.gitignoreSource ../.) { };
+                  openapi3-code-generator = final.haskellPackages.callCabal2nix "openapi3-code-generator" (final.gitignoreSource ../openapi3-code-generator) { };
                 }
             );
       }

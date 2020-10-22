@@ -297,12 +297,13 @@ createModuleHeaderWithReexports :: String -> [String] -> String -> Doc
 createModuleHeaderWithReexports moduleName modulesToExport description =
   let exports = vcat $ fmap (text . ("module " <>) . (<> ",")) modulesToExport
       imports = vcat $ fmap (text . ("import " <>)) modulesToExport
-   in generatorNote $ moduleDescription description $
-        text ("module " <> moduleName <> " (")
-          $$ nest
-            2
-            ( exports
-                $$ text ") where"
-            )
-          $$ text ""
-          $$ imports
+   in generatorNote $
+        moduleDescription description $
+          text ("module " <> moduleName <> " (")
+            $$ nest
+              2
+              ( exports
+                  $$ text ") where"
+              )
+            $$ text ""
+            $$ imports

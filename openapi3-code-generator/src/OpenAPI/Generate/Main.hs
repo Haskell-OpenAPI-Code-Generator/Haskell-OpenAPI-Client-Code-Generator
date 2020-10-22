@@ -47,26 +47,27 @@ defineConfigurationInformation moduleName spec =
       getServerURL = maybe "/" (OAT.url :: OAT.ServerObject -> Text) . Maybe.listToMaybe
    in Doc.addConfigurationModuleHeader moduleName
         . vcat
-          <$> sequence
-            [ pure $
-                Doc.generateHaddockComment
-                  [ "The default url specified by the OpenAPI specification",
-                    "",
-                    "@" <> defaultURL <> "@"
-                  ],
-              ppr
-                <$> [d|$(varP defaultURLName) = T.pack $(stringE $ T.unpack defaultURL)|],
-              pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
-              ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
-            ]
+        <$> sequence
+          [ pure $
+              Doc.generateHaddockComment
+                [ "The default url specified by the OpenAPI specification",
+                  "",
+                  "@" <> defaultURL <> "@"
+                ],
+            ppr
+              <$> [d|$(varP defaultURLName) = T.pack $(stringE $ T.unpack defaultURL)|],
+            pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
+            ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
+          ]
 
 -- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'
 defineModels :: String -> OAT.OpenApiSpecification -> Dep.Models -> OAM.Generator (Q [Dep.ModuleDefinition])
 defineModels moduleName spec operationDependencies =
   let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
-   in OAM.nested "components" $ OAM.nested "schemas" $ do
-        models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
-        pure $ Dep.getModelModulesFromModelsWithDependencies moduleName operationDependencies models
+   in OAM.nested "components" $
+        OAM.nested "schemas" $ do
+          models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
+          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName operationDependencies models
 
 -- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
 defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)

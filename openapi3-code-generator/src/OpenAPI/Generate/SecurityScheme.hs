@@ -28,9 +28,9 @@ defineSupportedSecuritySchemes moduleName securitySchemes = OAM.nested "security
   let securitySchemeDefinitions = fmap (BF.second $ defineSecurityScheme moduleName) securitySchemes
   mapM_
     ( \(name, _) ->
-        OAM.nested name
-          $ OAM.logWarning
-          $ "The security scheme '" <> name <> "' is not supported (currently only http-basic and http-bearer are supported)."
+        OAM.nested name $
+          OAM.logWarning $
+            "The security scheme '" <> name <> "' is not supported (currently only http-basic and http-bearer are supported)."
     )
     $ filter (Maybe.isNothing . snd) securitySchemeDefinitions
   pure $ fmap vcat $ mapM (fmap ($$ text "") . snd) $ Maybe.mapMaybe sequence securitySchemeDefinitions
@@ -81,7 +81,8 @@ basicAuthenticationScheme moduleName description =
                     ]
                     $$
                 )
-              . ppr <$> dataDefinition,
+              . ppr
+              <$> dataDefinition,
             ( Doc.generateHaddockComment
                 [ "Use this security scheme to use basic authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.",
                   "",
@@ -99,7 +100,8 @@ basicAuthenticationScheme moduleName description =
                 ]
                 $$
             )
-              . ppr <$> functionType,
+              . ppr
+              <$> functionType,
             ppr <$> functionBody
           ]
 

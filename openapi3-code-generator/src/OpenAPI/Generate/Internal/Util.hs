@@ -94,14 +94,14 @@ haskellifyText convertToCamelCase startWithUppercase name =
       replacePlus ('+' : rest) = "Plus" <> replacePlus rest
       replacePlus (x : xs) = x : replacePlus xs
       replacePlus a = a
-   in replaceReservedWord
-        $ caseFirstCharCorrectly
-        $ generateNameForEmptyIdentifier name
-        $ removeIllegalLeadingCharacters
-        $ (if convertToCamelCase then toCamelCase else id)
-        $ nameWithoutSpecialChars
-        $ replacePlus
-        $ T.unpack name
+   in replaceReservedWord $
+        caseFirstCharCorrectly $
+          generateNameForEmptyIdentifier name $
+            removeIllegalLeadingCharacters $
+              (if convertToCamelCase then toCamelCase else id) $
+                nameWithoutSpecialChars $
+                  replacePlus $
+                    T.unpack name
 
 -- | The same as 'haskellifyText' but transform the result to a 'Name'
 haskellifyName :: Bool -> Bool -> Text -> Name
@@ -120,24 +120,24 @@ transformToModuleName name =
       toCamelCase ('\'' : y : xs) | isCasableAlpha y = '\'' : Char.toUpper y : toCamelCase xs
       toCamelCase (x : xs) = x : toCamelCase xs
       toCamelCase xs = xs
-   in T.pack
-        $ uppercaseFirst
-        $ generateNameForEmptyIdentifier name
-        $ removeIllegalLeadingCharacters
-        $ fmap
-          ( \case
-              '\'' -> '_'
-              c -> c
-          )
-        $ toCamelCase
-        $ T.unpack
-        $ T.map
-          ( \case
-              '.' -> '\''
-              c | isValidCharaterInSuffixExceptUnderscore c -> c
-              _ -> '_'
-          )
-          name
+   in T.pack $
+        uppercaseFirst $
+          generateNameForEmptyIdentifier name $
+            removeIllegalLeadingCharacters $
+              fmap
+                ( \case
+                    '\'' -> '_'
+                    c -> c
+                )
+                $ toCamelCase $
+                  T.unpack $
+                    T.map
+                      ( \case
+                          '.' -> '\''
+                          c | isValidCharaterInSuffixExceptUnderscore c -> c
+                          _ -> '_'
+                      )
+                      name
 
 uppercaseFirst :: String -> String
 uppercaseFirst (x : xs) = Char.toUpper x : xs
