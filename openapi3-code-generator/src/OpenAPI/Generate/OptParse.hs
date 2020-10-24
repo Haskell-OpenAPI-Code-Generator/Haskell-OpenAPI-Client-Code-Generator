@@ -83,7 +83,11 @@ data Flags = Flags
     -- | The prefix which is added to header parameters
     flagParameterHeaderPrefix :: Text,
     -- | The operations to generate (if empty all operations are generated)
-    flagOperationsToGenerate :: [Text]
+    flagOperationsToGenerate :: [Text],
+    -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
+    -- which are not further investigated while generating code from the specification.
+    -- Only a type alias to 'Aeson.Value' is created for these schemas.
+    flagOpaqueSchemas :: [Text]
   }
   deriving (Show, Eq)
 
@@ -116,6 +120,7 @@ parseFlags =
     <*> parseFlagParameterCookiePrefix
     <*> parseFlagParameterHeaderPrefix
     <*> parseFlagOperationsToGenerate
+    <*> parseFlagOpaqueSchemas
 
 parseFlagOutputDir :: Parser Text
 parseFlagOutputDir =
@@ -369,4 +374,14 @@ parseFlagOperationsToGenerate =
         [ metavar "OPERATIONID",
           help "If not all operations should be generated, this option can be used to specify all of them which should be generated. The value has to correspond to the value in the 'operationId' field in the OpenAPI 3 specification.",
           long "operation-to-generate"
+        ]
+
+parseFlagOpaqueSchemas :: Parser [Text]
+parseFlagOpaqueSchemas =
+  many $
+    strOption $
+      mconcat
+        [ metavar "SCHEMA",
+          help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which are not further investigated while generating code from the specification. Only a type alias to 'Aeson.Value' is created for these schemas.",
+          long "opaque-schema"
         ]
