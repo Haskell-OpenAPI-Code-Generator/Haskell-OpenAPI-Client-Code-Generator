@@ -24,7 +24,7 @@ jobs:
           name: Tests and coverage
           command: ./.circleci/coverage
       - store_artifacts:
-          path: ./coverage-output
+          path: ./openapi3-code-generator/coverage-output
 
   build:
     <<: *defaults
