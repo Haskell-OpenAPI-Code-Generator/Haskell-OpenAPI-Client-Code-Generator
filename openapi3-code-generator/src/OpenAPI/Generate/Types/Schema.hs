@@ -14,8 +14,8 @@ module OpenAPI.Generate.Types.Schema where
 import qualified Data.Map as Map
 import qualified Data.Scientific as Scientific
 import Data.Set as Set
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Yaml
 import GHC.Generics
 import OpenAPI.Generate.Types.ExternalDocumentation
@@ -24,46 +24,45 @@ import Prelude hiding (maximum, minimum, not)
 
 type Schema = Referencable SchemaObject
 
-data SchemaObject
-  = SchemaObject
-      { type' :: SchemaType,
-        title :: Maybe Text,
-        multipleOf :: Maybe Integer,
-        maximum :: Maybe Float,
-        exclusiveMaximum :: Bool,
-        minimum :: Maybe Float,
-        exclusiveMinimum :: Bool,
-        maxLength :: Maybe Word,
-        minLength :: Maybe Word,
-        pattern' :: Maybe Text,
-        maxItems :: Maybe Word,
-        minItems :: Maybe Word,
-        uniqueItems :: Bool,
-        maxProperties :: Maybe Word,
-        minProperties :: Maybe Word,
-        required :: Set Text,
-        enum :: Set Value,
-        allOf :: Set Schema,
-        oneOf :: Set Schema,
-        anyOf :: Set Schema,
-        not :: Maybe Schema,
-        properties :: Map.Map Text Schema,
-        additionalProperties :: AdditionalProperties,
-        description :: Maybe Text,
-        format :: Maybe Text,
-        -- default would have the same value type as restricted by
-        -- the schema. Stripe only uses Text default values
-        default' :: Maybe ConcreteValue,
-        nullable :: Bool,
-        discriminator :: Maybe DiscriminatorObject,
-        readOnly :: Bool,
-        writeOnly :: Bool,
-        xml :: Maybe XMLObject,
-        externalDocs :: Maybe ExternalDocumentationObject,
-        example :: Maybe Value,
-        deprecated :: Bool,
-        items :: Maybe Schema
-      }
+data SchemaObject = SchemaObject
+  { type' :: SchemaType,
+    title :: Maybe Text,
+    multipleOf :: Maybe Integer,
+    maximum :: Maybe Float,
+    exclusiveMaximum :: Bool,
+    minimum :: Maybe Float,
+    exclusiveMinimum :: Bool,
+    maxLength :: Maybe Word,
+    minLength :: Maybe Word,
+    pattern' :: Maybe Text,
+    maxItems :: Maybe Word,
+    minItems :: Maybe Word,
+    uniqueItems :: Bool,
+    maxProperties :: Maybe Word,
+    minProperties :: Maybe Word,
+    required :: Set Text,
+    enum :: Set Value,
+    allOf :: Set Schema,
+    oneOf :: Set Schema,
+    anyOf :: Set Schema,
+    not :: Maybe Schema,
+    properties :: Map.Map Text Schema,
+    additionalProperties :: AdditionalProperties,
+    description :: Maybe Text,
+    format :: Maybe Text,
+    -- default would have the same value type as restricted by
+    -- the schema. Stripe only uses Text default values
+    default' :: Maybe ConcreteValue,
+    nullable :: Bool,
+    discriminator :: Maybe DiscriminatorObject,
+    readOnly :: Bool,
+    writeOnly :: Bool,
+    xml :: Maybe XMLObject,
+    externalDocs :: Maybe ExternalDocumentationObject,
+    example :: Maybe Value,
+    deprecated :: Bool,
+    items :: Maybe Schema
+  }
   deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON SchemaObject where
@@ -173,11 +172,10 @@ instance FromJSON SchemaType where
   parseJSON (String x) = fail $ "Only types integer, string, number, boolean, array and object are supported but got: " <> T.unpack x
   parseJSON _ = fail "type must be of type string"
 
-data DiscriminatorObject
-  = DiscriminatorObject
-      { propertyName :: Text,
-        mapping :: Map.Map Text Text
-      }
+data DiscriminatorObject = DiscriminatorObject
+  { propertyName :: Text,
+    mapping :: Map.Map Text Text
+  }
   deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON DiscriminatorObject where
@@ -229,14 +227,13 @@ instance FromJSON AdditionalProperties where
   parseJSON (Bool True) = pure HasAdditionalProperties
   parseJSON v = AdditionalPropertiesWithSchema <$> parseJSON v
 
-data XMLObject
-  = XMLObject
-      { name :: Maybe Text,
-        namespace :: Maybe Text,
-        prefix :: Maybe Text,
-        attribute :: Bool,
-        wrapped :: Bool
-      }
+data XMLObject = XMLObject
+  { name :: Maybe Text,
+    namespace :: Maybe Text,
+    prefix :: Maybe Text,
+    attribute :: Bool,
+    wrapped :: Bool
+  }
   deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON XMLObject where

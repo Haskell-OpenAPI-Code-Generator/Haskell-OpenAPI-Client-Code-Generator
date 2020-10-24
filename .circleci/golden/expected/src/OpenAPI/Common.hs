@@ -38,8 +38,8 @@ import qualified Data.ByteString.Lazy.Char8 as LB8
 import qualified Data.HashMap.Strict as HMap
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
 import qualified Network.HTTP.Client as HC
@@ -97,11 +97,10 @@ runWithConfiguration c (StripeT r) = MR.runReaderT r c
 --
 -- > defaultConfiguration
 -- >   { configSecurityScheme = bearerAuthenticationSecurityScheme "token" }
-data Configuration
-  = Configuration
-      { configBaseURL :: Text,
-        configSecurityScheme :: SecurityScheme
-      }
+data Configuration = Configuration
+  { configBaseURL :: Text,
+    configSecurityScheme :: SecurityScheme
+  }
 
 -- | Defines how a request body is encoded
 data RequestBodyEncoding
@@ -111,13 +110,12 @@ data RequestBodyEncoding
     RequestBodyEncodingFormData
 
 -- | Defines a query parameter with the information necessary for serialization
-data QueryParameter
-  = QueryParameter
-      { queryParamName :: Text,
-        queryParamValue :: Maybe Aeson.Value,
-        queryParamStyle :: Text,
-        queryParamExplode :: Bool
-      }
+data QueryParameter = QueryParameter
+  { queryParamName :: Text,
+    queryParamValue :: Maybe Aeson.Value,
+    queryParamStyle :: Text,
+    queryParamExplode :: Bool
+  }
   deriving (Show, Eq)
 
 -- | This type specifies a security scheme which can modify a request according to the scheme (e. g. add an Authorization header)
@@ -214,12 +212,12 @@ createBaseRequest ::
   -- | The Response from the server
   HS.Request
 createBaseRequest config method path queryParams =
-  configSecurityScheme config
-    $ HS.setRequestMethod (textToByte method)
-    $ HS.setRequestQueryString query
-    $ HS.setRequestPath
-      (B8.pack (T.unpack $ byteToText basePathModifier <> path))
-      baseRequest
+  configSecurityScheme config $
+    HS.setRequestMethod (textToByte method) $
+      HS.setRequestQueryString query $
+        HS.setRequestPath
+          (B8.pack (T.unpack $ byteToText basePathModifier <> path))
+          baseRequest
   where
     baseRequest = parseURL $ configBaseURL config
     basePath = HC.path baseRequest
@@ -275,9 +273,9 @@ textToByte = B8.pack . T.unpack
 
 parseURL :: Text -> HS.Request
 parseURL url =
-  Maybe.fromMaybe HS.defaultRequest
-    $ HS.parseRequest
-    $ T.unpack url
+  Maybe.fromMaybe HS.defaultRequest $
+    HS.parseRequest $
+      T.unpack url
 
 jsonToFormData :: Aeson.Value -> [(Text, Text)]
 jsonToFormData = jsonToFormDataPrefixed ""

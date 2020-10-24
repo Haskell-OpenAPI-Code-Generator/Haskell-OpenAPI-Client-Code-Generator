@@ -10,8 +10,6 @@ maintainer:          Joel Fisch <joel.fisch96@gmail.com> & Remo Dörig <remo.doe
 copyright:           "2020 Remo Dörig & Joel Fisch"
 
 extra-source-files:
-- README.md
-- ChangeLog.md
 - LICENSE
 
 description:         Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme>

@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 86db47bbf34607b1b63da475684e8f3ad50f4199434c6dfdb1fd8526d0e3c01d
+-- hash: 2c9baa547ea20206f8e472e0e4f9ff734130ea57706161cab7392ab633117890
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -20,8 +20,6 @@ license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
-    README.md
-    ChangeLog.md
     LICENSE
 
 source-repository head

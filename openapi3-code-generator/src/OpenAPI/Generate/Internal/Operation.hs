@@ -52,22 +52,20 @@ import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
 
 -- | Extracted request body information which can be used for code generation
-data RequestBodyDefinition
-  = RequestBodyDefinition
-      { schema :: OAT.Schema,
-        encoding :: OC.RequestBodyEncoding,
-        required :: Bool
-      }
+data RequestBodyDefinition = RequestBodyDefinition
+  { schema :: OAT.Schema,
+    encoding :: OC.RequestBodyEncoding,
+    required :: Bool
+  }
 
 -- | Defines the type of a parameter bundle including the information to access the specific parameters
-data ParameterTypeDefinition
-  = ParameterTypeDefinition
-      { parameterTypeDefinitionType :: Q Type,
-        parameterTypeDefinitionDoc :: Q Doc,
-        parameterTypeDefinitionDependencies :: Dep.Models,
-        parameterTypeDefinitionQueryParams :: [(Name, OAT.ParameterObject)],
-        parameterTypeDefinitionPathParams :: [(Name, OAT.ParameterObject)]
-      }
+data ParameterTypeDefinition = ParameterTypeDefinition
+  { parameterTypeDefinitionType :: Q Type,
+    parameterTypeDefinitionDoc :: Q Doc,
+    parameterTypeDefinitionDependencies :: Dep.Models,
+    parameterTypeDefinitionQueryParams :: [(Name, OAT.ParameterObject)],
+    parameterTypeDefinitionPathParams :: [(Name, OAT.ParameterObject)]
+  }
 
 -- | Represents the number of (supported) parameters and the generated types which result of it
 --
@@ -132,9 +130,9 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
             Set.fromList $
               fst <$> filter ((OAT.required :: OAT.ParameterObject -> Bool) . fst . snd) parametersWithNames
       (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, parameterTypeDefinitionDependencies)) <-
-        Model.defineModelForSchemaNamed schemaName
-          $ OAT.Concrete
-          $ OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
+        Model.defineModelForSchemaNamed schemaName $
+          OAT.Concrete $
+            OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
       convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
       let parametersWithPropertyNames = BF.bimap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText) fst <$> parametersWithNames
           filterByType t = filter ((== t) . getInFromParameterObject . snd) parametersWithPropertyNames
@@ -207,8 +205,8 @@ getNameFromParameter = OAT.name
 getParametersTypeForSignature :: [Q Type] -> Name -> Name -> Q Type
 getParametersTypeForSignature types responseTypeName monadName =
   createFunctionType
-    ( [t|OC.Configuration|]
-        : types
+    ( [t|OC.Configuration|] :
+      types
         <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
@@ -431,15 +429,16 @@ generateQueryParams =
                 OAT.SimpleParameterObjectSchema {..} -> (style, explode)
                 OAT.ComplexParameterObjectSchema _ -> (Just "form", True)
               style' =
-                stringE $ T.unpack $
-                  Maybe.fromMaybe
-                    ( case OAT.in' (param :: OAT.ParameterObject) of
-                        OAT.QueryParameterObjectLocation -> "form"
-                        OAT.HeaderParameterObjectLocation -> "simple"
-                        OAT.PathParameterObjectLocation -> "simple"
-                        OAT.CookieParameterObjectLocation -> "form"
-                    )
-                    maybeStyle
+                stringE $
+                  T.unpack $
+                    Maybe.fromMaybe
+                      ( case OAT.in' (param :: OAT.ParameterObject) of
+                          OAT.QueryParameterObjectLocation -> "form"
+                          OAT.HeaderParameterObjectLocation -> "simple"
+                          OAT.PathParameterObjectLocation -> "simple"
+                          OAT.CookieParameterObjectLocation -> "form"
+                      )
+                      maybeStyle
               expr =
                 if required
                   then [|Just $ Aeson.toJSON $var|]
@@ -467,11 +466,12 @@ generateParameterizedRequestPath _ path = stringE $ T.unpack path
 -- If neither is available, an empty description is used.
 getOperationDescription :: OAT.OperationObject -> Text
 getOperationDescription operation =
-  Maybe.fromMaybe "" $ Maybe.listToMaybe $
-    Maybe.catMaybes
-      [ OAT.description (operation :: OAT.OperationObject),
-        OAT.summary (operation :: OAT.OperationObject)
-      ]
+  Maybe.fromMaybe "" $
+    Maybe.listToMaybe $
+      Maybe.catMaybes
+        [ OAT.description (operation :: OAT.OperationObject),
+          OAT.summary (operation :: OAT.OperationObject)
+        ]
 
 -- | Constructs the name of an operation.
 -- If an 'OAT.operationId' is available, this is the primary choice.

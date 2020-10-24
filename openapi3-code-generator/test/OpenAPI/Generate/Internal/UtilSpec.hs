@@ -50,19 +50,19 @@ isValidSuffix = all (\x -> isValidSmall x || isValidLarge x || Char.isDigit x ||
 spec :: Spec
 spec = do
   describe "haskellifyText" $ do
-    it "uppercase without CamelCase"
-      $ forAllValid
-      $ isValidConId . haskellifyText False True
-    it "uppercase with CamelCase"
-      $ forAllValid
-      $ isValidConId . haskellifyText True True
-    it "lowercase without CamelCase"
-      $ forAllValid
-      $ isValidVarId . haskellifyText False False
-    it "lowercase with CamelCase"
-      $ forAllValid
-      $ isValidVarId . haskellifyText True False
-  describe "transformToModuleName"
-    $ it "should be valid module name"
-    $ forAllValid
-    $ isValidConId . T.unpack . transformToModuleName
+    it "uppercase without CamelCase" $
+      forAllValid $
+        isValidConId . haskellifyText False True
+    it "uppercase with CamelCase" $
+      forAllValid $
+        isValidConId . haskellifyText True True
+    it "lowercase without CamelCase" $
+      forAllValid $
+        isValidVarId . haskellifyText False False
+    it "lowercase with CamelCase" $
+      forAllValid $
+        isValidVarId . haskellifyText True False
+  describe "transformToModuleName" $
+    it "should be valid module name" $
+      forAllValid $
+        isValidConId . T.unpack . transformToModuleName

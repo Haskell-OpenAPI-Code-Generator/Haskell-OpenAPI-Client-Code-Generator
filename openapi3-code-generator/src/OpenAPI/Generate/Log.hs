@@ -29,12 +29,11 @@ instance Read LogSeverity where
   readsPrec _ _ = []
 
 -- | A log entry containing the location within the OpenAPI specification where the message was produced, a severity and the actual message.
-data LogEntry
-  = LogEntry
-      { logEntryPath :: [Text],
-        logEntrySeverity :: LogSeverity,
-        logEntryMessage :: Text
-      }
+data LogEntry = LogEntry
+  { logEntryPath :: [Text],
+    logEntrySeverity :: LogSeverity,
+    logEntryMessage :: Text
+  }
   deriving (Show, Eq)
 
 -- | The type contained in the writer of the 'OpenAPI.Generate.Monad.Generator' used to collect log entries
