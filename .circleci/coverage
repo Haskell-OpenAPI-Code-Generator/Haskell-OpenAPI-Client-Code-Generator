@@ -47,10 +47,14 @@ set -e
 
 cd $root
 
+mv coverage-files openapi3-code-generator
+
+cd openapi3-code-generator
+
 rm -rf tix-output
 mkdir tix-output
 
-PKG_NAME=$(openapi3-code-generator/*.cabal | grep "name:" | sed "s/name:\s*\(.*\)/\1/")
+PKG_NAME=$(cat *.cabal | grep "name:" | sed "s/name: *//g")
 PKG_HASH=$(ls $(stack path --dist-dir)/hpc | grep $PKG_NAME | sed "s/$PKG_NAME-[0-9]*-\([0-9A-Za-z]*\)/\1/g")
 
 for file in $(ls coverage-files); do
