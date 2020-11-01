@@ -87,7 +87,11 @@ data Flags = Flags
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which are not further investigated while generating code from the specification.
     -- Only a type alias to 'Aeson.Value' is created for these schemas.
-    flagOpaqueSchemas :: [Text]
+    flagOpaqueSchemas :: [Text],
+    -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
+    -- which need to be generated.
+    -- For all other schemas only a type alias to 'Aeson.Value' is created.
+    flagWhiteListedSchemas :: [Text]
   }
   deriving (Show, Eq)
 
@@ -121,6 +125,7 @@ parseFlags =
     <*> parseFlagParameterHeaderPrefix
     <*> parseFlagOperationsToGenerate
     <*> parseFlagOpaqueSchemas
+    <*> parseFlagWhiteListedSchemas
 
 parseFlagOutputDir :: Parser Text
 parseFlagOutputDir =
@@ -384,4 +389,14 @@ parseFlagOpaqueSchemas =
         [ metavar "SCHEMA",
           help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which are not further investigated while generating code from the specification. Only a type alias to 'Aeson.Value' is created for these schemas.",
           long "opaque-schema"
+        ]
+
+parseFlagWhiteListedSchemas :: Parser [Text]
+parseFlagWhiteListedSchemas =
+  many $
+    strOption $
+      mconcat
+        [ metavar "SCHEMA",
+          help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created.",
+          long "white-listed-schema"
         ]

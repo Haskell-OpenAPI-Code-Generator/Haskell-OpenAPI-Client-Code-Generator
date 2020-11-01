@@ -96,18 +96,21 @@ showAesonValue = LT.toStrict . Aeson.encodeToLazyText
 -- | Defines all the models for a schema
 defineModelForSchema :: Text -> OAS.Schema -> OAM.Generator Dep.ModelWithDependencies
 defineModelForSchema schemaName schema = do
-  let alias =
-        createAlias schemaName "This alias is created because of the generator configuration and possibly could have a more precise type." CreateTypeAlias $
+  let aliasWithText description =
+        createAlias schemaName description CreateTypeAlias $
           pure ([t|Aeson.Value|], (emptyDoc, Set.empty))
+      blackListAlias = aliasWithText "This alias is created because of the generator configuration and possibly could have a more precise type."
+      whiteListAlias = aliasWithText $ "This is just a type synonym and possibly could have a more precise type because the schema name @" <> schemaName <> "@ is not whitelisted."
   opaqueSchemasM <- OAM.getFromGeneratorConfiguration OAG.generatorConfigurationOpaqueSchemas
   flagOpaqueSchemas <- OAM.getFlag OAO.flagOpaqueSchemas
+  whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
   namedSchema <-
     OAM.nested schemaName $
       if schemaName `elem` flagOpaqueSchemas
-        then alias
+        then blackListAlias
         else case opaqueSchemasM of
-          Just opaqueSchemas | schemaName `elem` opaqueSchemas -> alias
-          _ -> defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema
+          Just opaqueSchemas | schemaName `elem` opaqueSchemas -> blackListAlias
+          _ -> if null whiteListedSchemas || schemaName `elem` whiteListedSchemas then defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema else whiteListAlias
   pure (transformToModuleName schemaName, snd namedSchema)
 
 -- | Defines all the models for a schema and returns the declarations with the type of the root model
