@@ -6,6 +6,7 @@
 , moduleName
 , extraFlags ? [ ]
 , operations ? [ ] # Empty list means "All operations"
+, schemas ? [ ] # if 'operations' is also empty, this means "All schemas"
 }:
 
 with pkgs.lib;
@@ -13,10 +14,11 @@ with pkgs.haskell.lib;
 let
   localPkgs = import ./pkgs.nix;
   extraFlagsStr = concatStringsSep " " extraFlags;
+  omitFlag = optionalString (schemas != [] && operations != []) "--omit-additional-operation-functions";
   operationFlag = operation: "--operation-to-generate '${operation}'";
-  operationsFlags = optionalString (operations != [ ]) ''
-    --omit-additional-operation-functions ${concatStringsSep " " (map operationFlag operations)}
-  '';
+  operationsFlags = concatStringsSep " " (map operationFlag operations);
+  schemaFlag = schema: "--white-listed-schema '${schema}'";
+  schemasFlags = concatStringsSep " " (map schemaFlag schemas);
   generatedCode = pkgs.stdenv.mkDerivation {
     name = "generated-${name}";
     buildInputs = [
@@ -33,8 +35,7 @@ let
         --module-name "${moduleName}" \
         --package-name "${packageName}" \
         --output-dir "$out" \
-        ${extraFlagsStr} \
-        ${operationsFlags}
+        ${extraFlagsStr} ${omitFlag} ${operationsFlags} ${schemasFlags}
 
       set +x
     '';
