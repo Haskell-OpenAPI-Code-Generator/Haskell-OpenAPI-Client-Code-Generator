@@ -419,7 +419,8 @@ getResponseObject (OAT.Reference ref) = do
 
 -- | Generates query params in the form of [(Text,ByteString)]
 generateQueryParams :: [(Q Exp, OAT.ParameterObject)] -> Q Exp
-generateQueryParams =
+generateQueryParams [] = [|mempty|]
+generateQueryParams x =
   listE
     . fmap
       ( \(var, param) ->
@@ -445,6 +446,7 @@ generateQueryParams =
                   else [|Aeson.toJSON <$> $var|]
            in [|OC.QueryParameter (T.pack $queryName) $expr (T.pack $style') explode'|]
       )
+    $ x
 
 -- | Resolves placeholders in paths with dynamic expressions
 --
