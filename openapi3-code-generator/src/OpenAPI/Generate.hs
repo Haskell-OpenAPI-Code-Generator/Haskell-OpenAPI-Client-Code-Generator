@@ -1,5 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- | Functionality to Generate Haskell Code out of an OpenAPI definition File
 module OpenAPI.Generate where
@@ -45,7 +46,7 @@ runGenerator =
         let flags = OAO.optFlags options
         spec <- decodeOpenApi $ OAO.optSpecification options
         generatorConfiguration <- maybe (pure Nothing) ((pure . Just) <=< decodeGeneratorConfiguration) $ OAO.flagGeneratorConfigurationFile flags
-        (moduleFiles, projectFiles) <- OAI.generateFilesToCreate spec options generatorConfiguration
+        outFiles@OAI.OutputFiles {..} <- OAI.generateFilesToCreate spec options generatorConfiguration
         if OAO.flagDryRun flags
           then
             mapM_
@@ -60,6 +61,6 @@ runGenerator =
             proceed <- OAI.permitProceed flags
             if proceed
               then do
-                OAI.writeFiles flags moduleFiles projectFiles
+                OAI.writeFiles flags outFiles
                 putStrLn "finished"
               else putStrLn "aborted"
