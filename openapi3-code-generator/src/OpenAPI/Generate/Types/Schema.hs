@@ -184,25 +184,6 @@ instance FromJSON DiscriminatorObject where
       <$> o .: "propertyName"
       <*> o .:? "mapping" .!= Map.empty
 
--- So that Sets are possible
-instance Ord Value where
-  (Object a) `compare` (Object b) = compare a b
-  (Array a) `compare` (Array b) = compare a b
-  (String a) `compare` (String b) = compare a b
-  (Number a) `compare` (Number b) = compare a b
-  (Bool a) `compare` (Bool b) = compare a b
-  Null `compare` Null = EQ
-  (Object _) `compare` _ = GT
-  _ `compare` (Object _) = LT
-  (Array _) `compare` _ = GT
-  _ `compare` (Array _) = LT
-  (String _) `compare` _ = GT
-  _ `compare` (String _) = LT
-  (Number _) `compare` _ = GT
-  _ `compare` (Number _) = LT
-  (Bool _) `compare` _ = GT
-  _ `compare` (Bool _) = LT
-
 data ConcreteValue
   = StringDefaultValue Text
   | NumericDefaultValue Scientific.Scientific
