@@ -36,6 +36,7 @@ dependencies:
 - hashmap
 - directory
 - filepath
+- record-hasfield
 
 library:
   source-dirs: src

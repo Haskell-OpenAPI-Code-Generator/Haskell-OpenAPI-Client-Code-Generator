@@ -31,6 +31,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as LT
 import Data.Time.Calendar
+import qualified GHC.Records.Extra as Records
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import Language.Haskell.TH.Syntax
@@ -572,6 +573,8 @@ defineObjectModelForSchema strategy schemaName schema =
           toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues
           fromJsonInstance = createFromJSONImplementation name propsWithNames required
           mkFunction = createMkFunction name propsWithNames required bangTypes
+          hasFieldInstances = createHasFieldImplementation name propsWithNames bangTypes
+ 
       pure
         ( varT name,
           ( pure
@@ -584,6 +587,7 @@ defineObjectModelForSchema strategy schemaName schema =
               `appendDoc` dataDefinition
               `appendDoc` toJsonInstance
               `appendDoc` fromJsonInstance
+              `appendDoc` hasFieldInstances
               `appendDoc` mkFunction
               `appendDoc` propertyContent,
             propertyDependencies
@@ -702,6 +706,43 @@ createFromJSONImplementation objectName recordNames required =
                   []
               ]
           ]
+
+createHasFieldImplementation :: Name -> [(Text, Name)] -> Q [VarBangType] -> Q Doc
+createHasFieldImplementation name propsWithNames bangTypes = do
+  bangs <- bangTypes
+
+  let recordVar = mkName "r"
+      valueVar = mkName "a"
+
+      propsWithTypes =
+        ( \((originalName, propertyName), (_, _, propertyType)) ->
+            (propertyName, propertyType, originalName)
+        )
+          <$> zip propsWithNames bangs
+     
+      setExpr propertyName =
+        lamE [varP valueVar] $
+          recUpdE (varE recordVar) [fieldExp propertyName (varE valueVar)]
+
+      getExpr propertyName =
+        varE propertyName `appE` varE recordVar
+        
+      fieldInstance (propertyName, propertyType, originalName) =
+        instanceD
+        (pure [])
+        [t|Records.HasField $(litT (strTyLit (T.unpack originalName))) $(varT name) $(pure propertyType)|]
+        [ funD
+            (mkName "hasField")
+            [ clause
+                [varP recordVar]
+                (normalB (tupE [setExpr propertyName, getExpr propertyName]))
+                []
+            ]
+        ]
+
+  instances <- traverse fieldInstance propsWithTypes
+
+  foldl (\doc x -> doc `appendDoc` pure (ppr x)) emptyDoc instances
 
 -- | create "bangs" record fields for properties
 propertiesToBangTypes :: Text -> [(Text, OAS.Schema)] -> Set.Set Text -> OAM.Generator BangTypesSelfDefined

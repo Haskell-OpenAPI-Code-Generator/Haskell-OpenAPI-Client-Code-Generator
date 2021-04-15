@@ -71,6 +71,7 @@ stackProjectFiles packageName moduleName modulesToExport =
                "    , time",
                "    , mtl",
                "    , transformers",
+               "    , record-hasfield",
                "  default-language: Haskell2010"
              ]
     ),

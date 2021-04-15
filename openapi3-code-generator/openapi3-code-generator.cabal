@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2c9baa547ea20206f8e472e0e4f9ff734130ea57706161cab7392ab633117890
+-- hash: 3986e6b54b70c5c0f96dbea48679efbd9fa6f149b9f905c877b441555204b7b7
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -68,6 +68,7 @@ library
     , http-types
     , mtl
     , optparse-applicative
+    , record-hasfield
     , scientific
     , split
     , template-haskell
@@ -100,6 +101,7 @@ executable openapi3-code-generator-exe
     , mtl
     , openapi3-code-generator
     , optparse-applicative
+    , record-hasfield
     , scientific
     , split
     , template-haskell
@@ -145,6 +147,7 @@ test-suite openapi3-code-generator-test
     , mtl
     , openapi3-code-generator
     , optparse-applicative
+    , record-hasfield
     , scientific
     , split
     , template-haskell

@@ -181,9 +181,12 @@ sideBySide leftDoc rightDoc =
 addOperationsModuleHeader :: String -> String -> String -> Doc -> Doc
 addOperationsModuleHeader mainModuleName moduleName operationId =
   generatorNote
-    . languageExtension "OverloadedStrings"
+    . languageExtension "DataKinds"
     . languageExtension "ExplicitForAll"
+    . languageExtension "FlexibleInstances"
+    . languageExtension "MultiParamTypeClasses"
     . languageExtension "MultiWayIf"
+    . languageExtension "OverloadedStrings"
     . emptyLine
     . moduleDescription ("Contains the different functions to run the operation " <> operationId)
     . moduleDeclaration (mainModuleName <> ".Operations") moduleName
@@ -213,6 +216,7 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "GHC.Int"
     . importQualified "GHC.Show"
     . importQualified "GHC.Types"
+    . importQualified "GHC.Records.Compat"
     . importQualified "Network.HTTP.Client"
     . importQualified "Network.HTTP.Client as Network.HTTP.Client.Request"
     . importQualified "Network.HTTP.Client as Network.HTTP.Client.Types"
@@ -228,8 +232,12 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
 addModelModuleHeader :: String -> String -> [String] -> String -> Doc -> Doc
 addModelModuleHeader mainModuleName moduleName modelModulesToImport description =
   generatorNote
-    . languageExtension "OverloadedStrings"
+    . languageExtension "DataKinds"
+    . languageExtension "ExplicitForAll"
+    . languageExtension "FlexibleInstances"
+    . languageExtension "MultiParamTypeClasses"
     . languageExtension "MultiWayIf"
+    . languageExtension "OverloadedStrings"
     . emptyLine
     . moduleDescription description
     . moduleDeclaration mainModuleName moduleName
@@ -256,6 +264,7 @@ addModelModuleHeader mainModuleName moduleName modelModulesToImport description 
     . importQualified "GHC.Int"
     . importQualified "GHC.Show"
     . importQualified "GHC.Types"
+    . importQualified "GHC.Records.Compat"
     . importQualified (mainModuleName <> ".Common")
     . (if moduleName == typeAliasModule then id else importUnqualified (mainModuleName <> "." <> typeAliasModule))
     . (vcat (fmap (text . ("import {-# SOURCE #-} " <>) . ((mainModuleName <> ".") <>)) modelModulesToImport) $$)
