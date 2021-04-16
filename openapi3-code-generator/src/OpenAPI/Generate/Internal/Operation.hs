@@ -121,8 +121,7 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
       properties <-
         mapM
           ( \((parameter, _), schema) -> do
-              prefix <- getParameterLocationPrefix parameter
-              pure (prefix <> uppercaseFirstText (getNameFromParameter parameter), schema)
+              pure (getNameFromParameter parameter, schema)
           )
           parametersWithSchemas
       let parametersWithNames = zip (fst <$> properties) (fst <$> parametersWithSchemas)
