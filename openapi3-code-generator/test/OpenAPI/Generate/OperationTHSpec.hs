@@ -38,7 +38,7 @@ spec =
           singleTestTH
             "should generate empty list"
             (generateQueryParams [])
-            [|[]|]
+            [|mempty|]
         describe "generateParameterizedRequestPath" $ do
           singleTestTH
             "should not change empty path without arguments"
