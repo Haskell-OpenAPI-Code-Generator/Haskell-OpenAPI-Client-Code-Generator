@@ -1,5 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -32,7 +33,7 @@ srcDirectory :: FilePath
 srcDirectory = "src"
 
 -- | Creates files from mostly static data
-stackProjectFiles ::
+cabalProjectFiles ::
   -- | Name of the cabal project
   String ->
   -- | Name of the module
@@ -40,7 +41,7 @@ stackProjectFiles ::
   -- | Modules to export
   [String] ->
   FilesWithContent
-stackProjectFiles packageName moduleName modulesToExport =
+cabalProjectFiles packageName moduleName modulesToExport =
   [ ( packageName ++ ".cabal",
       unlines $
         [ "cabal-version: 1.12",
@@ -73,12 +74,41 @@ stackProjectFiles packageName moduleName modulesToExport =
                "    , transformers",
                "  default-language: Haskell2010"
              ]
-    ),
-    ( "stack.yaml",
+    )
+  ]
+
+-- | Creates stack support files
+stackProjectFiles ::
+  FilesWithContent
+stackProjectFiles =
+  [ ( "stack.yaml",
       unlines
         [ "resolver: lts-15.3",
           "packages:",
           "- ."
+        ]
+    )
+  ]
+
+-- | Creates nix support files
+nixProjectFiles ::
+  -- | Name of the cabal project
+  String ->
+  FilesWithContent
+nixProjectFiles packageName =
+  [ ( "default.nix",
+      unlines
+        [ "{ pkgs ? import <nixpkgs> {} }:",
+          "let",
+          "  src = pkgs.nix-gitignore.gitignoreSource [ ] ./.;",
+          "in",
+          "  pkgs.haskellPackages.callCabal2nix \"" ++ packageName ++ "\" ./. { }"
+        ]
+    ),
+    ( "shell.nix",
+      unlines
+        [ "{ pkgs ? import <nixpkgs> {} }:",
+          "(import ./default.nix { inherit pkgs; }).env"
         ]
     )
   ]
@@ -152,7 +182,14 @@ getHsBootFiles flags modelModules =
           )
           modelModules
 
-generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Options -> Maybe OAG.GeneratorConfiguration -> IO (FilesWithContent, FilesWithContent)
+data OutputFiles = OutputFiles
+  { moduleFiles :: FilesWithContent,
+    cabalFiles :: FilesWithContent,
+    stackFiles :: FilesWithContent,
+    nixFiles :: FilesWithContent
+  }
+
+generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Options -> Maybe OAG.GeneratorConfiguration -> IO OutputFiles
 generateFilesToCreate spec options generatorConfiguration = do
   let flags = OAO.optFlags options
       outputDirectory = T.unpack $ OAO.flagOutputDir flags
@@ -188,16 +225,19 @@ generateFilesToCreate spec options generatorConfiguration = do
       mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
       mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
       hsBootFiles = getHsBootFiles flags modelModules
-  pure
-    ( BF.second (unlines . lines)
-        <$> (mainFile, mainModuleContent) :
-      (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
-        <> hsBootFiles,
-      BF.first (outputDirectory </>) <$> stackProjectFiles packageName moduleName modulesToExport
-    )
+  pure $
+    OutputFiles
+      ( BF.second (unlines . lines)
+          <$> (mainFile, mainModuleContent) :
+        (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+          <> hsBootFiles
+      )
+      (BF.first (outputDirectory </>) <$> cabalProjectFiles packageName moduleName modulesToExport)
+      (BF.first (outputDirectory </>) <$> stackProjectFiles)
+      (BF.first (outputDirectory </>) <$> nixProjectFiles packageName)
 
-writeFiles :: OAO.Flags -> FilesWithContent -> FilesWithContent -> IO ()
-writeFiles flags moduleFiles projectFiles = do
+writeFiles :: OAO.Flags -> OutputFiles -> IO ()
+writeFiles flags OutputFiles {..} = do
   let outputDirectory = T.unpack $ OAO.flagOutputDir flags
       moduleName = T.unpack $ OAO.flagModuleName flags
       incremental = OAO.flagIncremental flags
@@ -207,8 +247,11 @@ writeFiles flags moduleFiles projectFiles = do
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
   write moduleFiles
+  write cabalFiles
   unless (OAO.flagDoNotGenerateStackProject flags) $
-    write projectFiles
+    write stackFiles
+  unless (OAO.flagDoNotGenerateNixFiles flags) $
+    write nixFiles
 
 writeFileIncremental :: FileWithContent -> IO ()
 writeFileIncremental (filePath, content) = do

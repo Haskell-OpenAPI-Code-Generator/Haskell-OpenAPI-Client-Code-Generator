@@ -50,6 +50,8 @@ data Flags = Flags
     flagDryRun :: Bool,
     -- | Do not generate a stack project alongside the raw Haskell files
     flagDoNotGenerateStackProject :: Bool,
+    -- | Do not generate Nix files (default.nix and shell.nix)
+    flagDoNotGenerateNixFiles :: Bool,
     -- | Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration
     flagOmitAdditionalOperationFunctions :: Bool,
     -- | Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)
@@ -107,6 +109,7 @@ parseFlags =
     <*> parseFlagIncremental
     <*> parseFlagDryRun
     <*> parseFlagDoNotGenerateStackProject
+    <*> parseFlagDoNotGenerateNixFiles
     <*> parseFlagOmitAdditionalOperationFunctions
     <*> parseFlagGenerateOptionalEmptyRequestBody
     <*> parseFlagUseNumberedVariantConstructors
@@ -215,6 +218,14 @@ parseFlagDoNotGenerateStackProject =
     mconcat
       [ help "Do not generate a stack project alongside the raw Haskell files",
         long "do-not-generate-stack-project"
+      ]
+
+parseFlagDoNotGenerateNixFiles :: Parser Bool
+parseFlagDoNotGenerateNixFiles =
+  switch $
+    mconcat
+      [ help "Do not generate Nix files alongside the raw Haskell files",
+        long "do-not-generate-nix-files"
       ]
 
 parseFlagOmitAdditionalOperationFunctions :: Parser Bool
