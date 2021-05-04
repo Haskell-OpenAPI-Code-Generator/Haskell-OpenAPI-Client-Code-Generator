@@ -10,7 +10,7 @@ module OpenAPI.Generate.ModelDependencies
   )
 where
 
-import Data.List
+import Data.List (find, isPrefixOf, partition)
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Data.Text (Text)
