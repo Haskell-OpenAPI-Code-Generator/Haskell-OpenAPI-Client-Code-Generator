@@ -42,7 +42,7 @@ data CoverType = CoverType {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CoverType
-    where toJSON obj = Data.Aeson.Types.Internal.object ("cover" Data.Aeson.Types.ToJSON..= coverTypeCover obj : [])
+    where toJSON obj = Data.Aeson.Types.Internal.object ("cover" Data.Aeson.Types.ToJSON..= coverTypeCover obj : GHC.Base.mempty)
           toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("cover" Data.Aeson.Types.ToJSON..= coverTypeCover obj)
 instance Data.Aeson.Types.FromJSON.FromJSON CoverType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "CoverType" (\obj -> GHC.Base.pure CoverType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "cover"))
