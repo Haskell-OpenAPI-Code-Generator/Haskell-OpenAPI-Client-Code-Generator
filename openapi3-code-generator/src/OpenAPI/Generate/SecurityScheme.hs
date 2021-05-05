@@ -10,7 +10,7 @@ where
 
 import qualified Data.Bifunctor as BF
 import qualified Data.Maybe as Maybe
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified Network.HTTP.Client as HC
@@ -42,6 +42,12 @@ defineSecurityScheme moduleName (OAT.HttpSecuritySchemeObject scheme) =
    in case OAT.scheme scheme of
         "basic" -> Just $ basicAuthenticationScheme moduleName description
         "bearer" -> Just $ bearerAuthenticationScheme moduleName description
+        _ -> Nothing
+defineSecurityScheme moduleName (OAT.ApiKeySecuritySchemeObject scheme) =
+  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.description (scheme :: OAT.ApiKeySecurityScheme)
+      name = OAT.name (scheme :: OAT.ApiKeySecurityScheme)
+   in case OAT.in' (scheme :: OAT.ApiKeySecurityScheme) of
+        OAT.HeaderApiKeySecuritySchemeLocation -> Just $ apiKeyInHeaderAuthenticationScheme name moduleName description
         _ -> Nothing
 defineSecurityScheme _ _ = Nothing
 
@@ -121,6 +127,33 @@ bearerAuthenticationScheme moduleName description =
                   "@",
                   "'" <> moduleName <> ".Configuration.defaultConfiguration'",
                   "  { configSecurityScheme = 'bearerAuthenticationSecurityScheme' \"token\"",
+                  "  }",
+                  "@"
+                ]
+                $$
+            )
+              . ppr
+              <$> functionType,
+            ppr <$> functionBody
+          ]
+
+-- | ApiKeyAuthentication scheme with a bearer token
+apiKeyInHeaderAuthenticationScheme :: Text -> Text -> Text -> Q Doc
+apiKeyInHeaderAuthenticationScheme headerName moduleName description =
+  let fnName = mkName "apiKeyInHeaderAuthenticationSecurityScheme"
+      functionType = sigD fnName [t|Text -> OC.SecurityScheme|]
+      headerName' = Data.Text.unpack headerName
+      functionBody = [d|$(varP fnName) = HS.addRequestHeader headerName' . OC.textToByte|]
+   in vcat
+        <$> sequence
+          [ ( Doc.generateHaddockComment
+                [ "Use this security scheme to use token in HTTP header for authentication. Should be used in a 'OpenAPI.Common.Configuration'.",
+                  "",
+                  description,
+                  "",
+                  "@",
+                  "'" <> moduleName <> ".Configuration.defaultConfiguration'",
+                  "  { configSecurityScheme = 'apiKeyInHeaderAuthenticationSecurityScheme' \"token\"",
                   "  }",
                   "@"
                 ]
