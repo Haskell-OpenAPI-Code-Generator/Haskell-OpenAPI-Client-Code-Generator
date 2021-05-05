@@ -42,7 +42,7 @@ data PetByType = PetByType {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByType
-    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByTypeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj : [])
+    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByTypeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj : GHC.Base.mempty)
           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("hunts" Data.Aeson.Types.ToJSON..= petByTypeHunts obj) GHC.Base.<> ("pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))

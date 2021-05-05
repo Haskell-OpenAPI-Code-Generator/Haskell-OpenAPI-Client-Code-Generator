@@ -241,17 +241,25 @@ writeFiles flags OutputFiles {..} = do
   let outputDirectory = T.unpack $ OAO.flagOutputDir flags
       moduleName = T.unpack $ OAO.flagModuleName flags
       incremental = OAO.flagIncremental flags
-      write = mapM_ $ if incremental then writeFileIncremental else uncurry writeFile
+      write = mapM_ $ if incremental then writeFileIncremental else writeFileWithLog
+  putStrLn "Remove old output directory"
   unless incremental $
     tryIOError (removeDirectoryRecursive outputDirectory) >> pure ()
+  putStrLn "Output directory removed, create missing directories"
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
+  putStrLn "Directories created"
   write moduleFiles
   write cabalFiles
   unless (OAO.flagDoNotGenerateStackProject flags) $
     write stackFiles
   unless (OAO.flagDoNotGenerateNixFiles flags) $
     write nixFiles
+
+writeFileWithLog :: FileWithContent -> IO ()
+writeFileWithLog (filePath, content) = do
+  putStrLn $ "Write file to path: " <> filePath
+  writeFile filePath content
 
 writeFileIncremental :: FileWithContent -> IO ()
 writeFileIncremental (filePath, content) = do

@@ -3,7 +3,7 @@
 
 module OpenAPI.Generate.Log where
 
-import Data.List
+import Data.List (intersperse)
 import Data.Text (Text)
 import qualified Data.Text as T
 

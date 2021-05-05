@@ -194,8 +194,8 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
   let schemaDescription = getDescriptionOfSchema schema
       typeAliasing = createAlias schemaName schemaDescription strategy
   case schema of
-    OAS.SchemaObject {type' = OAS.SchemaTypeArray, ..} -> defineArrayModelForSchema strategy schemaName schema
-    OAS.SchemaObject {type' = OAS.SchemaTypeObject, ..} ->
+    OAS.SchemaObject {type' = OAS.SchemaTypeArray} -> defineArrayModelForSchema strategy schemaName schema
+    OAS.SchemaObject {type' = OAS.SchemaTypeObject} ->
       let allOfNull = Set.null $ OAS.allOf schema
           oneOfNull = Set.null $ OAS.oneOf schema
           anyOfNull = Set.null $ OAS.anyOf schema
@@ -775,21 +775,21 @@ getConstraintDescriptionsOfSchema schema =
 
 -- | Extracts the 'Name' of a 'OAS.SchemaObject' which should be used for primitive types
 getSchemaType :: OAO.Flags -> OAS.SchemaObject -> Name
-getSchemaType OAO.Flags {flagUseIntWithArbitraryPrecision = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeInteger, ..} = ''Integer
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int32", ..} = ''Int.Int32
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int64", ..} = ''Int.Int64
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, ..} = ''Int
-getSchemaType OAO.Flags {flagUseFloatWithArbitraryPrecision = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeNumber, ..} = ''Scientific.Scientific
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "float", ..} = ''Float
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "double", ..} = ''Double
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, ..} = ''Double
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "byte", ..} = ''OC.JsonByteString
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary", ..} = ''OC.JsonByteString
-getSchemaType OAO.Flags {flagUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date", ..} = ''Day
-getSchemaType OAO.Flags {flagUseDateTypesAsString = True, ..} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time", ..} = ''OC.JsonDateTime
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, ..} = ''Text
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool, ..} = ''Bool
-getSchemaType _ OAS.SchemaObject {..} = ''Text
+getSchemaType OAO.Flags {flagUseIntWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Integer
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int32"} = ''Int.Int32
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int64"} = ''Int.Int64
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Int
+getSchemaType OAO.Flags {flagUseFloatWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Scientific.Scientific
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "float"} = ''Float
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "double"} = ''Double
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Double
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "byte"} = ''OC.JsonByteString
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary"} = ''OC.JsonByteString
+getSchemaType OAO.Flags {flagUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date"} = ''Day
+getSchemaType OAO.Flags {flagUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time"} = ''OC.JsonDateTime
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString} = ''Text
+getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool} = ''Bool
+getSchemaType _ OAS.SchemaObject {} = ''Text
 
 getCurrentPathEscaped :: OAM.Generator Text
 getCurrentPathEscaped = Doc.escapeText . T.intercalate "." <$> OAM.getCurrentPath

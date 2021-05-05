@@ -50,7 +50,7 @@ data PetByAge = PetByAge {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAge
-    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeAnother_relative obj : "first_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relative obj : "nickname" Data.Aeson.Types.ToJSON..= petByAgeNickname obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeRelative obj : [])
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeAnother_relative obj : "first_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relative obj : "nickname" Data.Aeson.Types.ToJSON..= petByAgeNickname obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeRelative obj : GHC.Base.mempty)
           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeAnother_relative obj) GHC.Base.<> (("first_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relative obj) GHC.Base.<> (("nickname" Data.Aeson.Types.ToJSON..= petByAgeNickname obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAge
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAge" (\obj -> ((((GHC.Base.pure PetByAge GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "first_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "nickname")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
@@ -73,7 +73,7 @@ data PetByAgeAnother_relativeOneOf4 = PetByAgeAnother_relativeOneOf4 {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeAnother_relativeOneOf4
-    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Hunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Pet_type obj : [])
+    where toJSON obj = Data.Aeson.Types.Internal.object ("hunts" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Hunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Pet_type obj : GHC.Base.mempty)
           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("hunts" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Hunts obj) GHC.Base.<> ("pet_type" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeOneOf4Pet_type obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeOneOf4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeAnother_relativeOneOf4" (\obj -> (GHC.Base.pure PetByAgeAnother_relativeOneOf4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "pet_type"))
@@ -124,7 +124,7 @@ data PetByAgeFirst_relative = PetByAgeFirst_relative {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeFirst_relative
-    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj : [])
+    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj : "another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj : "pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj : "relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj : GHC.Base.mempty)
           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeHunts obj) GHC.Base.<> (("pet_type" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativePet_type obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= petByAgeFirst_relativeRelative obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeFirst_relative
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeFirst_relative" (\obj -> ((((GHC.Base.pure PetByAgeFirst_relative GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))

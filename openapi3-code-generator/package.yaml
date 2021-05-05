@@ -18,7 +18,7 @@ dependencies:
 - base >= 4.7 && < 5
 - template-haskell
 - yaml
-- aeson > 1.5.2.0
+- aeson
 - text
 - containers
 - http-conduit
