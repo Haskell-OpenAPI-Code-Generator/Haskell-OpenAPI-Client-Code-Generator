@@ -6,11 +6,11 @@ instance Show Mischling
 instance Eq Mischling
 instance FromJSON Mischling
 instance ToJSON Mischling
-data MischlingAnother_relativeOneOf4
-instance Show MischlingAnother_relativeOneOf4
-instance Eq MischlingAnother_relativeOneOf4
-instance FromJSON MischlingAnother_relativeOneOf4
-instance ToJSON MischlingAnother_relativeOneOf4
+data MischlingAnother_relativeOneOf5
+instance Show MischlingAnother_relativeOneOf5
+instance Eq MischlingAnother_relativeOneOf5
+instance FromJSON MischlingAnother_relativeOneOf5
+instance ToJSON MischlingAnother_relativeOneOf5
 data MischlingAnother_relativeVariants
 instance Show MischlingAnother_relativeVariants
 instance Eq MischlingAnother_relativeVariants

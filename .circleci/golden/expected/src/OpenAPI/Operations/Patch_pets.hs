@@ -54,15 +54,15 @@ patch_pets body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.eithe
 -- 
 data Patch_petsRequestBodyVariants =
    Patch_petsRequestBodyCat Cat
-  | Patch_petsRequestBodyCoverType CoverType
   | Patch_petsRequestBodyDog Dog
+  | Patch_petsRequestBodyCoverType CoverType
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Patch_petsRequestBodyVariants
     where toJSON (Patch_petsRequestBodyCat a) = Data.Aeson.Types.ToJSON.toJSON a
-          toJSON (Patch_petsRequestBodyCoverType a) = Data.Aeson.Types.ToJSON.toJSON a
           toJSON (Patch_petsRequestBodyDog a) = Data.Aeson.Types.ToJSON.toJSON a
+          toJSON (Patch_petsRequestBodyCoverType a) = Data.Aeson.Types.ToJSON.toJSON a
 instance Data.Aeson.Types.FromJSON.FromJSON Patch_petsRequestBodyVariants
-    where parseJSON val = case (Patch_petsRequestBodyCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((Patch_petsRequestBodyCoverType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((Patch_petsRequestBodyDog Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+    where parseJSON val = case (Patch_petsRequestBodyCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((Patch_petsRequestBodyDog Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((Patch_petsRequestBodyCoverType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
                               Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a
                               Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a
 -- | Represents a response of the operation 'patch_pets'.

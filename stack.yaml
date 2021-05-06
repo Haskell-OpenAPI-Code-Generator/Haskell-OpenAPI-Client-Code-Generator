@@ -1,4 +1,4 @@
-resolver: lts-17.10
+resolver: lts-16.12
 packages:
 - openapi3-code-generator
 nix:

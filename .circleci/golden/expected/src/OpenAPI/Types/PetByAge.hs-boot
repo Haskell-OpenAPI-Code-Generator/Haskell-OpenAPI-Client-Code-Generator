@@ -6,11 +6,11 @@ instance Show PetByAge
 instance Eq PetByAge
 instance FromJSON PetByAge
 instance ToJSON PetByAge
-data PetByAgeAnother_relativeOneOf4
-instance Show PetByAgeAnother_relativeOneOf4
-instance Eq PetByAgeAnother_relativeOneOf4
-instance FromJSON PetByAgeAnother_relativeOneOf4
-instance ToJSON PetByAgeAnother_relativeOneOf4
+data PetByAgeAnother_relativeOneOf5
+instance Show PetByAgeAnother_relativeOneOf5
+instance Eq PetByAgeAnother_relativeOneOf5
+instance FromJSON PetByAgeAnother_relativeOneOf5
+instance ToJSON PetByAgeAnother_relativeOneOf5
 data PetByAgeAnother_relativeVariants
 instance Show PetByAgeAnother_relativeVariants
 instance Eq PetByAgeAnother_relativeVariants
