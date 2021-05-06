@@ -3,14 +3,13 @@ version: 2
 defaults: &defaults
   docker:
     - image: joelfisch/stack-with-prebuilt-deps:latest
-  working_directory: /mnt/ramdisk
-  resource_class: xlarge
+  working_directory: ~/project
 
 jobs:
   lint:
-    <<: *defaults
     docker:
       - image: joelfisch/hlint:latest
+    working_directory: ~/project
     steps:
       - checkout
       - run:
@@ -35,14 +34,14 @@ jobs:
           name: Build
           command: ./.circleci/build_generator
       - persist_to_workspace:
-          root: /mnt/ramdisk
+          root: ~/project
           paths: .
 
   golden:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /mnt/ramdisk
+          at: ~/project
       - run:
           name: Golden tests
           command: ./.circleci/test_golden
@@ -51,7 +50,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /mnt/ramdisk
+          at: ~/project
       - run:
           name: System tests level 1
           command: ./.circleci/test_system_1
@@ -60,7 +59,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /mnt/ramdisk
+          at: ~/project
       - run:
           name: System tests level 2
           command: ./.circleci/test_system_2
@@ -69,7 +68,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /mnt/ramdisk
+          at: ~/project
       - run:
           name: System tests level 3
           command: ./.circleci/test_system_3
@@ -78,7 +77,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /mnt/ramdisk
+          at: ~/project
       - run:
           name: System tests level 3
           command: ./.circleci/test_system_3
