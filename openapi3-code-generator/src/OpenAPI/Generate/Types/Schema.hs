@@ -13,7 +13,8 @@ module OpenAPI.Generate.Types.Schema where
 
 import qualified Data.Map as Map
 import qualified Data.Scientific as Scientific
-import Data.Set as Set
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
@@ -41,10 +42,10 @@ data SchemaObject = SchemaObject
     maxProperties :: Maybe Word,
     minProperties :: Maybe Word,
     required :: Set Text,
-    enum :: Set Value,
-    allOf :: Set Schema,
-    oneOf :: Set Schema,
-    anyOf :: Set Schema,
+    enum :: [Value],
+    allOf :: [Schema],
+    oneOf :: [Schema],
+    anyOf :: [Schema],
     not :: Maybe Schema,
     properties :: Map.Map Text Schema,
     additionalProperties :: AdditionalProperties,
@@ -63,7 +64,7 @@ data SchemaObject = SchemaObject
     deprecated :: Bool,
     items :: Maybe Schema
   }
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Generic)
 
 instance FromJSON SchemaObject where
   parseJSON = withObject "SchemaObject" $ \o ->
@@ -84,10 +85,10 @@ instance FromJSON SchemaObject where
       <*> o .:? "maxProperties"
       <*> o .:? "minProperties"
       <*> o .:? "required" .!= Set.empty
-      <*> o .:? "enum" .!= Set.empty
-      <*> o .:? "allOf" .!= Set.empty
-      <*> o .:? "oneOf" .!= Set.empty
-      <*> o .:? "anyOf" .!= Set.empty
+      <*> o .:? "enum" .!= []
+      <*> o .:? "allOf" .!= []
+      <*> o .:? "oneOf" .!= []
+      <*> o .:? "anyOf" .!= []
       <*> o .:? "not"
       <*> o .:? "properties" .!= Map.empty
       <*> o .:? "additionalProperties" .!= HasAdditionalProperties
@@ -123,10 +124,10 @@ defaultSchema =
       maxProperties = Nothing,
       minProperties = Nothing,
       required = Set.empty,
-      enum = Set.empty,
-      allOf = Set.empty,
-      oneOf = Set.empty,
-      anyOf = Set.empty,
+      enum = [],
+      allOf = [],
+      oneOf = [],
+      anyOf = [],
       not = Nothing,
       properties = Map.empty,
       additionalProperties = HasAdditionalProperties,
@@ -149,9 +150,9 @@ isSchemaEmpty :: SchemaObject -> Bool
 isSchemaEmpty s =
   SchemaTypeObject == type' s
     && Map.null (properties s)
-    && Set.null (allOf s)
-    && Set.null (oneOf s)
-    && Set.null (anyOf s)
+    && null (allOf s)
+    && null (oneOf s)
+    && null (anyOf s)
 
 data SchemaType
   = SchemaTypeString
@@ -189,7 +190,7 @@ data ConcreteValue
   | NumericDefaultValue Scientific.Scientific
   | BoolDefaultValue Bool
   | OtherDefaultValue Value
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Generic)
 
 instance FromJSON ConcreteValue where
   parseJSON v@(String _) = StringDefaultValue <$> parseJSON v
@@ -201,7 +202,7 @@ data AdditionalProperties
   = NoAdditionalProperties
   | HasAdditionalProperties
   | AdditionalPropertiesWithSchema Schema
-  deriving (Show, Eq, Ord, Generic)
+  deriving (Show, Eq, Generic)
 
 instance FromJSON AdditionalProperties where
   parseJSON (Bool False) = pure NoAdditionalProperties

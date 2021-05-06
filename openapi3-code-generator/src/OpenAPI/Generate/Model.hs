@@ -196,23 +196,22 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
   case schema of
     OAS.SchemaObject {type' = OAS.SchemaTypeArray} -> defineArrayModelForSchema strategy schemaName schema
     OAS.SchemaObject {type' = OAS.SchemaTypeObject} ->
-      let allOfNull = Set.null $ OAS.allOf schema
-          oneOfNull = Set.null $ OAS.oneOf schema
-          anyOfNull = Set.null $ OAS.anyOf schema
+      let allOfNull = null $ OAS.allOf schema
+          oneOfNull = null $ OAS.oneOf schema
+          anyOfNull = null $ OAS.anyOf schema
        in case (allOfNull, oneOfNull, anyOfNull) of
-            (False, _, _) -> OAM.nested "allOf" $ defineAllOfSchema schemaName schemaDescription $ Set.toList $ OAS.allOf schema
-            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription $ Set.toList $ OAS.oneOf schema
-            (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ Set.toList $ OAS.anyOf schema
+            (False, _, _) -> OAM.nested "allOf" $ defineAllOfSchema schemaName schemaDescription $ OAS.allOf schema
+            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription $ OAS.oneOf schema
+            (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ OAS.anyOf schema
             _ -> defineObjectModelForSchema strategy schemaName schema
     _ ->
       typeAliasing $ pure (varT $ getSchemaType flags schema, (emptyDoc, Set.empty))
 
-defineEnumModel :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> Set.Set Aeson.Value -> OAM.Generator TypeWithDeclaration
-defineEnumModel strategy schemaName schema enumValuesSet = do
+defineEnumModel :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> [Aeson.Value] -> OAM.Generator TypeWithDeclaration
+defineEnumModel strategy schemaName schema enumValues = do
   name <- haskellifyNameM True schemaName
   OAM.logInfo $ "Define as enum named '" <> T.pack (nameBase name) <> "'"
-  let enumValues = Set.toList enumValuesSet
-      getConstructor (a, _, _) = a
+  let getConstructor (a, _, _) = a
       getValueInfo value = do
         cname <- haskellifyNameM True (schemaName <> T.pack "Enum" <> aesonValueToName value)
         pure (normalC cname [], cname, value)
@@ -475,12 +474,12 @@ getPropertiesForAllOf :: Text -> OAS.SchemaObject -> OAM.Generator (Map.Map Text
 getPropertiesForAllOf schemaName schema =
   let allOf = OAS.allOf schema
       anyOf = OAS.anyOf schema
-      relevantSubschemas = Set.union allOf anyOf
+      relevantSubschemas = allOf <> anyOf
    in if null relevantSubschemas
         then pure (OAS.properties schema, OAS.required schema)
         else do
-          (allOfProps, allOfRequired) <- fuseSchemasAllOf schemaName $ Set.toList allOf
-          (anyOfProps, _) <- fuseSchemasAllOf schemaName $ Set.toList anyOf
+          (allOfProps, allOfRequired) <- fuseSchemasAllOf schemaName allOf
+          (anyOfProps, _) <- fuseSchemasAllOf schemaName anyOf
           pure (Map.unionWith const allOfProps anyOfProps, allOfRequired)
 
 -- | defines a allOf subschema
@@ -600,7 +599,7 @@ extractSchemasWithFixedValues :: [OAS.Schema] -> ([OAS.Schema], [Aeson.Value])
 extractSchemasWithFixedValues = E.partitionEithers . fmap extractSchemaWithFixedValue
 
 extractSchemaWithFixedValue :: OAS.Schema -> Either OAS.Schema Aeson.Value
-extractSchemaWithFixedValue schema@(OAT.Concrete OAS.SchemaObject {..}) = case Set.toList enum of
+extractSchemaWithFixedValue schema@(OAT.Concrete OAS.SchemaObject {..}) = case enum of
   [value] -> Right value
   _ -> Left schema
 extractSchemaWithFixedValue schema = Left schema

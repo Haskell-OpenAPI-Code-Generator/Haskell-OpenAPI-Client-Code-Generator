@@ -142,8 +142,8 @@ apiKeyInHeaderAuthenticationScheme :: Text -> Text -> Text -> Q Doc
 apiKeyInHeaderAuthenticationScheme headerName moduleName description =
   let fnName = mkName "apiKeyInHeaderAuthenticationSecurityScheme"
       functionType = sigD fnName [t|Text -> OC.SecurityScheme|]
-      headerName' = Data.Text.unpack headerName
-      functionBody = [d|$(varP fnName) = HS.addRequestHeader headerName' . OC.textToByte|]
+      headerName' = stringE $ Data.Text.unpack headerName
+      functionBody = [d|$(varP fnName) = HS.addRequestHeader $(headerName') . OC.textToByte|]
    in vcat
         <$> sequence
           [ ( Doc.generateHaddockComment
