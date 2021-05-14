@@ -2,5 +2,4 @@ resolver: lts-16.12
 packages:
 - openapi3-code-generator
 nix:
-  packages:
-    - zlib
+  shell-file: shell.nix
