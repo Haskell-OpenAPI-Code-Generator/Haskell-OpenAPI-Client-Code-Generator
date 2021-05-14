@@ -1,66 +1,67 @@
 -- | The main module which exports all functionality.
-module OpenAPI (
-  module OpenAPI.Operations.UpdatePet,
-  module OpenAPI.Operations.AddPet,
-  module OpenAPI.Operations.FindPetsByStatus,
-  module OpenAPI.Operations.FindPetsByTags,
-  module OpenAPI.Operations.GetPetById,
-  module OpenAPI.Operations.UpdatePetWithForm,
-  module OpenAPI.Operations.DeletePet,
-  module OpenAPI.Operations.UploadFile,
-  module OpenAPI.Operations.GetInventory,
-  module OpenAPI.Operations.PlaceOrder,
-  module OpenAPI.Operations.GetOrderById,
-  module OpenAPI.Operations.DeleteOrder,
-  module OpenAPI.Operations.CreateUser,
-  module OpenAPI.Operations.CreateUsersWithArrayInput,
-  module OpenAPI.Operations.CreateUsersWithListInput,
-  module OpenAPI.Operations.LoginUser,
-  module OpenAPI.Operations.LogoutUser,
-  module OpenAPI.Operations.GetUserByName,
-  module OpenAPI.Operations.UpdateUser,
-  module OpenAPI.Operations.DeleteUser,
-  module OpenAPI.Types,
-  module OpenAPI.CyclicTypes,
-  module OpenAPI.Types.ApiResponse,
-  module OpenAPI.Types.Category,
-  module OpenAPI.Types.Order,
-  module OpenAPI.Types.Tag,
-  module OpenAPI.Types.User,
-  module OpenAPI.Types.Pet,
-  module OpenAPI.Configuration,
-  module OpenAPI.SecuritySchemes,
-  module OpenAPI.Common,
-  ) where
+module OpenAPI
+  ( module OpenAPI.Operations.UpdatePet,
+    module OpenAPI.Operations.AddPet,
+    module OpenAPI.Operations.FindPetsByStatus,
+    module OpenAPI.Operations.FindPetsByTags,
+    module OpenAPI.Operations.GetPetById,
+    module OpenAPI.Operations.UpdatePetWithForm,
+    module OpenAPI.Operations.DeletePet,
+    module OpenAPI.Operations.UploadFile,
+    module OpenAPI.Operations.GetInventory,
+    module OpenAPI.Operations.PlaceOrder,
+    module OpenAPI.Operations.GetOrderById,
+    module OpenAPI.Operations.DeleteOrder,
+    module OpenAPI.Operations.CreateUser,
+    module OpenAPI.Operations.CreateUsersWithArrayInput,
+    module OpenAPI.Operations.CreateUsersWithListInput,
+    module OpenAPI.Operations.LoginUser,
+    module OpenAPI.Operations.LogoutUser,
+    module OpenAPI.Operations.GetUserByName,
+    module OpenAPI.Operations.UpdateUser,
+    module OpenAPI.Operations.DeleteUser,
+    module OpenAPI.Types,
+    module OpenAPI.CyclicTypes,
+    module OpenAPI.Types.ApiResponse,
+    module OpenAPI.Types.Category,
+    module OpenAPI.Types.Order,
+    module OpenAPI.Types.Tag,
+    module OpenAPI.Types.User,
+    module OpenAPI.Types.Pet,
+    module OpenAPI.Configuration,
+    module OpenAPI.SecuritySchemes,
+    module OpenAPI.Common,
+  )
+where
 
-import OpenAPI.Operations.UpdatePet
+import OpenAPI.Common
+import OpenAPI.Configuration
+import OpenAPI.CyclicTypes
 import OpenAPI.Operations.AddPet
-import OpenAPI.Operations.FindPetsByStatus
-import OpenAPI.Operations.FindPetsByTags
-import OpenAPI.Operations.GetPetById
-import OpenAPI.Operations.UpdatePetWithForm
-import OpenAPI.Operations.DeletePet
-import OpenAPI.Operations.UploadFile
-import OpenAPI.Operations.GetInventory
-import OpenAPI.Operations.PlaceOrder
-import OpenAPI.Operations.GetOrderById
-import OpenAPI.Operations.DeleteOrder
 import OpenAPI.Operations.CreateUser
 import OpenAPI.Operations.CreateUsersWithArrayInput
 import OpenAPI.Operations.CreateUsersWithListInput
+import OpenAPI.Operations.DeleteOrder
+import OpenAPI.Operations.DeletePet
+import OpenAPI.Operations.DeleteUser
+import OpenAPI.Operations.FindPetsByStatus
+import OpenAPI.Operations.FindPetsByTags
+import OpenAPI.Operations.GetInventory
+import OpenAPI.Operations.GetOrderById
+import OpenAPI.Operations.GetPetById
+import OpenAPI.Operations.GetUserByName
 import OpenAPI.Operations.LoginUser
 import OpenAPI.Operations.LogoutUser
-import OpenAPI.Operations.GetUserByName
+import OpenAPI.Operations.PlaceOrder
+import OpenAPI.Operations.UpdatePet
+import OpenAPI.Operations.UpdatePetWithForm
 import OpenAPI.Operations.UpdateUser
-import OpenAPI.Operations.DeleteUser
+import OpenAPI.Operations.UploadFile
+import OpenAPI.SecuritySchemes
 import OpenAPI.Types
-import OpenAPI.CyclicTypes
 import OpenAPI.Types.ApiResponse
 import OpenAPI.Types.Category
 import OpenAPI.Types.Order
+import OpenAPI.Types.Pet
 import OpenAPI.Types.Tag
 import OpenAPI.Types.User
-import OpenAPI.Types.Pet
-import OpenAPI.Configuration
-import OpenAPI.SecuritySchemes
-import OpenAPI.Common

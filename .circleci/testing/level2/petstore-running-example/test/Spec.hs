@@ -36,23 +36,23 @@ main =
         (response1, response2) <- runMock runMultipleRequestsWithBearerAuth (requestExpectation, succeededResponse)
         getResponseBody response1 `shouldBe` GetInventoryResponse200 HashMap.empty
         getResponseBody response2 `shouldBe` AddPetResponse200
-    describe "runAddPet"
-      $ it "should encode Body"
-      $ do
-        let requestExpectation = expectBody "{\"category\":null,\"id\":null,\"name\":\"Harro\",\"photoUrls\":[],\"status\":null,\"tags\":null}" $ expectMethod "POST" noExpectation
-        response <- runMock runAddPet (requestExpectation, succeededResponse)
-        getResponseBody response `shouldBe` AddPetResponse200
-    describe "runGetAllPetsAsOneOf"
-      $ it "contain different results"
-      $ do
-        let rawResponse = defaultResponse {responseBody = "[1, \"test\", 2]"} :: Response ByteString
-        response <- runMock runGetAllPetsAsOneOf (noExpectation, rawResponse)
-        getResponseBody response
-          `shouldBe` GetAllPetsAsOneOfResponse200
-            [ GetAllPetsAsOneOfResponseBody200Double 1,
-              GetAllPetsAsOneOfResponseBody200Text "test",
-              GetAllPetsAsOneOfResponseBody200Double 2
-            ]
+    describe "runAddPet" $
+      it "should encode Body" $
+        do
+          let requestExpectation = expectBody "{\"category\":null,\"id\":null,\"name\":\"Harro\",\"photoUrls\":[],\"status\":null,\"tags\":null}" $ expectMethod "POST" noExpectation
+          response <- runMock runAddPet (requestExpectation, succeededResponse)
+          getResponseBody response `shouldBe` AddPetResponse200
+    describe "runGetAllPetsAsOneOf" $
+      it "contain different results" $
+        do
+          let rawResponse = defaultResponse {responseBody = "[1, \"test\", 2]"} :: Response ByteString
+          response <- runMock runGetAllPetsAsOneOf (noExpectation, rawResponse)
+          getResponseBody response
+            `shouldBe` GetAllPetsAsOneOfResponse200
+              [ GetAllPetsAsOneOfResponseBody200Double 1,
+                GetAllPetsAsOneOfResponseBody200Text "test",
+                GetAllPetsAsOneOfResponseBody200Double 2
+              ]
     describe "updatePet" $ do
       it "runUpdatePet" $ do
         let requestExpectation = expectBody "{\"photoUrls\":[],\"status\":null,\"category\":null,\"name\":\"Harro\",\"id\":null,\"tags\":null}" $ expectMethod "PUT" noExpectation

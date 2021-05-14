@@ -32,8 +32,8 @@ import qualified Data.ByteString.Char8 as B8
 import qualified Data.HashMap.Strict as HMap
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
 import GHC.Generics
@@ -71,11 +71,10 @@ instance MonadHTTP m => MonadHTTP (MR.ReaderT r m) where
 --
 -- > defaultConfiguration
 -- >   { configSecurityScheme = BearerAuthenticationSecurityScheme "token" }
-data Configuration s
-  = Configuration
-      { configBaseURL :: Text,
-        configSecurityScheme :: s
-      }
+data Configuration s = Configuration
+  { configBaseURL :: Text,
+    configSecurityScheme :: s
+  }
   deriving (Show, Ord, Eq, Generic)
 
 -- | Defines how a request body is encoded
@@ -191,12 +190,12 @@ createBaseRequest ::
   -- | The Response from the server
   HS.Request
 createBaseRequest config method path queryParams =
-  authenticateRequest (configSecurityScheme config)
-    $ HS.setRequestMethod (textToByte method)
-    $ HS.setRequestQueryString query
-    $ HS.setRequestPath
-      (B8.pack (T.unpack $ byteToText basePathModifier <> path))
-      baseRequest
+  authenticateRequest (configSecurityScheme config) $
+    HS.setRequestMethod (textToByte method) $
+      HS.setRequestQueryString query $
+        HS.setRequestPath
+          (B8.pack (T.unpack $ byteToText basePathModifier <> path))
+          baseRequest
   where
     baseRequest = parseURL $ configBaseURL config
     basePath = HC.path baseRequest
@@ -223,9 +222,9 @@ textToByte = B8.pack . T.unpack
 
 parseURL :: Text -> HS.Request
 parseURL url =
-  Maybe.fromMaybe HS.defaultRequest
-    $ HS.parseRequest
-    $ T.unpack url
+  Maybe.fromMaybe HS.defaultRequest $
+    HS.parseRequest $
+      T.unpack url
 
 jsonToFormData :: Aeson.Value -> [(Text, Text)]
 jsonToFormData = jsonToFormDataPrefixed ""

@@ -14,7 +14,7 @@ with pkgs.haskell.lib;
 let
   localPkgs = import ./pkgs.nix;
   extraFlagsStr = concatStringsSep " " extraFlags;
-  omitFlag = optionalString (schemas != [] && operations != []) "--omit-additional-operation-functions";
+  omitFlag = optionalString (schemas != [ ] && operations != [ ]) "--omit-additional-operation-functions";
   operationFlag = operation: "--operation-to-generate '${operation}'";
   operationsFlags = concatStringsSep " " (map operationFlag operations);
   schemaFlag = schema: "--white-listed-schema '${schema}'";

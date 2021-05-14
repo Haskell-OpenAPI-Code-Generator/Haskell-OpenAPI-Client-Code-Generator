@@ -9,11 +9,11 @@ in
     hooks = {
       ormolu = {
         enable = true;
-        excludes = [ ".circleci/golden" ];
+        excludes = [ ".circleci/golden" "example" ];
       };
       hlint = {
         enable = true;
-        excludes = [ ".circleci/golden" ];
+        excludes = [ ".circleci/golden" "example" ];
       };
       nixpkgs-fmt.enable = true;
     };

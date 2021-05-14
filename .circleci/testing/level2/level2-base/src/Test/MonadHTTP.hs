@@ -36,13 +36,12 @@ newtype BodyMismatch = BodyMismatch (Maybe ByteString)
 
 instance Exception BodyMismatch
 
-data RequestExpectation
-  = RequestExpectation
-      { methodExpectation :: Maybe Method,
-        urlExpectation :: Maybe String,
-        authorizationExpectation :: Maybe String,
-        bodyExpectation :: Maybe ByteString
-      }
+data RequestExpectation = RequestExpectation
+  { methodExpectation :: Maybe Method,
+    urlExpectation :: Maybe String,
+    authorizationExpectation :: Maybe String,
+    bodyExpectation :: Maybe ByteString
+  }
 
 noExpectation :: RequestExpectation
 noExpectation = RequestExpectation Nothing Nothing Nothing Nothing

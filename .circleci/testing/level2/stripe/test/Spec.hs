@@ -71,22 +71,22 @@ successResponseGetExpected =
 main :: IO ()
 main =
   hspec $ do
-    describe "runPostPaymentIntent"
-      $ it "should encode Body"
-      $ do
-        let requestExpectation = expectBody "amount=171&currency=CHF&application_fee_amount=7&payment_method_types%5B%5D=myType&payment_method_types%5B%5D=mySecondType" $ expectMethod "POST" noExpectation
-        response <- runMock runPostPaymentIntent (requestExpectation, succeededResponse)
-        getResponseBody response `shouldBe` PostPaymentIntentsResponse200 paymentIntent
-    describe "runGetPaymentIntent"
-      $ it "should encode Body"
-      $ do
-        let requestExpectation =
-              expectMethod "GET" $
-                expectURL
-                  "http://test.url/v1/payment_intents?created=3&ending_before=some_string&expand%5B%5D=another_string&limit=100&starting_after=the%20last%20string"
-                  noExpectation
-        response <- runMock runGetPaymentIntent (requestExpectation, successResponseGet)
-        getResponseBody response `shouldBe` GetPaymentIntentsResponse200 successResponseGetExpected
+    describe "runPostPaymentIntent" $
+      it "should encode Body" $
+        do
+          let requestExpectation = expectBody "amount=171&currency=CHF&application_fee_amount=7&payment_method_types%5B%5D=myType&payment_method_types%5B%5D=mySecondType" $ expectMethod "POST" noExpectation
+          response <- runMock runPostPaymentIntent (requestExpectation, succeededResponse)
+          getResponseBody response `shouldBe` PostPaymentIntentsResponse200 paymentIntent
+    describe "runGetPaymentIntent" $
+      it "should encode Body" $
+        do
+          let requestExpectation =
+                expectMethod "GET" $
+                  expectURL
+                    "http://test.url/v1/payment_intents?created=3&ending_before=some_string&expand%5B%5D=another_string&limit=100&starting_after=the%20last%20string"
+                    noExpectation
+          response <- runMock runGetPaymentIntent (requestExpectation, successResponseGet)
+          getResponseBody response `shouldBe` GetPaymentIntentsResponse200 successResponseGetExpected
     describe "runCheckoutSession" $ do
       it "should encode Body" $ do
         let requestExpectation = expectBody "line_items%5B%5D%5Bamount%5D=1000&line_items%5B%5D%5Bquantity%5D=4&line_items%5B%5D%5Bname%5D=static%20types&line_items%5B%5D%5Bcurrency%5D=CHF&line_items%5B%5D%5Bdescription%5D=algebraic%20data%20types&line_items%5B%5D%5Bamount%5D=5000&line_items%5B%5D%5Bquantity%5D=2&line_items%5B%5D%5Bname%5D=Haskell&line_items%5B%5D%5Bcurrency%5D=CHF&line_items%5B%5D%5Bdescription%5D=lambda%20calculus&success_url=https%3A%2F%2Flocalhost%3A8080%2Fpayments%2Findex.html%3Fsuccess%3Dtrue%26sessionId%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=https%3A%2F%2Flocalhost%3A8080%2Fpayments%2Findex.html%3Fsuccess%3Dfalse%26sessionId%3D%7BCHECKOUT_SESSION_ID%7D&payment_method_types%5B%5D=card" $ expectMethod "POST" noExpectation
