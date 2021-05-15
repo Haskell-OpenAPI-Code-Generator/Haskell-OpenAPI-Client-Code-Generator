@@ -13,7 +13,13 @@ in
   check = nix-pre-commit-hooks.run {
     src = ../.;
     hooks = {
-      nixpkgs-fmt.enable = true;
+      nixpkgs-fmt = {
+        enable = true;
+        excludes = [
+          "example"
+          ".circleci"
+        ];
+      };
       hlint = {
         enable = true;
         excludes = [
