@@ -182,7 +182,7 @@ getParametersFromOperationConcrete =
     . getParametersFromOperationReference
 
 getSchemaFromParameterObjectSchema :: OAT.ParameterObjectSchema -> OAM.Generator (Maybe OAS.Schema)
-getSchemaFromParameterObjectSchema OAT.SimpleParameterObjectSchema {..} = pure $ Just schema
+getSchemaFromParameterObjectSchema (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) = pure $ Just schema
 getSchemaFromParameterObjectSchema (OAT.ComplexParameterObjectSchema _) = OAM.nested "content" $ do
   OAM.logWarning "Complex parameter schemas are not supported and therefore will be skipped."
   pure Nothing
@@ -229,11 +229,18 @@ getParameterName parameter = haskellifyNameM False $ getNameFromParameter parame
 -- | Get a description of a parameter object (the name and if available the description from the specification)
 getParameterDescription :: OAT.ParameterObject -> OAM.Generator Text
 getParameterDescription parameter = do
-  schema <- Model.resolveSchemaReferenceWithoutWarning $ OAT.schema (OAT.schema (parameter :: OAT.ParameterObject) :: OAT.ParameterObjectSchema)
+  schema <- case getSchemaOfParameterObject parameter of
+    Just schema -> Model.resolveSchemaReferenceWithoutWarning schema
+    Nothing -> pure Nothing
   let name = OAT.name (parameter :: OAT.ParameterObject)
       description = maybe "" (": " <>) $ OAT.description (parameter :: OAT.ParameterObject)
       constraints = joinWith ", " $ Model.getConstraintDescriptionsOfSchema schema
   pure $ Doc.escapeText $ name <> description <> (if T.null constraints then "" else " | Constraints: " <> constraints)
+
+getSchemaOfParameterObject :: OAT.ParameterObject -> Maybe OAS.Schema
+getSchemaOfParameterObject parameterObject = case OAT.schema (parameterObject :: OAT.ParameterObject) of
+  (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> Just schema
+  OAT.ComplexParameterObjectSchema _ -> Nothing
 
 -- | Defines the body of an Operation function
 --   The Operation function calls an generall HTTP function
@@ -427,7 +434,7 @@ generateQueryParams x =
           let queryName = stringE $ T.unpack $ getNameFromParameter param
               required = getRequiredFromParameter param
               (maybeStyle, explode') = case OAT.schema (param :: OAT.ParameterObject) of
-                OAT.SimpleParameterObjectSchema {..} -> (style, explode)
+                (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> (style, explode)
                 OAT.ComplexParameterObjectSchema _ -> (Just "form", True)
               style' =
                 stringE $

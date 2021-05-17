@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2c9baa547ea20206f8e472e0e4f9ff734130ea57706161cab7392ab633117890
+-- hash: b03c3f2c843d0d59dd148c8998714934dd5293adfa20e611ffdae06c9fc5160f
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -54,7 +54,7 @@ library
       Paths_openapi3_code_generator
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wpartial-fields -Widentities -Wcpp-undef
   build-depends:
       aeson
     , base >=4.7 && <5
