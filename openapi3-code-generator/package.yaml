@@ -45,6 +45,9 @@ library:
   - -Wincomplete-record-updates
   - -Wincomplete-uni-patterns
   - -Wredundant-constraints
+  - -Wpartial-fields
+  - -Widentities
+  - -Wcpp-undef
 
 executables:
   openapi3-code-generator-exe:

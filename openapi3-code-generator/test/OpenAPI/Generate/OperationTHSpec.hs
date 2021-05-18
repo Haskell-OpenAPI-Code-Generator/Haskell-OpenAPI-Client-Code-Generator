@@ -28,7 +28,7 @@ spec =
           res <- runQ is
           expected `shouldBe` res
       schemaObject = Maybe.fromJust $ decodeThrow "{}" :: OAS.SchemaObject
-      testParameterSchema = OAT.SimpleParameterObjectSchema Nothing False False (OAT.Concrete schemaObject) Nothing Map.empty
+      testParameterSchema = OAT.SimpleParameterObjectSchema $ OAT.SimpleParameterSchema Nothing False False (OAT.Concrete schemaObject) Nothing Map.empty
       testParameter = OAT.ParameterObject "testName" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testParameterOtherName = OAT.ParameterObject "testName2" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testTHName = varE $ mkName "myTestName"

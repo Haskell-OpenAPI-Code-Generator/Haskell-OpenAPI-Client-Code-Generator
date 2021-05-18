@@ -330,14 +330,7 @@ instance FromJSON ParameterObjectLocation where
     _ -> fail "A ParameterObject must have a value of 'query', 'header', 'path' or 'cookie' in the property 'in'."
 
 data ParameterObjectSchema
-  = SimpleParameterObjectSchema
-      { style :: Maybe Text,
-        explode :: Bool,
-        allowReserved :: Bool,
-        schema :: Schema,
-        example :: Maybe Value,
-        examples :: Map.Map Text (Referencable ExampleObject)
-      }
+  = SimpleParameterObjectSchema SimpleParameterSchema
   | ComplexParameterObjectSchema (Map.Map Text MediaTypeObject)
   deriving (Show, Eq, Generic)
 
@@ -345,19 +338,32 @@ instance FromJSON ParameterObjectSchema where
   parseJSON = withObject "ParameterObjectSchema" $ \o -> do
     maybeSchema <- o .:? "schema"
     maybeContent <- o .:? "content"
-    case (maybeSchema, maybeContent) of
-      (Just schema', Nothing) -> do
-        maybeStyle <- o .:? "style"
-        SimpleParameterObjectSchema
-          <$> o .:? "style"
-            <*> o .:? "explode" .!= ((maybeStyle :: Maybe Text) == Just "form") -- The default value is true for form and false otherwise (http://spec.openapis.org/oas/v3.0.3#parameterExplode)
-            <*> o .:? "allowReserved" .!= False
-            <*> pure schema'
-            <*> o .:? "example"
-            <*> o .:? "examples" .!= Map.empty
+    case (maybeSchema :: Maybe Schema, maybeContent) of
+      (Just _, Nothing) -> SimpleParameterObjectSchema <$> parseJSON (Object o)
       (Nothing, Just content') -> pure $ ComplexParameterObjectSchema content'
       (Just _, Just _) -> fail "ParameterObject (http://spec.openapis.org/oas/v3.0.3#parameter-object) only allows one of the properties schema and content."
       (Nothing, Nothing) -> fail "ParameterObject (http://spec.openapis.org/oas/v3.0.3#parameter-object) requires one of the properties schema and content to be present."
+
+data SimpleParameterSchema = SimpleParameterSchema
+  { style :: Maybe Text,
+    explode :: Bool,
+    allowReserved :: Bool,
+    schema :: Schema,
+    example :: Maybe Value,
+    examples :: Map.Map Text (Referencable ExampleObject)
+  }
+  deriving (Show, Eq, Generic)
+
+instance FromJSON SimpleParameterSchema where
+  parseJSON = withObject "SimpleParameterSchema" $ \o -> do
+    maybeStyle <- o .:? "style"
+    SimpleParameterSchema
+      <$> o .:? "style"
+        <*> o .:? "explode" .!= ((maybeStyle :: Maybe Text) == Just "form") -- The default value is true for form and false otherwise (http://spec.openapis.org/oas/v3.0.3#parameterExplode)
+        <*> o .:? "allowReserved" .!= False
+        <*> o .: "schema"
+        <*> o .:? "example"
+        <*> o .:? "examples" .!= Map.empty
 
 newtype HeaderObject = HeaderObject ParameterObject
   deriving (Show, Eq, Generic)
