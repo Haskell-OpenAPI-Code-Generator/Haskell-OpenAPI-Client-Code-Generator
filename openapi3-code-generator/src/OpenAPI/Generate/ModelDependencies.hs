@@ -39,8 +39,8 @@ typesModule = "Types"
 -- | Analyzes the dependencies of the provided models and splits them into modules.
 -- All models which would form an own module but only consist of a type alias are put in a module named by 'Doc.typeAliasModule'.
 getModelModulesFromModelsWithDependencies :: String -> Models -> [ModelWithDependencies] -> Q [ModuleDefinition]
-getModelModulesFromModelsWithDependencies mainModuleName operationDependencies models = do
-  let modelsToGenerate = filterRequiredModels operationDependencies models
+getModelModulesFromModelsWithDependencies mainModuleName operationAndWhiteListDependencies models = do
+  let modelsToGenerate = filterRequiredModels operationAndWhiteListDependencies models
       prependTypesModule = ((typesModule <> ".") <>) . T.unpack
       prependMainModule = ((mainModuleName <> ".") <>)
   modelsWithResolvedContent <-

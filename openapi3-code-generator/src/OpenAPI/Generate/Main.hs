@@ -16,10 +16,12 @@ import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
+import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.Operation as Operation
+import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.SecurityScheme as SecurityScheme
 import qualified OpenAPI.Generate.Types as OAT
 
@@ -67,7 +69,9 @@ defineModels moduleName spec operationDependencies =
    in OAM.nested "components" $
         OAM.nested "schemas" $ do
           models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
-          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName operationDependencies models
+          whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
+          let dependencies = Set.union operationDependencies $ Set.fromList $ fmap transformToModuleName whiteListedSchemas
+          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies models
 
 -- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
 defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)
