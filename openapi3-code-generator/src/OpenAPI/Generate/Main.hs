@@ -16,6 +16,7 @@ import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
 import qualified OpenAPI.Common as OC
 import qualified OpenAPI.Generate.Doc as Doc
+import OpenAPI.Generate.Internal.Unknown
 import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.ModelDependencies as Dep
@@ -27,18 +28,19 @@ import qualified OpenAPI.Generate.Types as OAT
 
 -- | Defines all the operations as functions and the common imports
 defineOperations :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
-defineOperations moduleName =
-  OAM.nested "paths"
-    . fmap
-      ( BF.bimap
-          ( fmap concat
-              . sequence
+defineOperations moduleName specification =
+  let paths = Map.toList $ OAT.paths specification
+   in OAM.nested "paths" $ do
+        warnAboutUnknownOperations paths
+        fmap
+          ( BF.bimap
+              ( fmap concat
+                  . sequence
+              )
+              Set.unions
           )
-          Set.unions
-      )
-    . mapAndUnzipM (uncurry $ Operation.defineOperationsForPath moduleName)
-    . Map.toList
-    . OAT.paths
+          . mapAndUnzipM (uncurry $ Operation.defineOperationsForPath moduleName)
+          $ paths
 
 -- | Defines the @defaultURL@ and the @defaultConfiguration@ containing this URL.
 defineConfigurationInformation :: String -> OAT.OpenApiSpecification -> Q Doc
@@ -68,6 +70,7 @@ defineModels moduleName spec operationDependencies =
   let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
    in OAM.nested "components" $
         OAM.nested "schemas" $ do
+          warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions
           models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
           whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
           let dependencies = Set.union operationDependencies $ Set.fromList $ fmap transformToModuleName whiteListedSchemas

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b03c3f2c843d0d59dd148c8998714934dd5293adfa20e611ffdae06c9fc5160f
+-- hash: ce09bab9bf2cd9abcdcbb08ca77f5a142be37defb8fcbcb103537deea1f3102c
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -33,6 +33,7 @@ library
       OpenAPI.Generate.Doc
       OpenAPI.Generate.Internal.Embed
       OpenAPI.Generate.Internal.Operation
+      OpenAPI.Generate.Internal.Unknown
       OpenAPI.Generate.Internal.Util
       OpenAPI.Generate.IO
       OpenAPI.Generate.Log
