@@ -42,7 +42,7 @@ warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions = do
 printWarningIfUnknown :: (Text -> Text -> Text) -> [Text] -> [Text] -> OAM.Generator ()
 printWarningIfUnknown generateMessage namesFromSpecification =
   mapM_
-    ( \name -> do
+    ( \name ->
         unless (name `elem` namesFromSpecification) $
           OAM.logWarning $ generateMessage name $ getProposedOptionsFromNameAndAvailableSchemas name namesFromSpecification
     )
