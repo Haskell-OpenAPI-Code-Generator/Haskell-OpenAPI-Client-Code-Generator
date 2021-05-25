@@ -27,13 +27,13 @@ warnAboutUnknownOperations operationDefinitions = do
           Maybe.catMaybes $
             operationDefinitions >>= getAllOperationObjectsFromPathItemObject . snd
   operationsToGenerate <- OAM.getFlag OAO.flagOperationsToGenerate
-  printWarningIfUnknown (\operationId proposedOptions -> "The operation '" <> operationId <> "' which is listed for generation does not appear in the provided OpenAPI specification (" <> proposedOptions <> ").") operationIds operationsToGenerate
+  printWarningIfUnknown (\operationId proposedOptions -> "The operation '" <> operationId <> "' which is listed for generation does not appear in the provided OpenAPI specification. " <> proposedOptions) operationIds operationsToGenerate
 
 -- | Warn about schemas listed as CLI options (white list or opaque schemas) which do not appear in the provided OpenAPI specification
 warnAboutUnknownWhiteListedOrOpaqueSchemas :: [(Text, OAS.Schema)] -> OAM.Generator ()
 warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions = do
   let schemaNames = fst <$> schemaDefinitions
-      printWarningIfUnknownWithTypeName typeName = printWarningIfUnknown (\name proposedOptions -> "The " <> typeName <> " '" <> name <> "' does not appear in the provided OpenAPI specification (" <> proposedOptions <> ").") schemaNames
+      printWarningIfUnknownWithTypeName typeName = printWarningIfUnknown (\name proposedOptions -> "The " <> typeName <> " '" <> name <> "' does not appear in the provided OpenAPI specification. " <> proposedOptions) schemaNames
   whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
   opaqueSchemas <- OAM.getFlag OAO.flagOpaqueSchemas
   printWarningIfUnknownWithTypeName "white-listed schema" whiteListedSchemas
@@ -54,9 +54,11 @@ sortByLongestCommonSubstring :: Text -> [Text] -> [Text]
 sortByLongestCommonSubstring needle = fmap fst . L.sortOn snd . fmap (\x -> (x, - (longestCommonSubstringCount needle x)))
 
 getProposedOptions :: [Text] -> Text
-getProposedOptions [] = "Specification does not contain any"
+getProposedOptions [] = "Specification does not contain any."
 getProposedOptions (x1 : x2 : x3 : _ : _) = getProposedOptions [x1, x2, x3]
-getProposedOptions xs = "Did you mean one of following options? " <> T.intercalate ", " xs
+getProposedOptions xs =
+  let separator = "\n      "
+   in "Did you mean one of following options?" <> separator <> T.intercalate separator xs
 
 longestCommonSubstringCount :: Text -> Text -> Int
 longestCommonSubstringCount x y =
