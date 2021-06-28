@@ -29,6 +29,7 @@ succeededResponseBody =
   mconcat
     [ "{",
       "\"amount\": 23,",
+      "\"automatic_tax\": {\"enabled\":false},",
       "\"capture_method\": \"automatic\",",
       "\"confirmation_method\": \"bar\",",
       "\"created\": 45,",

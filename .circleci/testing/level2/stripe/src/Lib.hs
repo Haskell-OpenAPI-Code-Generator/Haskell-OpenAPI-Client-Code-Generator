@@ -10,16 +10,18 @@ import OpenAPI.Common
 lineItemPeriod = InvoiceLineItemPeriod 10 80
 
 checkoutLineItem =
-  (mkPostCheckoutSessionsRequestBodyLineItems' 4)
-    { postCheckoutSessionsRequestBodyLineItems'Amount = Just 1000,
+  mkPostCheckoutSessionsRequestBodyLineItems'
+    { postCheckoutSessionsRequestBodyLineItems'Quantity = Just 4,
+      postCheckoutSessionsRequestBodyLineItems'Amount = Just 1000,
       postCheckoutSessionsRequestBodyLineItems'Currency = Just "CHF",
       postCheckoutSessionsRequestBodyLineItems'Description = Just "algebraic data types",
       postCheckoutSessionsRequestBodyLineItems'Name = Just "static types"
     }
 
 checkoutLineItem2 =
-  (mkPostCheckoutSessionsRequestBodyLineItems' 2)
-    { postCheckoutSessionsRequestBodyLineItems'Amount = Just 5000,
+  mkPostCheckoutSessionsRequestBodyLineItems'
+    { postCheckoutSessionsRequestBodyLineItems'Quantity = Just 2,
+      postCheckoutSessionsRequestBodyLineItems'Amount = Just 5000,
       postCheckoutSessionsRequestBodyLineItems'Currency = Just "CHF",
       postCheckoutSessionsRequestBodyLineItems'Description = Just "lambda calculus",
       postCheckoutSessionsRequestBodyLineItems'Name = Just "Haskell"
@@ -28,10 +30,10 @@ checkoutLineItem2 =
 checkoutSession =
   ( mkPostCheckoutSessionsRequestBody
       "https://localhost:8080/payments/index.html?success=false&sessionId={CHECKOUT_SESSION_ID}"
-      [PostCheckoutSessionsRequestBodyPaymentMethodTypes'EnumCard]
       "https://localhost:8080/payments/index.html?success=true&sessionId={CHECKOUT_SESSION_ID}"
   )
-    { postCheckoutSessionsRequestBodyLineItems = Just [checkoutLineItem, checkoutLineItem2]
+    { postCheckoutSessionsRequestBodyLineItems = Just [checkoutLineItem, checkoutLineItem2],
+      postCheckoutSessionsRequestBodyPaymentMethodTypes = Just [PostCheckoutSessionsRequestBodyPaymentMethodTypes'EnumCard]
     }
 
 runCheckoutSession :: MonadHTTP m => m (Response PostCheckoutSessionsResponse)
