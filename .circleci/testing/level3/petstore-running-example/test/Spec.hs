@@ -1,8 +1,9 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Exception
+import Data.Aeson
 import Data.Either
+import Data.HashMap.Strict (fromList)
 import Lib
 import Network.HTTP.Client
 import Network.HTTP.Simple
@@ -17,27 +18,27 @@ main =
         do
           response <- runGetInventory
           getResponseBody response
-            `shouldSatisfy` ( \case
-                                GetInventoryResponse200 _ -> True
-                                _ -> False
-                            )
-    describe "runAddPetAndFindIt" $
-      it "add pet and find it" $
+            `shouldBe` GetInventoryResponse200 (fromList [("pet1", Number 23), ("pet2", Number 2)])
+    describe "runAddPet" $
+      it "add pet" $
         do
-          (response1, response2) <- runAddPetAndFindIt
-          getResponseBody response1
-            `shouldBe` AddPetResponse200
-          getResponseBody response2
-            `shouldSatisfy` ( \case
-                                FindPetsByStatusResponse200 pets -> any (\p -> petName p == Just "Harro") pets
-                                _ -> False
-                            )
+          response <- runAddPet
+          getResponseBody response `shouldBe` AddPetResponse200
     describe "runFindPetsByStatus" $
       it "find pets by status" $
         do
-          response <- runFindPetsByStatus
+          response <- runFindPetsByStatus FindPetsByStatusParametersStatusEnumPending
           getResponseBody response
-            `shouldSatisfy` ( \case
-                                FindPetsByStatusResponse200 _ -> True
-                                _ -> False
-                            )
+            `shouldBe` FindPetsByStatusResponse200
+              [ (mkPet [])
+                  { petId = Just 23,
+                    petName = Just "Ted",
+                    petStatus = Just PetStatusEnumPending
+                  }
+              ]
+    describe "runFindPetsByStatus" $
+      it "find pets by status" $
+        do
+          response <- runFindPetsByStatus $ FindPetsByStatusParametersStatusTyped "notExistingStatus"
+          getResponseBody response
+            `shouldBe` FindPetsByStatusResponse400

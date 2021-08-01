@@ -7,20 +7,18 @@ import Network.HTTP.Client
 import OpenAPI
 import OpenAPI.Common
 
-runAddPetAndFindIt :: MonadHTTP m => m (Response AddPetResponse, Response FindPetsByStatusResponse)
-runAddPetAndFindIt = runWithConfiguration defaultConfiguration $ do
-  response1 <- addPet myPet
-  response2 <- findPetsByStatus [FindPetsByStatusParametersStatusEnumPending]
-  pure (response1, response2)
-  where
-    myPet =
+runAddPet :: MonadHTTP m => m (Response AddPetResponse)
+runAddPet =
+  runWithConfiguration defaultConfiguration $
+    addPet $
       (mkPet [])
-        { petName = Just "Harro",
-          petStatus = Just PetStatusEnumPending
+        { petId = Just 21,
+          petName = Just "Harro",
+          petStatus = Just PetStatusEnumAvailable
         }
 
 runGetInventory :: MonadHTTP m => m (Response GetInventoryResponse)
 runGetInventory = getInventoryWithConfiguration defaultConfiguration
 
-runFindPetsByStatus :: MonadHTTP m => m (Response FindPetsByStatusResponse)
-runFindPetsByStatus = findPetsByStatusWithConfiguration defaultConfiguration [FindPetsByStatusParametersStatusEnumPending]
+runFindPetsByStatus :: MonadHTTP m => FindPetsByStatusParametersStatus -> m (Response FindPetsByStatusResponse)
+runFindPetsByStatus status = findPetsByStatusWithConfiguration defaultConfiguration [status]

@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 32b9cad0c80b60b3e8c6c0775e36a5133ea5d7b28613ca21ece6a9ad107d01d6
+-- hash: 4c50e0b37f40683ed4d293d9a72723137e232fb24800a21b0355746c735ce708
 
 name:           petstore-running-example
 version:        0.1.0.0
@@ -24,6 +24,7 @@ library
     , http-client
     , http-conduit
     , openapi
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite petstore-running-example-test
@@ -43,4 +44,5 @@ test-suite petstore-running-example-test
     , http-conduit
     , openapi
     , petstore-running-example
+    , unordered-containers
   default-language: Haskell2010
