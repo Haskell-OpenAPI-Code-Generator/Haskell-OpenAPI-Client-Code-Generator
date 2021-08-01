@@ -10,6 +10,7 @@ specifications=(
   official-petstore-expanded.yaml
   official-uspto.yaml
   petstore-expanded.json
+  selenium.yaml
   uber.json
 )
 

@@ -284,6 +284,9 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Dog'
+    Test6:
+      type: string
+      enum: ["hello", "there"]
     CoverType:
       type: object
       properties:
@@ -296,6 +299,7 @@ components:
             - $ref: '#/components/schemas/Test3'
             - $ref: '#/components/schemas/Test4'
             - $ref: '#/components/schemas/Test5'
+            - $ref: '#/components/schemas/Test6'
   parameters:
     PetParameters:
       name: petId
