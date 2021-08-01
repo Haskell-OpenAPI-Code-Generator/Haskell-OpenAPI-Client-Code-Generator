@@ -72,7 +72,7 @@ jobs:
       - run:
           name: System tests level 3
           command: |
-            cd /.circleci/testing/level3/mock-server
+            cd .circleci/testing/level3/mock-server
             stack build
             stack run &
             cd ~/project
