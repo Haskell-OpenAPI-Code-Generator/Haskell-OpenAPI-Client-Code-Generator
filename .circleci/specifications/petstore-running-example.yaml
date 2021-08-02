@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
-- url: https://petstore.swagger.io/v2
+  - url: http://localhost:8887
 info:
   description: 'This is a sample server Petstore server.  You can find out more about
     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For

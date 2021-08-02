@@ -20,7 +20,7 @@ main =
   hspec $ do
     describe "runGetInventory" $ do
       it "should run anonymous" $ do
-        let requestExpectation = expectURL "https://petstore.swagger.io/v2/store/inventory" $ expectMethod "GET" noExpectation
+        let requestExpectation = expectURL "http://localhost:8887/store/inventory" $ expectMethod "GET" noExpectation
         response <- runMock runGetInventoryAnonymous (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` GetInventoryResponse200 HashMap.empty
       it "should run with basic auth" $ do
