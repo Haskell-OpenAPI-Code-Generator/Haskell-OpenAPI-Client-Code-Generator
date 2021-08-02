@@ -15,6 +15,7 @@ module OpenAPI (
   module OpenAPI.Types.Mischling,
   module OpenAPI.Types.PetByAge,
   module OpenAPI.Types.PetByType,
+  module OpenAPI.Types.Test6,
   module OpenAPI.Configuration,
   module OpenAPI.SecuritySchemes,
   module OpenAPI.Common,
@@ -33,6 +34,7 @@ import OpenAPI.Types.Dog
 import OpenAPI.Types.Mischling
 import OpenAPI.Types.PetByAge
 import OpenAPI.Types.PetByType
+import OpenAPI.Types.Test6
 import OpenAPI.Configuration
 import OpenAPI.SecuritySchemes
 import OpenAPI.Common
