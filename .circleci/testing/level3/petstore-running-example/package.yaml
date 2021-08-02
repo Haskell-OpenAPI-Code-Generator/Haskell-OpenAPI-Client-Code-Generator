@@ -8,6 +8,7 @@ dependencies:
   - bytestring
   - openapi
   - aeson
+  - unordered-containers
 
 library:
   source-dirs: src

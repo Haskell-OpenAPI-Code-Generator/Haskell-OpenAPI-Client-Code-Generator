@@ -71,16 +71,12 @@ jobs:
           at: ~/project
       - run:
           name: System tests level 3
-          command: ./.circleci/test_system_3
-
-  coverage:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: System tests level 3
-          command: ./.circleci/test_system_3
+          command: |
+            cd .circleci/testing/level3/mock-server
+            stack build
+            stack run &
+            cd ~/project
+            ./.circleci/test_system_3
 
 workflows:
   version: 2
