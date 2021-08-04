@@ -1,10 +1,10 @@
 specification: .circleci/specifications/stripe-api.yml
-outputDir: stripe
+outputDir: out
 packageName: stripeapi
 moduleName: StripeAPI
 logLevel: WARN
-force: false
-incremental: true
+force: true
+incremental: false
 dryRun: false
 doNotGenerateStackProject: false
 generateNixFiles: false
