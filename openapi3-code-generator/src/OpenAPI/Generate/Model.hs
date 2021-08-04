@@ -181,7 +181,7 @@ defineModelForSchemaConcrete strategy schemaName schema =
   let enumValues = OAS.enum schema
    in if null enumValues
         then defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema
-        else defineEnumModel strategy schemaName schema enumValues
+        else defineEnumModel schemaName schema enumValues
 
 -- | Creates a Model, ignores enum values
 defineModelForSchemaConcreteIgnoreEnum :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
@@ -203,15 +203,15 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
     _ ->
       typeAliasing $ pure (varT $ getSchemaType settings schema, (emptyDoc, Set.empty))
 
-defineEnumModel :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> [Aeson.Value] -> OAM.Generator TypeWithDeclaration
-defineEnumModel strategy schemaName schema enumValues = do
+defineEnumModel :: Text -> OAS.SchemaObject -> [Aeson.Value] -> OAM.Generator TypeWithDeclaration
+defineEnumModel schemaName schema enumValues = do
   name <- haskellifyNameM True schemaName
   OAM.logInfo $ "Define as enum named '" <> T.pack (nameBase name) <> "'"
   let getConstructor (a, _, _) = a
       getValueInfo value = do
         cname <- haskellifyNameM True (schemaName <> T.pack "Enum" <> aesonValueToName value)
         pure (normalC cname [], cname, value)
-  (typ, (content, dependencies)) <- defineModelForSchemaConcreteIgnoreEnum strategy (schemaName <> "EnumValue") schema
+  (typ, (_, dependencies)) <- defineModelForSchemaConcreteIgnoreEnum DontCreateTypeAlias (schemaName <> "EnumValue") schema
   constructorsInfo <- mapM getValueInfo enumValues
   fallbackName <- haskellifyNameM True $ schemaName <> "Other"
   typedName <- haskellifyNameM True $ schemaName <> "Typed"
@@ -251,7 +251,7 @@ defineEnumModel strategy schemaName schema enumValues = do
             Nothing
             (fallbackC : typedC : (getConstructor <$> constructorsInfo))
             objectDeriveClause
-  pure (varT name, (content `appendDoc` newType `appendDoc` jsonImplementation, dependencies))
+  pure (varT name, (newType `appendDoc` jsonImplementation, dependencies))
 
 defineJsonImplementationForEnum :: Name -> Name -> Name -> [(Name, Aeson.Value)] -> Q Doc
 defineJsonImplementationForEnum name fallbackName typedName nameValues =
