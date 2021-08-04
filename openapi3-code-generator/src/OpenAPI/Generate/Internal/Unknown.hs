@@ -26,7 +26,7 @@ warnAboutUnknownOperations operationDefinitions = do
         Maybe.mapMaybe OAT.operationId $
           Maybe.catMaybes $
             operationDefinitions >>= getAllOperationObjectsFromPathItemObject . snd
-  operationsToGenerate <- OAM.getFlag OAO.flagOperationsToGenerate
+  operationsToGenerate <- OAM.getSetting OAO.settingOperationsToGenerate
   printWarningIfUnknown (\operationId proposedOptions -> "The operation '" <> operationId <> "' which is listed for generation does not appear in the provided OpenAPI specification. " <> proposedOptions) operationIds operationsToGenerate
 
 -- | Warn about schemas listed as CLI options (white list or opaque schemas) which do not appear in the provided OpenAPI specification
@@ -34,8 +34,8 @@ warnAboutUnknownWhiteListedOrOpaqueSchemas :: [(Text, OAS.Schema)] -> OAM.Genera
 warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions = do
   let schemaNames = fst <$> schemaDefinitions
       printWarningIfUnknownWithTypeName typeName = printWarningIfUnknown (\name proposedOptions -> "The " <> typeName <> " '" <> name <> "' does not appear in the provided OpenAPI specification. " <> proposedOptions) schemaNames
-  whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
-  opaqueSchemas <- OAM.getFlag OAO.flagOpaqueSchemas
+  whiteListedSchemas <- OAM.getSetting OAO.settingWhiteListedSchemas
+  opaqueSchemas <- OAM.getSetting OAO.settingOpaqueSchemas
   printWarningIfUnknownWithTypeName "white-listed schema" whiteListedSchemas
   printWarningIfUnknownWithTypeName "schema listed as opaque" opaqueSchemas
 

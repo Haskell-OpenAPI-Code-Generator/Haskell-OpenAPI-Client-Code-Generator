@@ -14,7 +14,6 @@ import qualified OpenAPI.Generate.Log as OAL
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
-import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import qualified OpenAPI.Generate.Types.Schema as OAS
 
 -- | The reader environment of the 'Generator' monad
@@ -25,8 +24,7 @@ import qualified OpenAPI.Generate.Types.Schema as OAS
 data GeneratorEnvironment = GeneratorEnvironment
   { currentPath :: [Text],
     references :: Ref.ReferenceMap,
-    options :: OAO.Options,
-    generatorConfiguration :: Maybe OAG.GeneratorConfiguration
+    settings :: OAO.Settings
   }
   deriving (Show, Eq)
 
@@ -39,14 +37,13 @@ newtype Generator a = Generator {unGenerator :: MW.WriterT OAL.LogEntries (MR.Re
 runGenerator :: GeneratorEnvironment -> Generator a -> (a, OAL.LogEntries)
 runGenerator e (Generator g) = MR.runReader (MW.runWriterT g) e
 
--- | Create an environment based on a 'Ref.ReferenceMap' and 'OAO.Flags'
-createEnvironment :: OAO.Options -> Maybe OAG.GeneratorConfiguration -> Ref.ReferenceMap -> GeneratorEnvironment
-createEnvironment options generatorConfiguration references =
+-- | Create an environment based on a 'Ref.ReferenceMap' and 'OAO.Settings'
+createEnvironment :: OAO.Settings -> Ref.ReferenceMap -> GeneratorEnvironment
+createEnvironment settings references =
   GeneratorEnvironment
     { currentPath = [],
       references = references,
-      options = options,
-      generatorConfiguration = generatorConfiguration
+      settings = settings
     }
 
 -- | Writes a log message to a 'Generator' monad
@@ -81,9 +78,6 @@ resetPath path = MR.local $ \g -> g {currentPath = path}
 
 getCurrentPath :: Generator [Text]
 getCurrentPath = MR.asks currentPath
-
-getFromGeneratorConfiguration :: (OAG.GeneratorConfiguration -> a) -> Generator (Maybe a)
-getFromGeneratorConfiguration f = MR.asks (fmap f . generatorConfiguration)
 
 appendToPath :: [Text] -> Generator [Text]
 appendToPath path = do
@@ -122,10 +116,10 @@ getHeaderReferenceM = createReferenceLookupM Ref.getHeaderReference
 getSecuritySchemeReferenceM :: Text -> Generator (Maybe OAT.SecuritySchemeObject)
 getSecuritySchemeReferenceM = createReferenceLookupM Ref.getSecuritySchemeReference
 
--- | Get all flags passed to the program
-getFlags :: Generator OAO.Flags
-getFlags = MR.asks $ OAO.optFlags . options
+-- | Get all settings passed to the program
+getSettings :: Generator OAO.Settings
+getSettings = MR.asks settings
 
--- | Get a specific flag selected by @f@
-getFlag :: (OAO.Flags -> a) -> Generator a
-getFlag f = MR.asks $ f . OAO.optFlags . options
+-- | Get a specific setting selected by @f@
+getSetting :: (OAO.Settings -> a) -> Generator a
+getSetting f = MR.asks $ f . settings

@@ -96,7 +96,7 @@ generateParameterTypeFromOperation operationName = getParametersFromOperationCon
 generateParameterType :: Text -> [(OAT.ParameterObject, [Text])] -> OAM.Generator ParameterCardinality
 generateParameterType operationName parameters = OAM.nested "parameters" $ do
   maybeSchemas <- mapM (\(p, path) -> OAM.resetPath path $ getSchemaFromParameter p) parameters
-  parametersSuffix <- OAM.getFlag OAO.flagParametersTypeSuffix
+  parametersSuffix <- OAM.getSetting OAO.settingParametersTypeSuffix
   let parametersWithSchemas =
         [ ((parameter, path), mergeDescriptionOfParameterWithSchema parameter schema)
           | ((parameter, path), Just schema) <-
@@ -133,7 +133,7 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
         Model.defineModelForSchemaNamed schemaName $
           OAT.Concrete $
             OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
-      convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
+      convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
       let parametersWithPropertyNames = BF.bimap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText) fst <$> parametersWithNames
           filterByType t = filter ((== t) . getInFromParameterObject . snd) parametersWithPropertyNames
           parameterTypeDefinitionQueryParams = filterByType OAT.QueryParameterObjectLocation
@@ -152,10 +152,10 @@ mergeDescriptionOfParameterWithSchema _ schema = schema
 getParameterLocationPrefix :: OAT.ParameterObject -> OAM.Generator Text
 getParameterLocationPrefix =
   ( \case
-      OAT.QueryParameterObjectLocation -> OAM.getFlag OAO.flagParameterQueryPrefix
-      OAT.PathParameterObjectLocation -> OAM.getFlag OAO.flagParameterPathPrefix
-      OAT.CookieParameterObjectLocation -> OAM.getFlag OAO.flagParameterCookiePrefix
-      OAT.HeaderParameterObjectLocation -> OAM.getFlag OAO.flagParameterHeaderPrefix
+      OAT.QueryParameterObjectLocation -> OAM.getSetting OAO.settingParameterQueryPrefix
+      OAT.PathParameterObjectLocation -> OAM.getSetting OAO.settingParameterPathPrefix
+      OAT.CookieParameterObjectLocation -> OAM.getSetting OAO.settingParameterCookiePrefix
+      OAT.HeaderParameterObjectLocation -> OAM.getSetting OAO.settingParameterHeaderPrefix
   )
     . getInFromParameterObject
 
@@ -332,7 +332,7 @@ shouldGenerateRequestBody :: Maybe RequestBodyDefinition -> OAM.Generator Bool
 shouldGenerateRequestBody Nothing = pure False
 shouldGenerateRequestBody (Just RequestBodyDefinition {..}) = do
   maybeSchema <- Model.resolveSchemaReferenceWithoutWarning schema
-  generateEmptyRequestBody <- OAM.getFlag OAO.flagGenerateOptionalEmptyRequestBody
+  generateEmptyRequestBody <- OAM.getSetting OAO.settingGenerateOptionalEmptyRequestBody
   case maybeSchema of
     Just s
       | not generateEmptyRequestBody

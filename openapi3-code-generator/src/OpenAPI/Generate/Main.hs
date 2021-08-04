@@ -72,7 +72,7 @@ defineModels moduleName spec operationDependencies =
         OAM.nested "schemas" $ do
           warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions
           models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
-          whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
+          whiteListedSchemas <- OAM.getSetting OAO.settingWhiteListedSchemas
           let dependencies = Set.union operationDependencies $ Set.fromList $ fmap transformToModuleName whiteListedSchemas
           pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies models
 

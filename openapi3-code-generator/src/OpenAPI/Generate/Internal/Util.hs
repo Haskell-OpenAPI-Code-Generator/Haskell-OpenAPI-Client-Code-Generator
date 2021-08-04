@@ -110,8 +110,8 @@ haskellifyName convertToCamelCase startWithUppercase name = mkName $ haskellifyT
 -- | 'OAM.Generator' version of 'haskellifyName'
 haskellifyNameM :: Bool -> Text -> OAM.Generator Name
 haskellifyNameM startWithUppercase name = do
-  flags <- OAM.getFlags
-  pure $ haskellifyName (OAO.flagConvertToCamelCase flags) startWithUppercase name
+  convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
+  pure $ haskellifyName convertToCamelCase startWithUppercase name
 
 -- | Transform a module name to ensure it is valid for file names
 transformToModuleName :: Text -> Text

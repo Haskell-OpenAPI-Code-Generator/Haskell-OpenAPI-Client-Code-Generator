@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ce09bab9bf2cd9abcdcbb08ca77f5a142be37defb8fcbcb103537deea1f3102c
+-- hash: cf1e3dff15e474ae5f844a8eda70a3bf67923dd895e3ad9097898bb122395653
 
 name:           openapi3-code-generator
 version:        0.1.0.6
@@ -43,12 +43,13 @@ library
       OpenAPI.Generate.Monad
       OpenAPI.Generate.Operation
       OpenAPI.Generate.OptParse
+      OpenAPI.Generate.OptParse.Configuration
+      OpenAPI.Generate.OptParse.Flags
       OpenAPI.Generate.Reference
       OpenAPI.Generate.Response
       OpenAPI.Generate.SecurityScheme
       OpenAPI.Generate.Types
       OpenAPI.Generate.Types.ExternalDocumentation
-      OpenAPI.Generate.Types.GeneratorConfiguration
       OpenAPI.Generate.Types.Referencable
       OpenAPI.Generate.Types.Schema
   other-modules:
@@ -69,6 +70,8 @@ library
     , http-types
     , mtl
     , optparse-applicative
+    , path
+    , path-io
     , scientific
     , split
     , template-haskell
@@ -78,6 +81,7 @@ library
     , unordered-containers
     , vector
     , yaml
+    , yamlparse-applicative
   default-language: Haskell2010
 
 executable openapi3-code-generator-exe
@@ -101,6 +105,8 @@ executable openapi3-code-generator-exe
     , mtl
     , openapi3-code-generator
     , optparse-applicative
+    , path
+    , path-io
     , scientific
     , split
     , template-haskell
@@ -110,6 +116,7 @@ executable openapi3-code-generator-exe
     , unordered-containers
     , vector
     , yaml
+    , yamlparse-applicative
   default-language: Haskell2010
 
 test-suite openapi3-code-generator-test
@@ -146,6 +153,8 @@ test-suite openapi3-code-generator-test
     , mtl
     , openapi3-code-generator
     , optparse-applicative
+    , path
+    , path-io
     , scientific
     , split
     , template-haskell
@@ -157,4 +166,5 @@ test-suite openapi3-code-generator-test
     , validity-text
     , vector
     , yaml
+    , yamlparse-applicative
   default-language: Haskell2010

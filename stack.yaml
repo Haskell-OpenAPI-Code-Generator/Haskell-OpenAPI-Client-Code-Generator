@@ -3,3 +3,5 @@ packages:
 - openapi3-code-generator
 nix:
   shell-file: shell.nix
+extra-deps:
+- yamlparse-applicative-0.1.0.2@sha256:bda91f2818c1b5b124963931cb7f9a4e5758d026c09713e9ae2234534062747d,2133
