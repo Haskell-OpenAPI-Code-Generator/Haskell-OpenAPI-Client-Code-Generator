@@ -43,9 +43,9 @@ getResponseDefinitions ::
   -- the definitions of all response types.
   OAM.Generator (Name, Q Exp, Q Doc, Dep.Models)
 getResponseDefinitions operation appendToOperationName = OAM.nested "responses" $ do
-  convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
-  responseSuffix <- OAM.getFlag OAO.flagResponseTypeSuffix
-  responseBodySuffix <- OAM.getFlag OAO.flagResponseBodyTypeSuffix
+  convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
+  responseSuffix <- OAM.getSetting OAO.settingResponseTypeSuffix
+  responseBodySuffix <- OAM.getSetting OAO.settingResponseBodyTypeSuffix
   let responsesObject = OAT.responses (operation :: OAT.OperationObject)
       createBodyName = createResponseNameAsText convertToCamelCase appendToOperationName . (responseBodySuffix <>)
       createName = createResponseName convertToCamelCase appendToOperationName . (responseSuffix <>)

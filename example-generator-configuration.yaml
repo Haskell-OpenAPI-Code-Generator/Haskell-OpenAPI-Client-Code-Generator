@@ -1,5 +1,0 @@
-# Example configuration which can be used for generation customization using
-# the --generator-configuration CLI option. For the Haskell data types this
-# configuration is parsed into, see https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/blob/master/src/OpenAPI/Generate/Types/GeneratorConfiguration.hs
-opaqueSchemas:
-  - error

@@ -20,7 +20,6 @@ import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
-import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import System.Directory
 import System.FilePath
 import System.IO.Error
@@ -120,13 +119,13 @@ replaceOpenAPI moduleName contents =
       T.replace (T.pack "OpenAPI.Configuration") (T.pack $ moduleName ++ ".Configuration") $
         T.pack contents
 
-permitProceed :: OAO.Flags -> IO Bool
-permitProceed flags = do
-  let outputDirectory = T.unpack $ OAO.flagOutputDir flags
+permitProceed :: OAO.Settings -> IO Bool
+permitProceed settings = do
+  let outputDirectory = T.unpack $ OAO.settingOutputDir settings
   outputDirectoryExists <- doesPathExist outputDirectory
   if outputDirectoryExists
     then
-      if OAO.flagForce flags || OAO.flagIncremental flags
+      if OAO.settingForce settings || OAO.settingIncremental settings
         then do
           putStrLn "Output directory already exists and will be overwritten"
           pure True
@@ -143,10 +142,10 @@ permitProceed flags = do
       putStrLn "Output directory will be created"
       pure True
 
-getHsBootFiles :: OAO.Flags -> [([String], String)] -> FilesWithContent
-getHsBootFiles flags modelModules =
-  let outputDirectory = T.unpack $ OAO.flagOutputDir flags
-      moduleName = T.unpack $ OAO.flagModuleName flags
+getHsBootFiles :: OAO.Settings -> [([String], String)] -> FilesWithContent
+getHsBootFiles settings modelModules =
+  let outputDirectory = T.unpack $ OAO.settingOutputDir settings
+      moduleName = T.unpack $ OAO.settingModuleName settings
    in BF.bimap
         ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs-boot") . foldr1 (</>))
         ( T.unpack
@@ -189,14 +188,13 @@ data OutputFiles = OutputFiles
     nixFiles :: FilesWithContent
   }
 
-generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Options -> Maybe OAG.GeneratorConfiguration -> IO OutputFiles
-generateFilesToCreate spec options generatorConfiguration = do
-  let flags = OAO.optFlags options
-      outputDirectory = T.unpack $ OAO.flagOutputDir flags
-      moduleName = T.unpack $ OAO.flagModuleName flags
-      packageName = T.unpack $ OAO.flagPackageName flags
-      env = OAM.createEnvironment options generatorConfiguration $ Ref.buildReferenceMap spec
-      logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.flagLogLevel flags)
+generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Settings -> IO OutputFiles
+generateFilesToCreate spec settings = do
+  let outputDirectory = T.unpack $ OAO.settingOutputDir settings
+      moduleName = T.unpack $ OAO.settingModuleName settings
+      packageName = T.unpack $ OAO.settingPackageName settings
+      env = OAM.createEnvironment settings $ Ref.buildReferenceMap spec
+      logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.settingLogLevel settings)
       showAndReplace = replaceOpenAPI moduleName . show
       ((operationsQ, operationDependencies), logs) = OAM.runGenerator env $ defineOperations moduleName spec
   logMessages logs
@@ -224,7 +222,7 @@ generateFilesToCreate spec options generatorConfiguration = do
           modules
       mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
       mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
-      hsBootFiles = getHsBootFiles flags modelModules
+      hsBootFiles = getHsBootFiles settings modelModules
   pure $
     OutputFiles
       ( BF.second (unlines . lines)
@@ -236,11 +234,11 @@ generateFilesToCreate spec options generatorConfiguration = do
       (BF.first (outputDirectory </>) <$> stackProjectFiles)
       (BF.first (outputDirectory </>) <$> nixProjectFiles packageName)
 
-writeFiles :: OAO.Flags -> OutputFiles -> IO ()
-writeFiles flags OutputFiles {..} = do
-  let outputDirectory = T.unpack $ OAO.flagOutputDir flags
-      moduleName = T.unpack $ OAO.flagModuleName flags
-      incremental = OAO.flagIncremental flags
+writeFiles :: OAO.Settings -> OutputFiles -> IO ()
+writeFiles settings OutputFiles {..} = do
+  let outputDirectory = T.unpack $ OAO.settingOutputDir settings
+      moduleName = T.unpack $ OAO.settingModuleName settings
+      incremental = OAO.settingIncremental settings
       write = mapM_ $ if incremental then writeFileIncremental else writeFileWithLog
   putStrLn "Remove old output directory"
   unless incremental $
@@ -251,9 +249,9 @@ writeFiles flags OutputFiles {..} = do
   putStrLn "Directories created"
   write moduleFiles
   write cabalFiles
-  unless (OAO.flagDoNotGenerateStackProject flags) $
+  unless (OAO.settingDoNotGenerateStackProject settings) $
     write stackFiles
-  unless (OAO.flagDoNotGenerateNixFiles flags) $
+  when (OAO.settingGenerateNixFiles settings) $
     write nixFiles
 
 writeFileWithLog :: FileWithContent -> IO ()

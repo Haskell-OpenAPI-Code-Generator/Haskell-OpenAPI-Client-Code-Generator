@@ -42,7 +42,6 @@ import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Types as OAT
-import qualified OpenAPI.Generate.Types.GeneratorConfiguration as OAG
 import qualified OpenAPI.Generate.Types.Schema as OAS
 import Prelude hiding (maximum, minimum, not)
 
@@ -101,16 +100,13 @@ defineModelForSchema schemaName schema = do
           pure ([t|Aeson.Value|], (emptyDoc, Set.empty))
       blackListAlias = aliasWithText "This alias is created because of the generator configuration and possibly could have a more precise type."
       whiteListAlias = aliasWithText $ "This is just a type synonym and possibly could have a more precise type because the schema name @" <> schemaName <> "@ is not whitelisted."
-  opaqueSchemasM <- OAM.getFromGeneratorConfiguration OAG.generatorConfigurationOpaqueSchemas
-  flagOpaqueSchemas <- OAM.getFlag OAO.flagOpaqueSchemas
-  whiteListedSchemas <- OAM.getFlag OAO.flagWhiteListedSchemas
+  settingOpaqueSchemas <- OAM.getSetting OAO.settingOpaqueSchemas
+  whiteListedSchemas <- OAM.getSetting OAO.settingWhiteListedSchemas
   namedSchema <-
     OAM.nested schemaName $
-      if schemaName `elem` flagOpaqueSchemas
+      if schemaName `elem` settingOpaqueSchemas
         then blackListAlias
-        else case opaqueSchemasM of
-          Just opaqueSchemas | schemaName `elem` opaqueSchemas -> blackListAlias
-          _ -> if null whiteListedSchemas || schemaName `elem` whiteListedSchemas then defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema else whiteListAlias
+        else if null whiteListedSchemas || schemaName `elem` whiteListedSchemas then defineModelForSchemaNamedWithTypeAliasStrategy CreateTypeAlias schemaName schema else whiteListAlias
   pure (transformToModuleName schemaName, snd namedSchema)
 
 -- | Defines all the models for a schema and returns the declarations with the type of the root model
@@ -190,7 +186,7 @@ defineModelForSchemaConcrete strategy schemaName schema =
 -- | Creates a Model, ignores enum values
 defineModelForSchemaConcreteIgnoreEnum :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
 defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
-  flags <- OAM.getFlags
+  settings <- OAM.getSettings
   let schemaDescription = getDescriptionOfSchema schema
       typeAliasing = createAlias schemaName schemaDescription strategy
   case schema of
@@ -205,7 +201,7 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
             (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ OAS.anyOf schema
             _ -> defineObjectModelForSchema strategy schemaName schema
     _ ->
-      typeAliasing $ pure (varT $ getSchemaType flags schema, (emptyDoc, Set.empty))
+      typeAliasing $ pure (varT $ getSchemaType settings schema, (emptyDoc, Set.empty))
 
 defineEnumModel :: Text -> OAS.SchemaObject -> [Aeson.Value] -> OAM.Generator TypeWithDeclaration
 defineEnumModel schemaName schema enumValues = do
@@ -330,8 +326,8 @@ defineAnyOfSchema strategy schemaName description schemas = do
 defineOneOfSchema :: Text -> Text -> [OAS.Schema] -> OAM.Generator TypeWithDeclaration
 defineOneOfSchema schemaName description schemas = do
   when (null schemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
-  flags <- OAM.getFlags
-  let name = haskellifyName (OAO.flagConvertToCamelCase flags) True $ schemaName <> "Variants"
+  settings <- OAM.getSettings
+  let name = haskellifyName (OAO.settingConvertToCamelCase settings) True $ schemaName <> "Variants"
       (schemas', schemasWithFixedValues) = extractSchemasWithFixedValues schemas
       indexedSchemas = zip schemas' ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
@@ -342,10 +338,10 @@ defineOneOfSchema schemaName description schemas = do
       dependencies = Set.unions $ fmap (snd . snd) variants
       types = fmap fst variants
       indexedTypes = zip types ([1 ..] :: [Integer])
-      haskellifyConstructor = haskellifyName (OAO.flagConvertToCamelCase flags) True
+      haskellifyConstructor = haskellifyName (OAO.settingConvertToCamelCase settings) True
       getConstructorName (typ, n) = do
         t <- typ
-        let suffix = if OAO.flagUseNumberedVariantConstructors flags then "Variant" <> T.pack (show n) else typeToSuffix t
+        let suffix = if OAO.settingUseNumberedVariantConstructors settings then "Variant" <> T.pack (show n) else typeToSuffix t
         pure $ haskellifyConstructor $ schemaName <> suffix
       constructorNames = fmap getConstructorName indexedTypes
       createTypeConstruct (typ, n) = do
@@ -547,9 +543,9 @@ defineObjectModelForSchema strategy schemaName schema =
   if OAS.isSchemaEmpty schema
     then createAlias schemaName (getDescriptionOfSchema schema) strategy $ pure ([t|Aeson.Object|], (emptyDoc, Set.empty))
     else do
-      flags <- OAM.getFlags
+      settings <- OAM.getSettings
       path <- getCurrentPathEscaped
-      let convertToCamelCase = OAO.flagConvertToCamelCase flags
+      let convertToCamelCase = OAO.settingConvertToCamelCase settings
           name = haskellifyName convertToCamelCase True schemaName
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues $ Map.toList $ OAS.properties schema
           propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
@@ -706,8 +702,8 @@ createFromJSONImplementation objectName recordNames required =
 propertiesToBangTypes :: Text -> [(Text, OAS.Schema)] -> Set.Set Text -> OAM.Generator BangTypesSelfDefined
 propertiesToBangTypes _ [] _ = pure (pure [], emptyDoc, Set.empty)
 propertiesToBangTypes schemaName props required = OAM.nested "properties" $ do
-  propertySuffix <- OAM.getFlag OAO.flagPropertyTypeSuffix
-  convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
+  propertySuffix <- OAM.getSetting OAO.settingPropertyTypeSuffix
+  convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
   let createBang :: Text -> Text -> Q Type -> Q VarBangType
       createBang recordName propName myType = do
         bang' <- bang noSourceUnpackedness noSourceStrictness
@@ -773,19 +769,19 @@ getConstraintDescriptionsOfSchema schema =
         ]
 
 -- | Extracts the 'Name' of a 'OAS.SchemaObject' which should be used for primitive types
-getSchemaType :: OAO.Flags -> OAS.SchemaObject -> Name
-getSchemaType OAO.Flags {flagUseIntWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Integer
+getSchemaType :: OAO.Settings -> OAS.SchemaObject -> Name
+getSchemaType OAO.Settings {settingUseIntWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Integer
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int32"} = ''Int.Int32
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int64"} = ''Int.Int64
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Int
-getSchemaType OAO.Flags {flagUseFloatWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Scientific.Scientific
+getSchemaType OAO.Settings {settingUseFloatWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Scientific.Scientific
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "float"} = ''Float
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "double"} = ''Double
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Double
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "byte"} = ''OC.JsonByteString
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary"} = ''OC.JsonByteString
-getSchemaType OAO.Flags {flagUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date"} = ''Day
-getSchemaType OAO.Flags {flagUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time"} = ''OC.JsonDateTime
+getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date"} = ''Day
+getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time"} = ''OC.JsonDateTime
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString} = ''Text
 getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool} = ''Bool
 getSchemaType _ OAS.SchemaObject {} = ''Text

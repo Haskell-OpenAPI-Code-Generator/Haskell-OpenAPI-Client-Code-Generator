@@ -32,10 +32,13 @@ dependencies:
 - transformers
 - time
 - optparse-applicative
+- yamlparse-applicative
 - vector
 - hashmap
 - directory
 - filepath
+- path
+- path-io
 
 library:
   source-dirs: src

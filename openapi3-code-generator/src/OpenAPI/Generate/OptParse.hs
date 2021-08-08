@@ -1,413 +1,166 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
--- | This module defines the available command line flags and their default values.
+-- | This module defines the settings and their default values.
 module OpenAPI.Generate.OptParse
-  ( Options (..),
-    Flags (..),
-    parseOptions,
-    parseFlags,
+  ( Settings (..),
+    getSettings,
   )
 where
 
+import Control.Applicative
+import Data.Maybe
 import Data.Text (Text)
+import qualified Data.Text as T
 import qualified OpenAPI.Generate.Log as OAL
+import OpenAPI.Generate.OptParse.Configuration
+import OpenAPI.Generate.OptParse.Flags
 import Options.Applicative
+import Options.Applicative.Help (string)
+import Path.IO
+import Path.Posix
+import YamlParse.Applicative as YamlParse
 
-data Options = Options
-  { optSpecification :: Text,
-    optFlags :: Flags
-  }
-  deriving (Show, Eq)
+getSettings :: IO Settings
+getSettings = do
+  flags <- getFlags
+  config <- getConfiguration flags
+  combineToSettings flags config
 
-parseOptions :: Parser Options
-parseOptions =
-  Options
-    <$> strArgument
-      ( mconcat
-          [ metavar "FILENAME",
-            help "The OpenAPI 3 specification file which code should be generated for."
-          ]
-      )
-    <*> parseFlags
-
--- | The options passed to the generator via CLI
-data Flags = Flags
-  { -- | The directory where the generated output is stored.
-    flagOutputDir :: Text,
-    -- | The path to a configuration file which allows to configure the generation
-    flagGeneratorConfigurationFile :: Maybe Text,
+data Settings = Settings
+  { -- | The OpenAPI 3 specification file which code should be generated for.
+    settingOpenApiSpecification :: !Text,
+    -- | The directory where the generated output is stored.
+    settingOutputDir :: !Text,
     -- | Name of the stack project
-    flagPackageName :: Text,
+    settingPackageName :: !Text,
     -- | Name of the module
-    flagModuleName :: Text,
+    settingModuleName :: !Text,
     -- | The minimum log level to output
-    flagLogLevel :: OAL.LogSeverity,
+    settingLogLevel :: !OAL.LogSeverity,
     -- | Overwrite output directory without question
-    flagForce :: Bool,
+    settingForce :: !Bool,
     -- | Only write new/changed files
-    flagIncremental :: Bool,
+    settingIncremental :: !Bool,
     -- | Do not generate the output files but only print the generated code
-    flagDryRun :: Bool,
+    settingDryRun :: !Bool,
     -- | Do not generate a stack project alongside the raw Haskell files
-    flagDoNotGenerateStackProject :: Bool,
-    -- | Do not generate Nix files (default.nix and shell.nix)
-    flagDoNotGenerateNixFiles :: Bool,
+    settingDoNotGenerateStackProject :: !Bool,
+    -- | Generate Nix files (default.nix and shell.nix)
+    settingGenerateNixFiles :: !Bool,
     -- | Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration
-    flagOmitAdditionalOperationFunctions :: Bool,
+    settingOmitAdditionalOperationFunctions :: !Bool,
     -- | Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)
-    flagGenerateOptionalEmptyRequestBody :: Bool,
+    settingGenerateOptionalEmptyRequestBody :: !Bool,
     -- | Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types
-    flagUseNumberedVariantConstructors :: Bool,
+    settingUseNumberedVariantConstructors :: !Bool,
     -- | Use Data.Scientific instead of Double to support arbitrary number precision
-    flagUseFloatWithArbitraryPrecision :: Bool,
+    settingUseFloatWithArbitraryPrecision :: !Bool,
     -- | Use 'Integer' instead of 'Int' to support arbitrary number precision
-    flagUseIntWithArbitraryPrecision :: Bool,
+    settingUseIntWithArbitraryPrecision :: !Bool,
     -- | Convert strings formatted as date / date-time to date types
-    flagUseDateTypesAsString :: Bool,
+    settingUseDateTypesAsString :: !Bool,
     -- | Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification
-    flagConvertToCamelCase :: Bool,
+    settingConvertToCamelCase :: !Bool,
     -- | Add a suffix to property types to prevent naming conflicts
-    flagPropertyTypeSuffix :: Text,
+    settingPropertyTypeSuffix :: !Text,
     -- | The suffix which is added to the response data types
-    flagResponseTypeSuffix :: Text,
+    settingResponseTypeSuffix :: !Text,
     -- | The suffix which is added to the response body data types
-    flagResponseBodyTypeSuffix :: Text,
+    settingResponseBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the request body data types
-    flagRequestBodyTypeSuffix :: Text,
+    settingRequestBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the parameters type of operations
-    flagParametersTypeSuffix :: Text,
+    settingParametersTypeSuffix :: !Text,
     -- | The prefix which is added to query parameters
-    flagParameterQueryPrefix :: Text,
+    settingParameterQueryPrefix :: !Text,
     -- | The prefix which is added to path parameters
-    flagParameterPathPrefix :: Text,
+    settingParameterPathPrefix :: !Text,
     -- | The prefix which is added to cookie parameters
-    flagParameterCookiePrefix :: Text,
+    settingParameterCookiePrefix :: !Text,
     -- | The prefix which is added to header parameters
-    flagParameterHeaderPrefix :: Text,
+    settingParameterHeaderPrefix :: !Text,
     -- | The operations to generate (if empty all operations are generated)
-    flagOperationsToGenerate :: [Text],
+    settingOperationsToGenerate :: ![Text],
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which are not further investigated while generating code from the specification.
     -- Only a type alias to 'Aeson.Value' is created for these schemas.
-    flagOpaqueSchemas :: [Text],
+    settingOpaqueSchemas :: ![Text],
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which need to be generated.
     -- For all other schemas only a type alias to 'Aeson.Value' is created.
-    flagWhiteListedSchemas :: [Text]
+    settingWhiteListedSchemas :: ![Text]
   }
   deriving (Show, Eq)
 
-parseFlags :: Parser Flags
-parseFlags =
-  Flags
-    <$> parseFlagOutputDir
-    <*> parseFlagGeneratorConfigurationFile
-    <*> parseFlagPackageName
-    <*> parseFlagModuleName
-    <*> parseFlagLogLevel
-    <*> parseFlagForce
-    <*> parseFlagIncremental
-    <*> parseFlagDryRun
-    <*> parseFlagDoNotGenerateStackProject
-    <*> parseFlagDoNotGenerateNixFiles
-    <*> parseFlagOmitAdditionalOperationFunctions
-    <*> parseFlagGenerateOptionalEmptyRequestBody
-    <*> parseFlagUseNumberedVariantConstructors
-    <*> parseFlagUseFloatWithArbitraryPrecision
-    <*> parseFlagUseIntWithArbitraryPrecision
-    <*> parseFlagUseDateTypesAsString
-    <*> parseFlagConvertToCamelCase
-    <*> parseFlagPropertyTypeSuffix
-    <*> parseFlagResponseTypeSuffix
-    <*> parseFlagResponseBodyTypeSuffix
-    <*> parseFlagRequestBodyTypeSuffix
-    <*> parseFlagParametersTypeSuffix
-    <*> parseFlagParameterQueryPrefix
-    <*> parseFlagParameterPathPrefix
-    <*> parseFlagParameterCookiePrefix
-    <*> parseFlagParameterHeaderPrefix
-    <*> parseFlagOperationsToGenerate
-    <*> parseFlagOpaqueSchemas
-    <*> parseFlagWhiteListedSchemas
+combineToSettings :: Flags -> Maybe Configuration -> IO Settings
+combineToSettings Flags {..} mConf = do
+  let resolveRelativeToConfiguration mPath = case (mPath, flagConfiguration) of
+        (Just filePath, Just configurationPath) -> do
+          configurationDirectory <- resolveFile' $ T.unpack configurationPath
+          file <- resolveFile (parent configurationDirectory) $ T.unpack filePath
+          pure $ Just $ T.pack $ toFilePath file
+        _ -> pure Nothing
+  mConfigOpenApiSpecification <- resolveRelativeToConfiguration $ mc configOpenApiSpecification
+  mConfigOutputDir <- resolveRelativeToConfiguration $ mc configOutputDir
+  let settingOpenApiSpecification = fromMaybe "openapi-specification.yml" $ flagOpenApiSpecification <|> mConfigOpenApiSpecification
+      settingOutputDir = fromMaybe "out" $ flagOutputDir <|> mConfigOutputDir
+      settingPackageName = fromMaybe "openapi" $ flagPackageName <|> mc configPackageName
+      settingModuleName = fromMaybe "OpenAPI" $ flagModuleName <|> mc configModuleName
+      settingLogLevel = fromMaybe OAL.InfoSeverity $ flagLogLevel <|> mc configLogLevel
+      settingForce = fromMaybe False $ flagForce <|> mc configForce
+      settingIncremental = fromMaybe False $ flagIncremental <|> mc configIncremental
+      settingDryRun = fromMaybe False $ flagDryRun <|> mc configDryRun
+      settingDoNotGenerateStackProject = fromMaybe False $ flagDoNotGenerateStackProject <|> mc configDoNotGenerateStackProject
+      settingGenerateNixFiles = fromMaybe False $ flagGenerateNixFiles <|> mc configGenerateNixFiles
+      settingOmitAdditionalOperationFunctions = fromMaybe False $ flagOmitAdditionalOperationFunctions <|> mc configOmitAdditionalOperationFunctions
+      settingGenerateOptionalEmptyRequestBody = fromMaybe False $ flagGenerateOptionalEmptyRequestBody <|> mc configGenerateOptionalEmptyRequestBody
+      settingUseNumberedVariantConstructors = fromMaybe False $ flagUseNumberedVariantConstructors <|> mc configUseNumberedVariantConstructors
+      settingUseFloatWithArbitraryPrecision = fromMaybe False $ flagUseFloatWithArbitraryPrecision <|> mc configUseFloatWithArbitraryPrecision
+      settingUseIntWithArbitraryPrecision = fromMaybe False $ flagUseIntWithArbitraryPrecision <|> mc configUseIntWithArbitraryPrecision
+      settingUseDateTypesAsString = fromMaybe False $ flagUseDateTypesAsString <|> mc configUseDateTypesAsString
+      settingConvertToCamelCase = fromMaybe False $ flagConvertToCamelCase <|> mc configConvertToCamelCase
+      settingPropertyTypeSuffix = fromMaybe "" $ flagPropertyTypeSuffix <|> mc configPropertyTypeSuffix
+      settingResponseTypeSuffix = fromMaybe "Response" $ flagResponseTypeSuffix <|> mc configResponseTypeSuffix
+      settingResponseBodyTypeSuffix = fromMaybe "ResponseBody" $ flagResponseBodyTypeSuffix <|> mc configResponseBodyTypeSuffix
+      settingRequestBodyTypeSuffix = fromMaybe "RequestBody" $ flagRequestBodyTypeSuffix <|> mc configRequestBodyTypeSuffix
+      settingParametersTypeSuffix = fromMaybe "Parameters" $ flagParametersTypeSuffix <|> mc configParametersTypeSuffix
+      settingParameterQueryPrefix = fromMaybe "query" $ flagParameterQueryPrefix <|> mc configParameterQueryPrefix
+      settingParameterPathPrefix = fromMaybe "path" $ flagParameterPathPrefix <|> mc configParameterPathPrefix
+      settingParameterCookiePrefix = fromMaybe "cookie" $ flagParameterCookiePrefix <|> mc configParameterCookiePrefix
+      settingParameterHeaderPrefix = fromMaybe "header" $ flagParameterHeaderPrefix <|> mc configParameterHeaderPrefix
+      settingOperationsToGenerate = fromMaybe [] $ flagOperationsToGenerate <|> mc configOperationsToGenerate
+      settingOpaqueSchemas = fromMaybe [] $ flagOpaqueSchemas <|> mc configOpaqueSchemas
+      settingWhiteListedSchemas = fromMaybe [] $ flagWhiteListedSchemas <|> mc configWhiteListedSchemas
 
-parseFlagOutputDir :: Parser Text
-parseFlagOutputDir =
-  strOption $
-    mconcat
-      [ metavar "OUTDIR",
-        help "The directory where the generated output is stored.",
-        long "output-dir",
-        short 'o',
-        value "out",
-        showDefault
-      ]
+  pure Settings {..}
+  where
+    mc :: (Configuration -> Maybe a) -> Maybe a
+    mc f = mConf >>= f
 
-parseFlagGeneratorConfigurationFile :: Parser (Maybe Text)
-parseFlagGeneratorConfigurationFile =
-  optional $
-    strOption $
-      mconcat
-        [ metavar "FILEPATH",
-          help "The path to a configuration file which allows to configure the generation. Should be a .yaml file. For an example see https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/blob/master/example-generator-configuration.yaml.",
-          long "generator-configuration"
-        ]
+getFlags :: IO Flags
+getFlags = customExecParser prefs_ flagsParser
 
-parseFlagPackageName :: Parser Text
-parseFlagPackageName =
-  strOption $
-    mconcat
-      [ metavar "PACKAGE",
-        help "Name of the stack project",
-        long "package-name",
-        value "openapi",
-        showDefault
-      ]
+prefs_ :: ParserPrefs
+prefs_ =
+  defaultPrefs
+    { prefShowHelpOnError = True,
+      prefShowHelpOnEmpty = True
+    }
 
-parseFlagModuleName :: Parser Text
-parseFlagModuleName =
-  strOption $
-    mconcat
-      [ metavar "MODULE",
-        help "Name of the module",
-        long "module-name",
-        value "OpenAPI",
-        showDefault
-      ]
-
-parseFlagLogLevel :: Parser OAL.LogSeverity
-parseFlagLogLevel =
-  option auto $
-    mconcat
-      [ metavar "LOGLEVEL",
-        help "Set the minium log level (e. g. WARN to only print warnings and errors). Possible values: TRACE, INFO, WARN, ERROR",
-        long "log-level",
-        value OAL.InfoSeverity,
-        showDefault,
-        completeWith ["TRACE", "INFO", "WARN", "ERROR"]
-      ]
-
-parseFlagForce :: Parser Bool
-parseFlagForce =
-  switch $
-    mconcat
-      [ help "Overwrite output directory without question",
-        long "force",
-        short 'f'
-      ]
-
-parseFlagIncremental :: Parser Bool
-parseFlagIncremental =
-  switch $
-    mconcat
-      [ help "Only write new/changed files. Does not need --force flag to overwrite files.",
-        long "incremental",
-        short 'i'
-      ]
-
-parseFlagDryRun :: Parser Bool
-parseFlagDryRun =
-  switch $
-    mconcat
-      [ help "Do not generate the output files but only print the generated code",
-        long "dry-run"
-      ]
-
-parseFlagDoNotGenerateStackProject :: Parser Bool
-parseFlagDoNotGenerateStackProject =
-  switch $
-    mconcat
-      [ help "Do not generate a stack project alongside the raw Haskell files",
-        long "do-not-generate-stack-project"
-      ]
-
-parseFlagDoNotGenerateNixFiles :: Parser Bool
-parseFlagDoNotGenerateNixFiles =
-  switch $
-    mconcat
-      [ help "Do not generate Nix files alongside the raw Haskell files",
-        long "do-not-generate-nix-files"
-      ]
-
-parseFlagOmitAdditionalOperationFunctions :: Parser Bool
-parseFlagOmitAdditionalOperationFunctions =
-  switch $
-    mconcat
-      [ help "Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration",
-        long "omit-additional-operation-functions"
-      ]
-
-parseFlagGenerateOptionalEmptyRequestBody :: Parser Bool
-parseFlagGenerateOptionalEmptyRequestBody =
-  switch $
-    mconcat
-      [ help "Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)",
-        long "generate-optional-empty-request-body"
-      ]
-
-parseFlagUseNumberedVariantConstructors :: Parser Bool
-parseFlagUseNumberedVariantConstructors =
-  switch $
-    mconcat
-      [ help "Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types",
-        long "use-numbered-variant-constructors"
-      ]
-
-parseFlagUseFloatWithArbitraryPrecision :: Parser Bool
-parseFlagUseFloatWithArbitraryPrecision =
-  switch $
-    mconcat
-      [ help "Use Data.Scientific instead of Double to support arbitary number precision",
-        long "use-float-with-arbitrary-precision"
-      ]
-
-parseFlagUseIntWithArbitraryPrecision :: Parser Bool
-parseFlagUseIntWithArbitraryPrecision =
-  switch $
-    mconcat
-      [ help "Use 'Integer' instead of 'Int' to support arbitrary number precision",
-        long "use-int-with-arbitrary-precision"
-      ]
-
-parseFlagUseDateTypesAsString :: Parser Bool
-parseFlagUseDateTypesAsString =
-  switch $
-    mconcat
-      [ help "Convert strings formatted as date / date-time to date types",
-        long "use-date-types-as-string"
-      ]
-
-parseFlagConvertToCamelCase :: Parser Bool
-parseFlagConvertToCamelCase =
-  switch $
-    mconcat
-      [ help "Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification",
-        long "convert-to-camel-case"
-      ]
-
-parseFlagPropertyTypeSuffix :: Parser Text
-parseFlagPropertyTypeSuffix =
-  strOption $
-    mconcat
-      [ metavar "SUFFIX",
-        help "Add a suffix to property types to prevent naming conflicts",
-        long "property-type-suffix",
-        value ""
-      ]
-
-parseFlagResponseTypeSuffix :: Parser Text
-parseFlagResponseTypeSuffix =
-  strOption $
-    mconcat
-      [ metavar "SUFFIX",
-        help "The suffix which is added to the response data types",
-        long "response-type-suffix",
-        value "Response",
-        showDefault
-      ]
-
-parseFlagResponseBodyTypeSuffix :: Parser Text
-parseFlagResponseBodyTypeSuffix =
-  strOption $
-    mconcat
-      [ metavar "SUFFIX",
-        help "The suffix which is added to the response body data types",
-        long "response-body-type-suffix",
-        value "ResponseBody",
-        showDefault
-      ]
-
-parseFlagRequestBodyTypeSuffix :: Parser Text
-parseFlagRequestBodyTypeSuffix =
-  strOption $
-    mconcat
-      [ metavar "SUFFIX",
-        help "The suffix which is added to the request body data types",
-        long "request-body-type-suffix",
-        value "RequestBody",
-        showDefault
-      ]
-
-parseFlagParametersTypeSuffix :: Parser Text
-parseFlagParametersTypeSuffix =
-  strOption $
-    mconcat
-      [ metavar "SUFFIX",
-        help "The suffix which is added to the parameters type of operations",
-        long "parameters-type-suffix",
-        value "Parameters",
-        showDefault
-      ]
-
-parseFlagParameterQueryPrefix :: Parser Text
-parseFlagParameterQueryPrefix =
-  strOption $
-    mconcat
-      [ metavar "PREFIX",
-        help "The prefix which is added to query parameters",
-        long "parameter-query-prefix",
-        value "query",
-        showDefault
-      ]
-
-parseFlagParameterPathPrefix :: Parser Text
-parseFlagParameterPathPrefix =
-  strOption $
-    mconcat
-      [ metavar "PREFIX",
-        help "The prefix which is added to path parameters",
-        long "parameter-path-prefix",
-        value "path",
-        showDefault
-      ]
-
-parseFlagParameterCookiePrefix :: Parser Text
-parseFlagParameterCookiePrefix =
-  strOption $
-    mconcat
-      [ metavar "PREFIX",
-        help "The prefix which is added to cookie parameters",
-        long "parameter-cookie-prefix",
-        value "cookie",
-        showDefault
-      ]
-
-parseFlagParameterHeaderPrefix :: Parser Text
-parseFlagParameterHeaderPrefix =
-  strOption $
-    mconcat
-      [ metavar "PREFIX",
-        help "The prefix which is added to header parameters",
-        long "parameter-header-prefix",
-        value "header",
-        showDefault
-      ]
-
-parseFlagOperationsToGenerate :: Parser [Text]
-parseFlagOperationsToGenerate =
-  many $
-    strOption $
-      mconcat
-        [ metavar "OPERATIONID",
-          help "If not all operations should be generated, this option can be used to specify all of them which should be generated. The value has to correspond to the value in the 'operationId' field in the OpenAPI 3 specification.",
-          long "operation-to-generate"
-        ]
-
-parseFlagOpaqueSchemas :: Parser [Text]
-parseFlagOpaqueSchemas =
-  many $
-    strOption $
-      mconcat
-        [ metavar "SCHEMA",
-          help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which are not further investigated while generating code from the specification. Only a type alias to 'Aeson.Value' is created for these schemas.",
-          long "opaque-schema"
-        ]
-
-parseFlagWhiteListedSchemas :: Parser [Text]
-parseFlagWhiteListedSchemas =
-  many $
-    strOption $
-      mconcat
-        [ metavar "SCHEMA",
-          help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created.",
-          long "white-listed-schema"
+flagsParser :: ParserInfo Flags
+flagsParser =
+  info
+    (helper <*> parseFlags)
+    ( fullDesc <> footerDoc (Just $ string footerStr)
+        <> progDesc "This tool can be used to generate Haskell code from OpenAPI 3 specifications. For more information see https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator."
+        <> header "Generate Haskell code from OpenAPI 3 specifications"
+    )
+  where
+    footerStr =
+      unlines
+        [ "Configuration file format:",
+          "",
+          T.unpack (YamlParse.prettyColourisedSchemaDoc @Configuration)
         ]

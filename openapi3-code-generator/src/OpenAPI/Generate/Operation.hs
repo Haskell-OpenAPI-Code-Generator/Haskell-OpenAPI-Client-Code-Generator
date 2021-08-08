@@ -34,7 +34,7 @@ import qualified OpenAPI.Generate.Types as OAT
 -- | Defines the operations for all paths and their methods
 defineOperationsForPath :: String -> Text -> OAT.PathItemObject -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
 defineOperationsForPath mainModuleName requestPath pathItemObject = OAM.nested requestPath $ do
-  operationsToGenerate <- OAM.getFlag OAO.flagOperationsToGenerate
+  operationsToGenerate <- OAM.getSetting OAO.settingOperationsToGenerate
   fmap (BF.bimap sequence Set.unions)
     . mapAndUnzipM
       (uncurry (defineModuleForOperation mainModuleName requestPath))
@@ -76,7 +76,7 @@ defineModuleForOperation ::
   OAM.Generator (Q Dep.ModuleDefinition, Dep.Models)
 defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
-  convertToCamelCase <- OAM.getFlag OAO.flagConvertToCamelCase
+  convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
   let operationIdAsText = T.pack $ show operationIdName
       appendToOperationName = ((T.pack $ nameBase operationIdName) <>)
       moduleName = haskellifyText convertToCamelCase True operationIdAsText
@@ -146,7 +146,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
           pure [fmap addCommentsToFnSignature fnSignature `Doc.appendDoc` functionBody]
       )
       availableOperationCombinations
-  omitAdditionalFunctions <- OAM.getFlag OAO.flagOmitAdditionalOperationFunctions
+  omitAdditionalFunctions <- OAM.getSetting OAO.settingOmitAdditionalOperationFunctions
   let content =
         concat $
           if omitAdditionalFunctions
@@ -177,6 +177,6 @@ getBodyType requestBody appendToOperationName = do
   case requestBody of
     Just RequestBodyDefinition {..} | generateBody -> do
       let transformType = pure . (if required then id else appT $ varT ''Maybe)
-      requestBodySuffix <- OAM.getFlag OAO.flagRequestBodyTypeSuffix
+      requestBodySuffix <- OAM.getSetting OAO.settingRequestBodyTypeSuffix
       BF.first transformType <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
     _ -> pure ([], (Doc.emptyDoc, Set.empty))
