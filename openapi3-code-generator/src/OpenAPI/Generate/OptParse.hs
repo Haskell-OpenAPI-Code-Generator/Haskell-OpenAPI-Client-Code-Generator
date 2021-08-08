@@ -18,6 +18,8 @@ import OpenAPI.Generate.OptParse.Configuration
 import OpenAPI.Generate.OptParse.Flags
 import Options.Applicative
 import Options.Applicative.Help (string)
+import Path.IO
+import Path.Posix
 import YamlParse.Applicative as YamlParse
 
 getSettings :: IO Settings
@@ -28,74 +30,82 @@ getSettings = do
 
 data Settings = Settings
   { -- | The OpenAPI 3 specification file which code should be generated for.
-    settingOpenApiSpecification :: Text,
+    settingOpenApiSpecification :: !Text,
     -- | The directory where the generated output is stored.
-    settingOutputDir :: Text,
+    settingOutputDir :: !Text,
     -- | Name of the stack project
-    settingPackageName :: Text,
+    settingPackageName :: !Text,
     -- | Name of the module
-    settingModuleName :: Text,
+    settingModuleName :: !Text,
     -- | The minimum log level to output
-    settingLogLevel :: OAL.LogSeverity,
+    settingLogLevel :: !OAL.LogSeverity,
     -- | Overwrite output directory without question
-    settingForce :: Bool,
+    settingForce :: !Bool,
     -- | Only write new/changed files
-    settingIncremental :: Bool,
+    settingIncremental :: !Bool,
     -- | Do not generate the output files but only print the generated code
-    settingDryRun :: Bool,
+    settingDryRun :: !Bool,
     -- | Do not generate a stack project alongside the raw Haskell files
-    settingDoNotGenerateStackProject :: Bool,
+    settingDoNotGenerateStackProject :: !Bool,
     -- | Generate Nix files (default.nix and shell.nix)
-    settingGenerateNixFiles :: Bool,
+    settingGenerateNixFiles :: !Bool,
     -- | Omit the additional operation functions, which are: with explicit configuration and raw variants (returning the plain ByteString) for both with and without explicit configuration
-    settingOmitAdditionalOperationFunctions :: Bool,
+    settingOmitAdditionalOperationFunctions :: !Bool,
     -- | Force the generator to create types for empty request bodies which are optional (e. g. no properties and required equals false)
-    settingGenerateOptionalEmptyRequestBody :: Bool,
+    settingGenerateOptionalEmptyRequestBody :: !Bool,
     -- | Use numbered data constructors (e. g. Variant1, Variant 2, etc.) for one-of types
-    settingUseNumberedVariantConstructors :: Bool,
+    settingUseNumberedVariantConstructors :: !Bool,
     -- | Use Data.Scientific instead of Double to support arbitrary number precision
-    settingUseFloatWithArbitraryPrecision :: Bool,
+    settingUseFloatWithArbitraryPrecision :: !Bool,
     -- | Use 'Integer' instead of 'Int' to support arbitrary number precision
-    settingUseIntWithArbitraryPrecision :: Bool,
+    settingUseIntWithArbitraryPrecision :: !Bool,
     -- | Convert strings formatted as date / date-time to date types
-    settingUseDateTypesAsString :: Bool,
+    settingUseDateTypesAsString :: !Bool,
     -- | Convert names to CamelCase instead of using names which are as close as possible to the names provided in the specification
-    settingConvertToCamelCase :: Bool,
+    settingConvertToCamelCase :: !Bool,
     -- | Add a suffix to property types to prevent naming conflicts
-    settingPropertyTypeSuffix :: Text,
+    settingPropertyTypeSuffix :: !Text,
     -- | The suffix which is added to the response data types
-    settingResponseTypeSuffix :: Text,
+    settingResponseTypeSuffix :: !Text,
     -- | The suffix which is added to the response body data types
-    settingResponseBodyTypeSuffix :: Text,
+    settingResponseBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the request body data types
-    settingRequestBodyTypeSuffix :: Text,
+    settingRequestBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the parameters type of operations
-    settingParametersTypeSuffix :: Text,
+    settingParametersTypeSuffix :: !Text,
     -- | The prefix which is added to query parameters
-    settingParameterQueryPrefix :: Text,
+    settingParameterQueryPrefix :: !Text,
     -- | The prefix which is added to path parameters
-    settingParameterPathPrefix :: Text,
+    settingParameterPathPrefix :: !Text,
     -- | The prefix which is added to cookie parameters
-    settingParameterCookiePrefix :: Text,
+    settingParameterCookiePrefix :: !Text,
     -- | The prefix which is added to header parameters
-    settingParameterHeaderPrefix :: Text,
+    settingParameterHeaderPrefix :: !Text,
     -- | The operations to generate (if empty all operations are generated)
-    settingOperationsToGenerate :: [Text],
+    settingOperationsToGenerate :: ![Text],
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which are not further investigated while generating code from the specification.
     -- Only a type alias to 'Aeson.Value' is created for these schemas.
-    settingOpaqueSchemas :: [Text],
+    settingOpaqueSchemas :: ![Text],
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which need to be generated.
     -- For all other schemas only a type alias to 'Aeson.Value' is created.
-    settingWhiteListedSchemas :: [Text]
+    settingWhiteListedSchemas :: ![Text]
   }
   deriving (Show, Eq)
 
 combineToSettings :: Flags -> Maybe Configuration -> IO Settings
 combineToSettings Flags {..} mConf = do
-  let settingOpenApiSpecification = fromMaybe "openapi-specification.yml" $ flagOpenApiSpecification <|> mc configOpenApiSpecification
-      settingOutputDir = fromMaybe "out" $ flagOutputDir <|> mc configOutputDir
+  let resolveRelativeToConfiguration mPath = case (mPath, flagConfiguration) of
+        (Just filePath, Just configurationPath) -> do
+          configurationDirectory <- resolveFile' $ T.unpack configurationPath
+          file <- resolveFile (parent configurationDirectory) $ T.unpack filePath
+          pure $ Just $ T.pack $ toFilePath file
+        _ -> pure Nothing
+  mConfigOpenApiSpecification <- resolveRelativeToConfiguration $ mc configOpenApiSpecification
+  mConfigOutputDir <- resolveRelativeToConfiguration $ mc configOutputDir
+  let settingOpenApiSpecification = fromMaybe "openapi-specification.yml" $ flagOpenApiSpecification <|> mConfigOpenApiSpecification
+      settingOutputDir = fromMaybe "out" $ flagOutputDir <|> mConfigOutputDir
       settingPackageName = fromMaybe "openapi" $ flagPackageName <|> mc configPackageName
       settingModuleName = fromMaybe "OpenAPI" $ flagModuleName <|> mc configModuleName
       settingLogLevel = fromMaybe OAL.InfoSeverity $ flagLogLevel <|> mc configLogLevel
