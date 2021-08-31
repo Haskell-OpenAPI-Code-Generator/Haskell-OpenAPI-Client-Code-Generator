@@ -547,10 +547,10 @@ defineObjectModelForSchema strategy schemaName schema =
       path <- getCurrentPathEscaped
       let convertToCamelCase = OAO.settingConvertToCamelCase settings
           name = haskellifyName convertToCamelCase True schemaName
-          (props, propsWithFixedValues) = extractPropertiesWithFixedValues $ Map.toList $ OAS.properties schema
+          required = OAS.required schema
+          (props, propsWithFixedValues) = extractPropertiesWithFixedValues required $ Map.toList $ OAS.properties schema
           propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
           emptyCtx = pure []
-          required = OAS.required schema
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
       (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes schemaName props required
       propertyDescriptions <- getDescriptionOfProperties props
@@ -585,11 +585,16 @@ defineObjectModelForSchema strategy schemaName schema =
           )
         )
 
-extractPropertiesWithFixedValues :: [(Text, OAS.Schema)] -> ([(Text, OAS.Schema)], [(Text, Aeson.Value)])
-extractPropertiesWithFixedValues =
+extractPropertiesWithFixedValues :: Set.Set Text -> [(Text, OAS.Schema)] -> ([(Text, OAS.Schema)], [(Text, Aeson.Value)])
+extractPropertiesWithFixedValues required =
   E.partitionEithers
     . fmap
-      (\(name, schema) -> BF.bimap (name,) (name,) $ extractSchemaWithFixedValue schema)
+      ( \(name, schema) ->
+          BF.bimap (name,) (name,) $
+            if name `Set.member` required
+              then extractSchemaWithFixedValue schema
+              else Left schema
+      )
 
 extractSchemasWithFixedValues :: [OAS.Schema] -> ([OAS.Schema], [Aeson.Value])
 extractSchemasWithFixedValues = E.partitionEithers . fmap extractSchemaWithFixedValue
@@ -676,7 +681,7 @@ createFromJSONImplementation objectName recordNames required =
               let propName' = stringE $ T.unpack propName
                   arg = varE fnArgName
                   readPropE =
-                    if propName `elem` required
+                    if propName `Set.member` required
                       then [|$arg Aeson..: $propName'|]
                       else [|$arg Aeson..:? $propName'|]
                in [|$prev <*> $readPropE|]
@@ -708,7 +713,7 @@ propertiesToBangTypes schemaName props required = OAM.nested "properties" $ do
       createBang recordName propName myType = do
         bang' <- bang noSourceUnpackedness noSourceStrictness
         type' <-
-          if recordName `elem` required
+          if recordName `Set.member` required
             then myType
             else appT (varT ''Maybe) myType
         pure (haskellifyName convertToCamelCase False propName, bang', type')

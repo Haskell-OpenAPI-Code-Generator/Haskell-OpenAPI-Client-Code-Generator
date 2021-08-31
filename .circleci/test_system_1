@@ -4,6 +4,7 @@ set -e
 
 specifications=(
   google-payment.json
+  hetzner.json
   official-api-with-examples.yaml
   official-callback-example.yaml
   official-link-example.yaml
