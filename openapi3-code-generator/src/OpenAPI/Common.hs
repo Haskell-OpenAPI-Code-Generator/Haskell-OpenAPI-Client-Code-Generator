@@ -25,8 +25,6 @@ module OpenAPI.Common
     QueryParameter (..),
     ClientT (..),
     ClientM,
-    StripeT,
-    StripeM,
   )
 where
 
@@ -69,9 +67,6 @@ instance MonadHTTP m => MonadHTTP (ClientT m) where
 newtype ClientT m a = ClientT (MR.ReaderT Configuration m a)
   deriving (Functor, Applicative, Monad, MR.MonadReader Configuration)
 
--- | Alias for 'ClientT' included for backwards compatibility
-type StripeT = ClientT
-
 instance MT.MonadTrans ClientT where
   lift = ClientT . MT.lift
 
@@ -80,9 +75,6 @@ instance MIO.MonadIO m => MIO.MonadIO (ClientT m) where
 
 -- | Utility type which uses 'IO' as underlying monad
 type ClientM a = ClientT IO a
-
--- | Alias for 'ClientM' included for backwards compatibility
-type StripeM a = ClientM a
 
 -- | Run a 'ClientT' monad transformer in another monad with a specified configuration
 runWithConfiguration :: Configuration -> ClientT m a -> m a
