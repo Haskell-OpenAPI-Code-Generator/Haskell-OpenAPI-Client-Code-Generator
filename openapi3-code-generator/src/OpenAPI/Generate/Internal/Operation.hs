@@ -215,7 +215,7 @@ getParametersTypeForSignatureWithMonadTransformer :: [Q Type] -> Name -> Name ->
 getParametersTypeForSignatureWithMonadTransformer types responseTypeName monadName =
   createFunctionType
     ( types
-        <> [[t|OC.StripeT $(varT monadName) (HS.Response $(varT responseTypeName))|]]
+        <> [[t|OC.ClientT $(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
 createFunctionType :: [Q Type] -> Q Type

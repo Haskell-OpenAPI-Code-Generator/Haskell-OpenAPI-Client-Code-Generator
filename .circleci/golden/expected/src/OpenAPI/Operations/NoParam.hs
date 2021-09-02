@@ -45,7 +45,7 @@ import OpenAPI.Types
 -- | > GET /pet/noparam
 -- 
 -- Operation with no parameters
-noParam :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response NoParamResponse) -- ^ Monadic computation which returns the result of the operation
+noParam :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response NoParamResponse) -- ^ Monadic computation which returns the result of the operation
 noParam = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either NoParamResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> NoParamResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                    Dog)
                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/noparam") GHC.Base.mempty)
@@ -67,7 +67,7 @@ noParamWithConfiguration config = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (D
 -- | > GET /pet/noparam
 -- 
 -- The same as 'noParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
-noParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.StripeT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+noParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
 noParamRaw = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/noparam") GHC.Base.mempty)
 -- | > GET /pet/noparam
 -- 
