@@ -38,6 +38,7 @@ data Configuration = Configuration
     configResponseTypeSuffix :: !(Maybe Text),
     configResponseBodyTypeSuffix :: !(Maybe Text),
     configRequestBodyTypeSuffix :: !(Maybe Text),
+    configArrayItemTypeSuffix :: !(Maybe Text),
     configParametersTypeSuffix :: !(Maybe Text),
     configParameterQueryPrefix :: !(Maybe Text),
     configParameterPathPrefix :: !(Maybe Text),
@@ -77,6 +78,7 @@ instance YamlSchema Configuration where
         <*> optionalField "responseTypeSuffix" "The suffix which is added to the response data types"
         <*> optionalField "responseBodyTypeSuffix" "The suffix which is added to the response body data types"
         <*> optionalField "requestBodyTypeSuffix" "The suffix which is added to the request body data types"
+        <*> optionalField "arrayItemTypeSuffix" "The suffix which is added to the item type of an array. This is only applied to item types of top level array types which an alias is generated for."
         <*> optionalField "parametersTypeSuffix" "The suffix which is added to the parameters type of operations"
         <*> optionalField "parameterQueryPrefix" "The prefix which is added to query parameters"
         <*> optionalField "parameterPathPrefix" "The prefix which is added to path parameters"

@@ -71,6 +71,8 @@ data Settings = Settings
     settingResponseBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the request body data types
     settingRequestBodyTypeSuffix :: !Text,
+    -- | The suffix which is added to the item type of an array. This is only applied to item types of top level array types which an alias is generated for.
+    settingArrayItemTypeSuffix :: !Text,
     -- | The suffix which is added to the parameters type of operations
     settingParametersTypeSuffix :: !Text,
     -- | The prefix which is added to query parameters
@@ -125,6 +127,7 @@ combineToSettings Flags {..} mConf = do
       settingResponseTypeSuffix = fromMaybe "Response" $ flagResponseTypeSuffix <|> mc configResponseTypeSuffix
       settingResponseBodyTypeSuffix = fromMaybe "ResponseBody" $ flagResponseBodyTypeSuffix <|> mc configResponseBodyTypeSuffix
       settingRequestBodyTypeSuffix = fromMaybe "RequestBody" $ flagRequestBodyTypeSuffix <|> mc configRequestBodyTypeSuffix
+      settingArrayItemTypeSuffix = fromMaybe "Item" $ flagArrayItemTypeSuffix <|> mc configArrayItemTypeSuffix
       settingParametersTypeSuffix = fromMaybe "Parameters" $ flagParametersTypeSuffix <|> mc configParametersTypeSuffix
       settingParameterQueryPrefix = fromMaybe "query" $ flagParameterQueryPrefix <|> mc configParameterQueryPrefix
       settingParameterPathPrefix = fromMaybe "path" $ flagParameterPathPrefix <|> mc configParameterPathPrefix

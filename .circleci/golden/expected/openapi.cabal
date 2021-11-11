@@ -21,6 +21,7 @@ library
       OpenAPI.Types.PetByAge
       OpenAPI.Types.PetByType
       OpenAPI.Types.Test6
+      OpenAPI.Types.Test7
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common
