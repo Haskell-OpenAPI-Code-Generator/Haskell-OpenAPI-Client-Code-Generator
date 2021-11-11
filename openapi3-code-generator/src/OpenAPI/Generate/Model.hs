@@ -508,9 +508,12 @@ defineNewSchemaForAllOf schemaName description schemas = do
 -- | defines an array
 defineArrayModelForSchema :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
 defineArrayModelForSchema strategy schemaName schema = do
+  arrayItemTypeSuffix <- case strategy of
+    CreateTypeAlias -> OAM.getSetting OAO.settingArrayItemTypeSuffix
+    DontCreateTypeAlias -> pure "" -- The suffix is only relevant for top level declarations because only there a named type of the array even exists
   (type', (content, dependencies)) <-
     case OAS.items schema of
-      Just itemSchema -> OAM.nested "items" $ defineModelForSchemaNamed schemaName itemSchema
+      Just itemSchema -> OAM.nested "items" $ defineModelForSchemaNamed (schemaName <> arrayItemTypeSuffix) itemSchema
       -- not allowed by the spec
       Nothing -> do
         OAM.logWarning "Array type was defined without a items schema and therefore cannot be defined correctly"

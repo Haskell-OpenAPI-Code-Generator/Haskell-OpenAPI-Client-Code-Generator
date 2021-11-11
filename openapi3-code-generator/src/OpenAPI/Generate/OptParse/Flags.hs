@@ -34,6 +34,7 @@ data Flags = Flags
     flagResponseTypeSuffix :: !(Maybe Text),
     flagResponseBodyTypeSuffix :: !(Maybe Text),
     flagRequestBodyTypeSuffix :: !(Maybe Text),
+    flagArrayItemTypeSuffix :: !(Maybe Text),
     flagParametersTypeSuffix :: !(Maybe Text),
     flagParameterQueryPrefix :: !(Maybe Text),
     flagParameterPathPrefix :: !(Maybe Text),
@@ -70,6 +71,7 @@ parseFlags =
     <*> parseFlagResponseTypeSuffix
     <*> parseFlagResponseBodyTypeSuffix
     <*> parseFlagRequestBodyTypeSuffix
+    <*> parseFlagArrayItemTypeSuffix
     <*> parseFlagParametersTypeSuffix
     <*> parseFlagParameterQueryPrefix
     <*> parseFlagParameterPathPrefix
@@ -255,6 +257,16 @@ parseFlagRequestBodyTypeSuffix =
         [ metavar "SUFFIX",
           help "The suffix which is added to the request body data types (default: 'RequestBody')",
           long "request-body-type-suffix"
+        ]
+
+parseFlagArrayItemTypeSuffix :: Parser (Maybe Text)
+parseFlagArrayItemTypeSuffix =
+  optional $
+    strOption $
+      mconcat
+        [ metavar "SUFFIX",
+          help "The suffix which is added to the item type of an array (default: 'Item'). This is only applied to item types of top level array types which an alias is generated for.",
+          long "array-item-type-suffix"
         ]
 
 parseFlagParametersTypeSuffix :: Parser (Maybe Text)

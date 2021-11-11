@@ -287,6 +287,15 @@ components:
     Test6:
       type: string
       enum: ["hello", "there"]
+    Test7:
+      type: array
+      items:
+        type: object
+        properties:
+          prop1:
+            type: integer
+          prop2:
+            type: string
     CoverType:
       type: object
       properties:
@@ -300,6 +309,7 @@ components:
             - $ref: '#/components/schemas/Test4'
             - $ref: '#/components/schemas/Test5'
             - $ref: '#/components/schemas/Test6'
+            - $ref: '#/components/schemas/Test7'
   parameters:
     PetParameters:
       name: petId

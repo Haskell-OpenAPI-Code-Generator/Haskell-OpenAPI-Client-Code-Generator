@@ -10,6 +10,7 @@ module OpenAPI.Types (
   module OpenAPI.Types.PetByAge,
   module OpenAPI.Types.PetByType,
   module OpenAPI.Types.Test6,
+  module OpenAPI.Types.Test7,
   ) where
 
 import OpenAPI.TypeAlias
@@ -20,3 +21,4 @@ import OpenAPI.Types.Mischling
 import OpenAPI.Types.PetByAge
 import OpenAPI.Types.PetByType
 import OpenAPI.Types.Test6
+import OpenAPI.Types.Test7

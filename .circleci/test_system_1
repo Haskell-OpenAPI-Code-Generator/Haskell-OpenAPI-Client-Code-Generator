@@ -12,7 +12,9 @@ specifications=(
   official-uspto.yaml
   petstore-expanded.json
   selenium.yaml
+  spot_api.yml
   uber.json
+  z_complex_self_made_example.yml
 )
 
 outDir=openapi
@@ -51,7 +53,7 @@ for specification in "${specifications[@]}"; do
   rm -rf $outDir
   printf "\n\nRun compile test for $specification\n"
   echo "-------------------------"
-  $GENERATOR_EXE "../specifications/$specification" --output-dir=$outDir --response-type-suffix="Response'"
+  $GENERATOR_EXE "../specifications/$specification" --output-dir=$outDir --response-type-suffix="Response'" --opaque-schema="aggTrade"
   continueOnFailure "code generation" "$specification"
   cd $outDir
   stack build --fast
