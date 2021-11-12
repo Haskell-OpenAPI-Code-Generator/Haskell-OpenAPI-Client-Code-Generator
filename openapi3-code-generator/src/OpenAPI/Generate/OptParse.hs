@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -10,6 +11,7 @@ module OpenAPI.Generate.OptParse
 where
 
 import Control.Applicative
+import Control.Monad
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -20,13 +22,16 @@ import Options.Applicative
 import Options.Applicative.Help (string)
 import Path.IO
 import Path.Posix
+import System.Exit
 import YamlParse.Applicative as YamlParse
 
 getSettings :: IO Settings
 getSettings = do
   flags <- getFlags
-  config <- getConfiguration flags
-  combineToSettings flags config
+  let configurationFilePath = fromMaybe "openapi-configuration.yml" $ flagConfiguration flags
+  config <- getConfiguration configurationFilePath
+  unless (isJust config || isNothing (flagConfiguration flags)) $ die $ "Could not read configuration file: " <> T.unpack configurationFilePath
+  combineToSettings flags config configurationFilePath
 
 data Settings = Settings
   { -- | The OpenAPI 3 specification file which code should be generated for.
@@ -96,11 +101,11 @@ data Settings = Settings
   }
   deriving (Show, Eq)
 
-combineToSettings :: Flags -> Maybe Configuration -> IO Settings
-combineToSettings Flags {..} mConf = do
-  let resolveRelativeToConfiguration mPath = case (mPath, flagConfiguration) of
-        (Just filePath, Just configurationPath) -> do
-          configurationDirectory <- resolveFile' $ T.unpack configurationPath
+combineToSettings :: Flags -> Maybe Configuration -> Text -> IO Settings
+combineToSettings Flags {..} mConf configurationFilePath = do
+  let resolveRelativeToConfiguration = \case
+        Just filePath -> do
+          configurationDirectory <- resolveFile' $ T.unpack configurationFilePath
           file <- resolveFile (parent configurationDirectory) $ T.unpack filePath
           pure $ Just $ T.pack $ toFilePath file
         _ -> pure Nothing

@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module OpenAPI.Generate.OptParse.Configuration
   ( Configuration (..),
@@ -11,8 +10,6 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
 import qualified OpenAPI.Generate.Log as OAL
-import OpenAPI.Generate.OptParse.Flags
-import Path
 import Path.IO
 import YamlParse.Applicative as YamlParse
 
@@ -88,10 +85,5 @@ instance YamlSchema Configuration where
         <*> optionalField "opaqueSchemas" "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which are not further investigated while generating code from the specification. Only a type alias to 'Aeson.Value' is created for these schemas."
         <*> optionalField "whiteListedSchemas" "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created."
 
-getConfiguration :: Flags -> IO (Maybe Configuration)
-getConfiguration Flags {..} =
-  case flagConfiguration of
-    Nothing -> parseRelFile "openapi-configuration.yml" >>= YamlParse.readConfigFile
-    Just cf -> do
-      afp <- resolveFile' $ T.unpack cf
-      YamlParse.readConfigFile afp
+getConfiguration :: Text -> IO (Maybe Configuration)
+getConfiguration path = resolveFile' (T.unpack path) >>= YamlParse.readConfigFile
