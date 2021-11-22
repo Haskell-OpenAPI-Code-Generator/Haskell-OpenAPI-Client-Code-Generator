@@ -32,7 +32,8 @@ dependencies:
 - transformers
 - time
 - optparse-applicative
-- yamlparse-applicative
+- autodocodec
+- autodocodec-yaml
 - vector
 - hashmap
 - directory

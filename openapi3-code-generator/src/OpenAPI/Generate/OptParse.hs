@@ -10,11 +10,13 @@ module OpenAPI.Generate.OptParse
   )
 where
 
+import Autodocodec.Yaml
 import Control.Applicative
 import Control.Monad
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 import qualified OpenAPI.Generate.Log as OAL
 import OpenAPI.Generate.OptParse.Configuration
 import OpenAPI.Generate.OptParse.Flags
@@ -23,7 +25,6 @@ import Options.Applicative.Help (string)
 import Path.IO
 import Path.Posix
 import System.Exit
-import YamlParse.Applicative as YamlParse
 
 getSettings :: IO Settings
 getSettings = do
@@ -170,5 +171,5 @@ flagsParser =
       unlines
         [ "Configuration file format:",
           "",
-          T.unpack (YamlParse.prettyColourisedSchemaDoc @Configuration)
+          T.unpack $ TE.decodeUtf8 $ renderColouredSchemaViaCodec @Configuration
         ]

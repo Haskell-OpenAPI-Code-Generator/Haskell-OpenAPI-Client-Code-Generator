@@ -3,11 +3,10 @@
 
 module OpenAPI.Generate.Log where
 
-import Control.Applicative
+import Autodocodec
 import Data.List (intersperse)
 import Data.Text (Text)
 import qualified Data.Text as T
-import YamlParse.Applicative
 
 -- | Data type representing the log severities
 data LogSeverity
@@ -15,7 +14,7 @@ data LogSeverity
   | InfoSeverity
   | WarningSeverity
   | ErrorSeverity
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Bounded, Enum)
 
 instance Show LogSeverity where
   show ErrorSeverity = "ERROR"
@@ -30,14 +29,8 @@ instance Read LogSeverity where
   readsPrec _ ('T' : 'R' : 'A' : 'C' : 'E' : rest) = [(TraceSeverity, rest)]
   readsPrec _ _ = []
 
-instance YamlSchema LogSeverity where
-  yamlSchema =
-    TraceSeverity <$ literalString (toText TraceSeverity)
-      <|> InfoSeverity <$ literalString (toText InfoSeverity)
-      <|> WarningSeverity <$ literalString (toText WarningSeverity)
-      <|> ErrorSeverity <$ literalString (toText ErrorSeverity)
-    where
-      toText = T.pack . show
+instance HasCodec LogSeverity where
+  codec = shownBoundedEnumCodec
 
 -- | A log entry containing the location within the OpenAPI specification where the message was produced, a severity and the actual message.
 data LogEntry = LogEntry

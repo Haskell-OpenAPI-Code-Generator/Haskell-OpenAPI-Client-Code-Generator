@@ -1,4 +1,16 @@
 {
+    "autodocodec": {
+        "branch": "master",
+        "description": "self(auto)- documenting encoders and decoders",
+        "homepage": "",
+        "owner": "NorfairKing",
+        "repo": "autodocodec",
+        "rev": "f0cb2ead0985b4394db0627e6befd7ce23c54c22",
+        "sha256": "1wyhwq38zl8ph2y1n8xjia67f7viyv253jg9rr3a78qnwlpvjxbd",
+        "type": "tarball",
+        "url": "https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "gitignore": {
         "branch": "master",
         "description": "Nix function for filtering local git sources",
@@ -45,6 +57,18 @@
         "sha256": "0yi1vdi0bdfmwnzrmal103vb5sk9994h6894616ivrn0r3514kai",
         "type": "tarball",
         "url": "https://github.com/cachix/pre-commit-hooks.nix/archive/40a51af82c1181b9dea3526c4124eee077e30213.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "safe-coloured-text": {
+        "branch": "master",
+        "description": null,
+        "homepage": "https://cs-syd.eu/posts/2021-03-07-safe-coloured-text",
+        "owner": "NorfairKing",
+        "repo": "safe-coloured-text",
+        "rev": "bd8700a555e977004e2dec24e12494a5a01ca500",
+        "sha256": "01frnv185r6mhqqkd6hqxd8p1h3yybf05xilyazxa07aqxhzn0an",
+        "type": "tarball",
+        "url": "https://github.com/NorfairKing/safe-coloured-text/archive/bd8700a555e977004e2dec24e12494a5a01ca500.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

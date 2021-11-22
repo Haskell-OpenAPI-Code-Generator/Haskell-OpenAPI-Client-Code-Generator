@@ -5,12 +5,57 @@
 
 packages:
 - completed:
-    hackage: yamlparse-applicative-0.1.0.2@sha256:bda91f2818c1b5b124963931cb7f9a4e5758d026c09713e9ae2234534062747d,2133
+    size: 55097
+    subdir: autodocodec
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+    name: autodocodec
+    version: 0.0.0.0
+    sha256: f6077c120cad6005cd1c410df02c0631d1f534312ab8b432813c0e2f42cd00a2
     pantry-tree:
-      size: 799
-      sha256: d7f9dc8e45e6c100a902f0595e6090169705d9451793ef1cb896237334a1b529
+      size: 788
+      sha256: 96cdf6548d1f1387da8b04d4cc77c2362790126395fdf4e4ebda22c73d07f373
   original:
-    hackage: yamlparse-applicative-0.1.0.2@sha256:bda91f2818c1b5b124963931cb7f9a4e5758d026c09713e9ae2234534062747d,2133
+    subdir: autodocodec
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+- completed:
+    size: 55097
+    subdir: autodocodec-schema
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+    name: autodocodec-schema
+    version: 0.0.0.0
+    sha256: f6077c120cad6005cd1c410df02c0631d1f534312ab8b432813c0e2f42cd00a2
+    pantry-tree:
+      size: 335
+      sha256: e7730f8f0ca854b4dce5da06d519211f24447243f88076cb61b2e94b54dad5bb
+  original:
+    subdir: autodocodec-schema
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+- completed:
+    size: 55097
+    subdir: autodocodec-yaml
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+    name: autodocodec-yaml
+    version: 0.0.0.0
+    sha256: f6077c120cad6005cd1c410df02c0631d1f534312ab8b432813c0e2f42cd00a2
+    pantry-tree:
+      size: 539
+      sha256: eb648697dbc9e5982610f43d442c66f280e57935f8ba15e8a736d69bcedb12b7
+  original:
+    subdir: autodocodec-yaml
+    url: https://github.com/NorfairKing/autodocodec/archive/f0cb2ead0985b4394db0627e6befd7ce23c54c22.tar.gz
+- completed:
+    size: 36445
+    subdir: safe-coloured-text
+    url: https://github.com/NorfairKing/safe-coloured-text/archive/bd8700a555e977004e2dec24e12494a5a01ca500.tar.gz
+    name: safe-coloured-text
+    version: 0.1.0.0
+    sha256: 8b1111f0f8a7bb021bfc980ffd344001bd50373842f7f4ea24ced5e0f700da5e
+    pantry-tree:
+      size: 427
+      sha256: bf43a24970a946ed4c8582ee0b6a1dd2b6597c6aef03f27def3b6ad6e2135e63
+  original:
+    subdir: safe-coloured-text
+    url: https://github.com/NorfairKing/safe-coloured-text/archive/bd8700a555e977004e2dec24e12494a5a01ca500.tar.gz
 snapshots:
 - completed:
     size: 532377
