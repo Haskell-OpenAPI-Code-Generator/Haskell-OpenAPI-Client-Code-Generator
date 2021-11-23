@@ -40,6 +40,7 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
 import qualified Network.HTTP.Client as HC
@@ -265,11 +266,11 @@ createFormData body =
 
 -- | Convert a 'B8.ByteString' to 'Text'
 byteToText :: B8.ByteString -> Text
-byteToText = T.pack . B8.unpack
+byteToText = TE.decodeUtf8
 
 -- | Convert 'Text' a to 'B8.ByteString'
 textToByte :: Text -> B8.ByteString
-textToByte = B8.pack . T.unpack
+textToByte = TE.encodeUtf8
 
 parseURL :: Text -> HS.Request
 parseURL url =
