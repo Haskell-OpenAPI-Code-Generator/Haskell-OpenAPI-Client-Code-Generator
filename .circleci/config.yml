@@ -64,6 +64,15 @@ jobs:
           name: System tests level 2
           command: ./.circleci/test_system_2
 
+  system2stripe:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 2 (Stripe)
+          command: ./.circleci/test_system_2_stripe
+
   system3:
     <<: *defaults
     steps:
@@ -92,6 +101,9 @@ workflows:
           requires:
             - build
       - system2:
+          requires:
+            - build
+      - system2stripe:
           requires:
             - build
       - system3:
