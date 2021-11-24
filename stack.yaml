@@ -4,4 +4,13 @@ packages:
 nix:
   shell-file: shell.nix
 extra-deps:
-- yamlparse-applicative-0.1.0.2@sha256:bda91f2818c1b5b124963931cb7f9a4e5758d026c09713e9ae2234534062747d,2133
+- github: NorfairKing/autodocodec
+  commit: f0cb2ead0985b4394db0627e6befd7ce23c54c22
+  subdirs:
+  - autodocodec
+  - autodocodec-schema
+  - autodocodec-yaml
+- github: NorfairKing/safe-coloured-text
+  commit: bd8700a555e977004e2dec24e12494a5a01ca500
+  subdirs:
+  - safe-coloured-text
