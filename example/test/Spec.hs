@@ -16,7 +16,7 @@ main =
       it "get inventory" $
         do
           response <- runGetInventory
-          getResponseBody (fromRight undefined response)
+          getResponseBody response
             `shouldSatisfy` ( \case
                                 GetInventoryResponse200 _ -> True
                                 _ -> False
@@ -25,13 +25,14 @@ main =
       it "add pet" $
         do
           response <- runAddPet
-          getResponseBody (fromRight undefined response)
+          getResponseBody response
             `shouldBe` AddPetResponse200
+
     describe "runFindPetsByStatus" $
       it "find pets by status" $
         do
           response <- runFindPetsByStatus
-          getResponseBody (fromRight undefined response)
+          getResponseBody response
             `shouldSatisfy` ( \case
                                 FindPetsByStatusResponse200 _ -> True
                                 _ -> False

@@ -28,13 +28,13 @@ library
       OpenAPI.Operations.UpdateUser
       OpenAPI.Operations.DeleteUser
       OpenAPI.Types
-      OpenAPI.CyclicTypes
+      OpenAPI.TypeAlias
       OpenAPI.Types.ApiResponse
       OpenAPI.Types.Category
       OpenAPI.Types.Order
+      OpenAPI.Types.Pet
       OpenAPI.Types.Tag
       OpenAPI.Types.User
-      OpenAPI.Types.Pet
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common

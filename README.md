@@ -70,3 +70,20 @@ The following features are not supported
 - `maxProperties`
 - `minProperties`
 - `xml`
+
+## Development
+Re-generate the code found in the [example](./example/) directory if you made changes to the output generator.
+You can do this using the [example-configuration.yml](./example-configuration.yml):
+
+``` bash
+openapi3-code-generator-exe --configuration example-configuration.yml
+```
+
+Also adapt golden tests. 
+The script to generate these can found in [.cicleci/test_golden](./.cicleci/test_golden).
+As these assume to be run as root you have to manually execute the commands listed there, e.g.:
+
+``` bash
+stack build # just to make sure the built executable is up-to-date
+.circleci/test_golden update
+```
