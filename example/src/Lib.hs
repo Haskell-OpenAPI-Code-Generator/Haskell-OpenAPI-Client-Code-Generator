@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Lib where
 
 import Data.ByteString.Char8
@@ -5,8 +6,8 @@ import Network.HTTP.Client
 import OpenAPI
 import OpenAPI.Common
 
-runAddPet :: MonadHTTP m => m (Either HttpException (Response AddPetResponse))
-runAddPet = addPet defaultConfiguration myPet
+runAddPet :: MonadHTTP m => m (Response AddPetResponse)
+runAddPet = runWithConfiguration defaultConfiguration (addPet myPet)
   where
     myPet =
       Pet
@@ -18,8 +19,10 @@ runAddPet = addPet defaultConfiguration myPet
           petTags = Nothing
         }
 
-runGetInventory :: MonadHTTP m => m (Either HttpException (Response GetInventoryResponse))
-runGetInventory = getInventory defaultConfiguration
+runGetInventory :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventory = runWithConfiguration defaultConfiguration getInventory
 
-runFindPetsByStatus :: MonadHTTP m => m (Either HttpException (Response FindPetsByStatusResponse))
-runFindPetsByStatus = findPetsByStatus defaultConfiguration "pending"
+runFindPetsByStatus :: MonadHTTP m => m (Response FindPetsByStatusResponse)
+runFindPetsByStatus = runWithConfiguration
+                        defaultConfiguration
+                        (findPetsByStatus [FindPetsByStatusParametersStatusEnumPending])
