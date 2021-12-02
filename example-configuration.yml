@@ -1,0 +1,3 @@
+specification: specifications/petstore.yaml
+outputDir: example/generatedCode
+force: true
