@@ -79,6 +79,13 @@ You can do this using the [example-configuration.yml](./example-configuration.ym
 openapi3-code-generator-exe --configuration example-configuration.yml
 ```
 
+Also make sure that the tests there run fine:
+
+``` bash
+cd example
+stack test
+```
+
 Also adapt golden tests. 
 The script to generate these can found in [.cicleci/test_golden](./.cicleci/test_golden).
 As these assume to be run as root you have to manually execute the commands listed there, e.g.:
