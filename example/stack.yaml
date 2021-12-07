@@ -3,3 +3,6 @@ resolver: lts-18.16
 packages:
 - .
 - generatedCode
+
+nix:
+  shell: ../shell.nix
