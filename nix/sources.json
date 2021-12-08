@@ -36,15 +36,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "nixos-20.09",
+        "branch": "nixos-21.11",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c85e2a478c26cfd77d1445169e51475afe9cc7cd",
-        "sha256": "049vq5xgaq78pzsygmlzfjqbv7qax0npxqvnsdyjdlaqyx4k03x5",
+        "rev": "e34c5379866833f41e2a36f309912fa675d687c7",
+        "sha256": "15shzr1wmc5770kblvlfwq5dsdlmvkpc3rhkn40nyi00fidqq96v",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/c85e2a478c26cfd77d1445169e51475afe9cc7cd.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/e34c5379866833f41e2a36f309912fa675d687c7.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "pre-commit-hooks": {
