@@ -44,5 +44,6 @@ test-suite petstore-running-example-test
     , http-conduit
     , openapi
     , petstore-running-example
+    , text
     , unordered-containers
   default-language: Haskell2010

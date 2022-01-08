@@ -115,9 +115,15 @@ nixProjectFiles packageName =
 replaceOpenAPI :: String -> String -> String
 replaceOpenAPI moduleName contents =
   T.unpack $
-    T.replace (T.pack "OpenAPI.Common") (T.pack $ moduleName ++ ".Common") $
-      T.replace (T.pack "OpenAPI.Configuration") (T.pack $ moduleName ++ ".Configuration") $
+    T.replace "OpenAPI.Common" (T.pack $ moduleName ++ ".Common") $
+      T.replace "OpenAPI.Configuration" (T.pack $ moduleName ++ ".Configuration") $
         T.pack contents
+
+replaceVersionNumber :: String -> String
+replaceVersionNumber contents =
+  T.unpack $
+    T.replace "VERSION_TO_REPLACE" (T.pack $(embedPackageVersionNumber "package.yaml")) $
+      T.pack contents
 
 permitProceed :: OAO.Settings -> IO Bool
 permitProceed settings = do
@@ -211,7 +217,7 @@ generateFilesToCreate spec settings = do
           <> modelModules
           <> [ (["Configuration"], showAndReplace configurationInfo),
                (["SecuritySchemes"], showAndReplace securitySchemes'),
-               (["Common"], replaceOpenAPI moduleName $(embedFile "src/OpenAPI/Common.hs"))
+               (["Common"], replaceOpenAPI moduleName $ replaceVersionNumber $(embedFile "src/OpenAPI/Common.hs"))
              ]
       modulesToExport =
         fmap

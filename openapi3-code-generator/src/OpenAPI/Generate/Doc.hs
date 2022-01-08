@@ -289,6 +289,7 @@ addConfigurationModuleHeader moduleName =
     . moduleDeclaration moduleName "Configuration"
     . emptyLine
     . importQualified "Data.Text"
+    . importQualified "GHC.Types "
     . importQualified (moduleName <> ".Common")
     . emptyLine
 
