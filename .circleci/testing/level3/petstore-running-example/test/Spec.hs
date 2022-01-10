@@ -4,6 +4,7 @@ import Control.Exception
 import Data.Aeson
 import Data.Either
 import Data.HashMap.Strict (fromList)
+import qualified Data.Text as T
 import Lib
 import Network.HTTP.Client
 import Network.HTTP.Simple
@@ -42,3 +43,22 @@ main =
           response <- runFindPetsByStatus $ FindPetsByStatusParametersStatusTyped "notExistingStatus"
           getResponseBody response
             `shouldBe` FindPetsByStatusResponse400
+
+    describe "runEchoUserAgent" $
+      it "returns the user agent" $
+        do
+          response <- runEchoUserAgent
+          getResponseBody response
+            `shouldSatisfy` ( \body -> case body of
+                                EchoUserAgentResponse200 text ->
+                                  "XYZ" `T.isInfixOf` text
+                                    && "openapi3-code-generator" `T.isInfixOf` text
+                                _ -> False
+                            )
+
+    describe "runEchoUserAgentWithoutUserAgent" $
+      it "should fail as the user agent is not present" $
+        do
+          response <- runEchoUserAgentWithoutUserAgent
+          getResponseBody response
+            `shouldBe` EchoUserAgentResponse400

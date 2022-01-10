@@ -22,3 +22,17 @@ runGetInventory = getInventoryWithConfiguration defaultConfiguration
 
 runFindPetsByStatus :: MonadHTTP m => FindPetsByStatusParametersStatus -> m (Response FindPetsByStatusResponse)
 runFindPetsByStatus status = findPetsByStatusWithConfiguration defaultConfiguration [status]
+
+runEchoUserAgent :: MonadHTTP m => m (Response EchoUserAgentResponse)
+runEchoUserAgent =
+  echoUserAgentWithConfiguration $
+    defaultConfiguration
+      { configApplicationName = "XYZ"
+      }
+
+runEchoUserAgentWithoutUserAgent :: MonadHTTP m => m (Response EchoUserAgentResponse)
+runEchoUserAgentWithoutUserAgent =
+  echoUserAgentWithConfiguration $
+    defaultConfiguration
+      { configIncludeUserAgent = False
+      }

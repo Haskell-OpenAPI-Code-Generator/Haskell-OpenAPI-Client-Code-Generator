@@ -49,6 +49,8 @@ defineConfigurationInformation moduleName spec =
       defaultURL = getServerURL servers'
       defaultURLName = mkName "defaultURL"
       getServerURL = maybe "/" (OAT.url :: OAT.ServerObject -> Text) . Maybe.listToMaybe
+      defaultApplicationNameVarName = mkName "defaultApplicationName"
+      defaultApplicationName = OAT.title $ OAT.info spec
    in Doc.addConfigurationModuleHeader moduleName
         . vcat
         <$> sequence
@@ -60,8 +62,16 @@ defineConfigurationInformation moduleName spec =
                 ],
             ppr
               <$> [d|$(varP defaultURLName) = T.pack $(stringE $ T.unpack defaultURL)|],
+            pure $
+              Doc.generateHaddockComment
+                [ "The default application name used in the @User-Agent@ header which is based on the @info.title@ field of the specification",
+                  "",
+                  "@" <> defaultApplicationName <> "@"
+                ],
+            ppr
+              <$> [d|$(varP defaultApplicationNameVarName) = T.pack $(stringE $ T.unpack defaultApplicationName)|],
             pure $ Doc.generateHaddockComment ["The default configuration containing the 'defaultURL' and no authorization"],
-            ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme|]
+            ppr <$> [d|$(varP $ mkName "defaultConfiguration") = OC.Configuration $(varE defaultURLName) OC.anonymousSecurityScheme True $(varE defaultApplicationNameVarName)|]
           ]
 
 -- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'

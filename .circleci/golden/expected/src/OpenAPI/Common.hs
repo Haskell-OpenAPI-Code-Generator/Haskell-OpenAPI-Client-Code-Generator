@@ -45,6 +45,7 @@ import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
 import qualified Network.HTTP.Client as HC
 import qualified Network.HTTP.Simple as HS
+import qualified Network.HTTP.Types as HT
 
 -- | Abstracts the usage of 'Network.HTTP.Simple.httpBS' away,
 --  so that it can be used for testing
@@ -99,8 +100,18 @@ runWithConfiguration c (ClientT r) = MR.runReaderT r c
 -- > defaultConfiguration
 -- >   { configSecurityScheme = bearerAuthenticationSecurityScheme "token" }
 data Configuration = Configuration
-  { configBaseURL :: Text,
-    configSecurityScheme :: SecurityScheme
+  { -- | The path of the operation is appended to this URL
+    configBaseURL :: Text,
+    -- | The 'SecurityScheme' which is applied to the request
+    -- This is used to set the @Authentication@ header for example
+    configSecurityScheme :: SecurityScheme,
+    -- | This flag indicates if an automatically generated @User-Agent@ header
+    -- should be added to the request. This allows the server to detect with
+    -- which version of the generator the code was generated.
+    configIncludeUserAgent :: Bool,
+    -- | The application name which will be included in the @User-Agent@ header
+    -- if 'configIncludeUserAgent' is set to 'True'
+    configApplicationName :: Text
   }
 
 -- | Defines how a request body is encoded
@@ -214,11 +225,12 @@ createBaseRequest ::
   HS.Request
 createBaseRequest config method path queryParams =
   configSecurityScheme config $
-    HS.setRequestMethod (textToByte method) $
-      HS.setRequestQueryString query $
-        HS.setRequestPath
-          (B8.pack (T.unpack $ byteToText basePathModifier <> path))
-          baseRequest
+    addUserAgent $
+      HS.setRequestMethod (textToByte method) $
+        HS.setRequestQueryString query $
+          HS.setRequestPath
+            (B8.pack (T.unpack $ byteToText basePathModifier <> path))
+            baseRequest
   where
     baseRequest = parseURL $ configBaseURL config
     basePath = HC.path baseRequest
@@ -228,6 +240,11 @@ createBaseRequest config method path queryParams =
         else basePath
     -- filters all maybe
     query = BF.second pure <$> serializeQueryParams queryParams
+    userAgent = configApplicationName config <> " openapi3-code-generator/0.1.0.6 (https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator)"
+    addUserAgent =
+      if configIncludeUserAgent config
+        then HS.addRequestHeader HT.hUserAgent $ textToByte userAgent
+        else id
 
 serializeQueryParams :: [QueryParameter] -> [(B8.ByteString, B8.ByteString)]
 serializeQueryParams = (>>= serializeQueryParam)
