@@ -10,6 +10,7 @@ import Control.Exception
 import Control.Monad
 import qualified Data.Bifunctor as BF
 import qualified Data.Text as T
+import Data.Version (showVersion)
 import Language.Haskell.TH
 import qualified OpenAPI.Generate.Doc as Doc
 import OpenAPI.Generate.Internal.Embed
@@ -20,6 +21,7 @@ import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Reference as Ref
 import qualified OpenAPI.Generate.Types as OAT
+import Paths_openapi3_code_generator (version)
 import System.Directory
 import System.FilePath
 import System.IO.Error
@@ -122,7 +124,7 @@ replaceOpenAPI moduleName contents =
 replaceVersionNumber :: String -> String
 replaceVersionNumber contents =
   T.unpack $
-    T.replace "VERSION_TO_REPLACE" (T.pack $(embedPackageVersionNumber "package.yaml")) $
+    T.replace "VERSION_TO_REPLACE" (T.pack $ showVersion version) $
       T.pack contents
 
 permitProceed :: OAO.Settings -> IO Bool
