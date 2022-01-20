@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bb097229402f0cce133bf27168e3c33312434c994f68e4012532b4ccf84cf5da
+-- hash: 32506648aaf0bd947f7c5eab0209f3426a5e70f31645b6045ab0a9c326ea3167
 
 name:           openapi3-code-generator
-version:        0.1.0.6
+version:        0.1.0.7
 synopsis:       OpenAPI3 Haskell Client Code Generator
 description:    Please see the README on GitHub at <https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme>
 category:       Code-Generator

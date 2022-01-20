@@ -1,5 +1,5 @@
 name:                openapi3-code-generator
-version:             0.1.0.6
+version:             0.1.0.7
 github:              "Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator"
 author:              "Remo Dörig & Joel Fisch"
 synopsis:            OpenAPI3 Haskell Client Code Generator
