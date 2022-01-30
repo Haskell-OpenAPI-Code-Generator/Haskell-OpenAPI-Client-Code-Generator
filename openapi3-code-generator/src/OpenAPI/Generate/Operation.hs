@@ -31,13 +31,16 @@ import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Response as OAR
 import qualified OpenAPI.Generate.Types as OAT
 
+getParametersFromPath :: OAT.PathItemObject -> [OAT.Referencable OAT.ParameterObject]
+getParametersFromPath = OAT.parameters
+
 -- | Defines the operations for all paths and their methods
 defineOperationsForPath :: String -> Text -> OAT.PathItemObject -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
 defineOperationsForPath mainModuleName requestPath pathItemObject = OAM.nested requestPath $ do
   operationsToGenerate <- OAM.getSetting OAO.settingOperationsToGenerate
   fmap (BF.bimap sequence Set.unions)
     . mapAndUnzipM
-      (uncurry (defineModuleForOperation mainModuleName requestPath))
+      (uncurry (defineModuleForOperation mainModuleName requestPath (getParametersFromPath pathItemObject)))
     $ filterEmptyAndOmittedOperations
       operationsToGenerate
       [ ("GET", OAT.get pathItemObject),
@@ -68,13 +71,15 @@ defineModuleForOperation ::
   -- | The path to the request (This is the key from the map of Operations)
   --  It may contain placeholder variables in the form of /my/{var}/path/
   Text ->
+  -- | Path parameter definition
+  [OAT.Referencable OAT.ParameterObject] ->
   -- | HTTP Method (GET,POST,etc)
   Text ->
   -- | The Operation Object
   OAT.OperationObject ->
   -- | commented function definition and implementation
   OAM.Generator (Q Dep.ModuleDefinition, Dep.Models)
-defineModuleForOperation mainModuleName requestPath method operation = OAM.nested method $ do
+defineModuleForOperation mainModuleName requestPath pathParams method operation = OAM.nested method $ do
   operationIdName <- getOperationName requestPath method operation
   convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
   let operationIdAsText = T.pack $ show operationIdName
@@ -84,7 +89,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
   (bodySchema, bodyPath) <- getBodySchemaFromOperation operation
   (responseTypeName, responseTransformerExp, responseBodyDefinitions, responseBodyDependencies) <- OAR.getResponseDefinitions operation appendToOperationName
   (bodyType, (bodyDefinition, bodyDependencies)) <- OAM.resetPath bodyPath $ getBodyType bodySchema appendToOperationName
-  parameterCardinality <- generateParameterTypeFromOperation operationIdAsText operation
+  parameterCardinality <- generateParameterTypeFromOperation pathParams operationIdAsText operation
   paramDescriptions <-
     (<> ["The request body to send" | not $ null bodyType])
       <$> ( case parameterCardinality of

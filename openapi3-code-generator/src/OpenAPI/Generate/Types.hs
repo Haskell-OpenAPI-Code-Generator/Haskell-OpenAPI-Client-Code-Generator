@@ -319,7 +319,7 @@ data ParameterObjectLocation
   | HeaderParameterObjectLocation
   | PathParameterObjectLocation
   | CookieParameterObjectLocation
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON ParameterObjectLocation where
   parseJSON = withText "ParameterObjectLocation" $ \case
