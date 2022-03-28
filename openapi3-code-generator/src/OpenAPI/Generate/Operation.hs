@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -103,14 +104,19 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       types = paramType <> bodyType
       monadName = mkName "m"
       createFunSignature operationName fnType' =
-        ppr
-          <$> sigD
-            operationName
-            ( forallT
-                [plainTV monadName]
-                (cxt [appT (conT ''OC.MonadHTTP) (varT monadName)])
-                fnType'
-            )
+#if MIN_VERSION_template_haskell(2,17,0)
+         do tv <- plainInvisTV monadName specifiedSpec
+#else
+         let tv = plainTV monadName in
+#endif
+            ppr
+              <$> sigD
+                operationName
+                ( forallT
+                    [tv]
+                    (cxt [appT (conT ''OC.MonadHTTP) (varT monadName)])
+                    fnType'
+                )
       methodAndPath = T.toUpper method <> " " <> requestPath
       operationNameAsString = nameBase operationIdName
       operationDescription = pure . Doc.generateHaddockComment . ("> " <> methodAndPath :) . ("" :)
