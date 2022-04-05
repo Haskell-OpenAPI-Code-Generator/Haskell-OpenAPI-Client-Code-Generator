@@ -23,6 +23,7 @@ import qualified Data.Aeson.Text as Aeson
 import qualified Data.Bifunctor as BF
 import qualified Data.Either as E
 import qualified Data.Int as Int
+import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
@@ -567,7 +568,7 @@ defineObjectModelForSchema strategy schemaName schema =
               . Doc.reformatRecord
               . ppr
               <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
-          toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues
+          toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues required
           fromJsonInstance = createFromJSONImplementation name propsWithNames required
           mkFunction = createMkFunction name propsWithNames required bangTypes
       pure
@@ -639,26 +640,26 @@ createMkFunction name propsWithNames required bangTypes = do
     `appendDoc` fmap ppr (funD fnName [clause parameterPatterns (normalB expr) []])
 
 -- | create toJSON implementation for an object
-createToJSONImplementation :: Name -> [(Text, Name)] -> [(Text, Aeson.Value)] -> Q Doc
-createToJSONImplementation objectName recordNames propsWithFixedValues =
+createToJSONImplementation :: Name -> [(Text, Name)] -> [(Text, Aeson.Value)] -> Set.Set Text -> Q Doc
+createToJSONImplementation objectName recordNames propsWithFixedValues required =
   let emptyDefs = pure []
       fnArgName = mkName "obj"
       toAssertion (jsonName, hsName) =
-        [|$(stringE $ T.unpack jsonName) Aeson..= $(varE hsName) $(varE fnArgName)|]
+        if jsonName `Set.member` required
+          then [|[$(stringE $ T.unpack jsonName) Aeson..= $(varE hsName) $(varE fnArgName)]|]
+          else [|(maybe [] (pure . ($(stringE $ T.unpack jsonName) Aeson..=)) ($(varE hsName) $(varE fnArgName)))|]
       toFixedAssertion (jsonName, value) =
-        [|$(stringE $ T.unpack jsonName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)|]
+        [|[$(stringE $ T.unpack jsonName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)]|]
       assertions = fmap toAssertion recordNames <> fmap toFixedAssertion propsWithFixedValues
+      assertionsList = [|(List.concat $(toExprList assertions))|]
       toExprList = foldr (\x expr -> uInfixE x (varE $ mkName ":") expr) [|mempty|]
-      toExprCombination [] = [|[]|]
-      toExprCombination [x] = x
-      toExprCombination (x : xs) = [|$(x) <> $(toExprCombination xs)|]
       defaultJsonImplementation =
         [ funD
             (mkName "toJSON")
             [ clause
                 [varP fnArgName]
                 ( normalB
-                    [|Aeson.object $(toExprList assertions)|]
+                    [|Aeson.object $assertionsList|]
                 )
                 []
             ],
@@ -667,7 +668,7 @@ createToJSONImplementation objectName recordNames propsWithFixedValues =
             [ clause
                 [varP fnArgName]
                 ( normalB
-                    [|Aeson.pairs $(toExprCombination assertions)|]
+                    [|Aeson.pairs (mconcat $assertionsList)|]
                 )
                 []
             ]
