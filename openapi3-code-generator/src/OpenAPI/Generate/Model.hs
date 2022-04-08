@@ -647,7 +647,7 @@ createToJSONImplementation objectName recordNames propsWithFixedValues required 
       toAssertion (jsonName, hsName) =
         if jsonName `Set.member` required
           then [|[$(stringE $ T.unpack jsonName) Aeson..= $(varE hsName) $(varE fnArgName)]|]
-          else [|(maybe [] (pure . ($(stringE $ T.unpack jsonName) Aeson..=)) ($(varE hsName) $(varE fnArgName)))|]
+          else [|(maybe mempty (pure . ($(stringE $ T.unpack jsonName) Aeson..=)) ($(varE hsName) $(varE fnArgName)))|]
       toFixedAssertion (jsonName, value) =
         [|[$(stringE $ T.unpack jsonName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)]|]
       assertions = fmap toAssertion recordNames <> fmap toFixedAssertion propsWithFixedValues
