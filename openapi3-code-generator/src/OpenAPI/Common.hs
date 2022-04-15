@@ -251,7 +251,7 @@ serializeQueryParams = (>>= serializeQueryParam)
 
 serializeQueryParam :: QueryParameter -> [(B8.ByteString, B8.ByteString)]
 serializeQueryParam QueryParameter {..} =
-  let concatValues joinWith = if queryParamExplode then pure . (queryParamName,) . B8.intercalate joinWith . fmap snd else id
+  let concatValues joinWith = if queryParamExplode then id else pure . (queryParamName,) . B8.intercalate joinWith . fmap snd
    in BF.first textToByte <$> case queryParamValue of
         Nothing -> []
         Just value ->
