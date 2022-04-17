@@ -301,6 +301,7 @@ components:
       type: object
       required:
         - prop1
+        - prop3
       properties:
         prop1:
           nullable: true
@@ -308,6 +309,12 @@ components:
         prop2:
           nullable: true
           type: string
+        prop3:
+          nullable: true
+          type: array
+          items:
+            nullable: true
+            type: string
     CoverType:
       type: object
       properties:
