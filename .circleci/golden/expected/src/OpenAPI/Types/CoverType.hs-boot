@@ -1,6 +1,7 @@
 module OpenAPI.Types.CoverType where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data CoverType
 instance Show CoverType
 instance Eq CoverType

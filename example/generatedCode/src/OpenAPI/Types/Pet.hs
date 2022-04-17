@@ -17,7 +17,9 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -52,10 +54,10 @@ data Pet = Pet {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Pet
-    where toJSON obj = Data.Aeson.Types.Internal.object ("category" Data.Aeson.Types.ToJSON..= petCategory obj : "id" Data.Aeson.Types.ToJSON..= petId obj : "name" Data.Aeson.Types.ToJSON..= petName obj : "photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj : "status" Data.Aeson.Types.ToJSON..= petStatus obj : "tags" Data.Aeson.Types.ToJSON..= petTags obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("category" Data.Aeson.Types.ToJSON..= petCategory obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= petId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= petName obj) GHC.Base.<> (("photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= petStatus obj) GHC.Base.<> ("tags" Data.Aeson.Types.ToJSON..= petTags obj))))))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON Pet
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Pet" (\obj -> (((((GHC.Base.pure Pet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "category")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "photoUrls")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tags"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Pet" (\obj -> (((((GHC.Base.pure Pet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "category")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "photoUrls")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "tags"))
 -- | Create a new 'Pet' with all required fields.
 mkPet :: Data.Text.Internal.Text -- ^ 'petName'
   -> [Data.Text.Internal.Text] -- ^ 'petPhotoUrls'

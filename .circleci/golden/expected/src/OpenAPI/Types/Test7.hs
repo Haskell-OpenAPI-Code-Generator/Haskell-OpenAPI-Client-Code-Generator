@@ -17,7 +17,9 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -42,10 +44,10 @@ data Test7Item = Test7Item {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test7Item
-    where toJSON obj = Data.Aeson.Types.Internal.object ("prop1" Data.Aeson.Types.ToJSON..= test7ItemProp1 obj : "prop2" Data.Aeson.Types.ToJSON..= test7ItemProp2 obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("prop1" Data.Aeson.Types.ToJSON..= test7ItemProp1 obj) GHC.Base.<> ("prop2" Data.Aeson.Types.ToJSON..= test7ItemProp2 obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON Test7Item
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Test7Item" (\obj -> (GHC.Base.pure Test7Item GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "prop2"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Test7Item" (\obj -> (GHC.Base.pure Test7Item GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2"))
 -- | Create a new 'Test7Item' with all required fields.
 mkTest7Item :: Test7Item
 mkTest7Item = Test7Item{test7ItemProp1 = GHC.Maybe.Nothing,

@@ -39,7 +39,7 @@ main =
     describe "runAddPet" $
       it "should encode Body" $
         do
-          let requestExpectation = expectBody "{\"category\":null,\"id\":null,\"name\":\"Harro\",\"photoUrls\":[],\"status\":null,\"tags\":null}" $ expectMethod "POST" noExpectation
+          let requestExpectation = expectBody "{\"name\":\"Harro\",\"photoUrls\":[]}" $ expectMethod "POST" noExpectation
           response <- runMock runAddPet (requestExpectation, succeededResponse)
           getResponseBody response `shouldBe` AddPetResponse200
     describe "runGetAllPetsAsOneOf" $
@@ -55,7 +55,7 @@ main =
               ]
     describe "updatePet" $ do
       it "runUpdatePet" $ do
-        let requestExpectation = expectBody "{\"photoUrls\":[],\"status\":null,\"category\":null,\"name\":\"Harro\",\"id\":null,\"tags\":null}" $ expectMethod "PUT" noExpectation
+        let requestExpectation = expectBody "{\"photoUrls\":[],\"name\":\"Harro\"}" $ expectMethod "PUT" noExpectation
         response <- runMock runUpdatePet (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` UpdatePetResponse200
       it "runUpdatePetWithTag" $ do

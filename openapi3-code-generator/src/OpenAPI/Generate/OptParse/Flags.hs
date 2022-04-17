@@ -35,6 +35,7 @@ data Flags = Flags
     flagResponseBodyTypeSuffix :: !(Maybe Text),
     flagRequestBodyTypeSuffix :: !(Maybe Text),
     flagArrayItemTypeSuffix :: !(Maybe Text),
+    flagNonNullableTypeSuffix :: !(Maybe Text),
     flagParametersTypeSuffix :: !(Maybe Text),
     flagParameterQueryPrefix :: !(Maybe Text),
     flagParameterPathPrefix :: !(Maybe Text),
@@ -72,6 +73,7 @@ parseFlags =
     <*> parseFlagResponseBodyTypeSuffix
     <*> parseFlagRequestBodyTypeSuffix
     <*> parseFlagArrayItemTypeSuffix
+    <*> parseFlagNonNullableTypeSuffix
     <*> parseFlagParametersTypeSuffix
     <*> parseFlagParameterQueryPrefix
     <*> parseFlagParameterPathPrefix
@@ -267,6 +269,16 @@ parseFlagArrayItemTypeSuffix =
         [ metavar "SUFFIX",
           help "The suffix which is added to the item type of an array (default: 'Item'). This is only applied to item types of top level array types which an alias is generated for.",
           long "array-item-type-suffix"
+        ]
+
+parseFlagNonNullableTypeSuffix :: Parser (Maybe Text)
+parseFlagNonNullableTypeSuffix =
+  optional $
+    strOption $
+      mconcat
+        [ metavar "SUFFIX",
+          help "The suffix which is added to the non-nullable part of a nullable type (default: 'NonNullable'). This is only applied to top level nullable schemas as they are the only ones which need to be referencable by name.",
+          long "non-nullable-type-suffix"
         ]
 
 parseFlagParametersTypeSuffix :: Parser (Maybe Text)

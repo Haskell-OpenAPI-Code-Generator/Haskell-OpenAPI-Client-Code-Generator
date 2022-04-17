@@ -159,7 +159,12 @@ getHsBootFiles settings modelModules =
         ( T.unpack
             . T.unlines
             . ( \xs -> case xs of
-                  x : xs' -> x : "import Data.Aeson" : "import qualified Data.Aeson as Data.Aeson.Types.Internal" : xs'
+                  x : xs' ->
+                    x :
+                    "import Data.Aeson" :
+                    "import qualified Data.Aeson as Data.Aeson.Types.Internal" :
+                    "import qualified " <> T.pack moduleName <> ".Common" :
+                    xs'
                   _ -> xs
               )
             . ( ( \l ->

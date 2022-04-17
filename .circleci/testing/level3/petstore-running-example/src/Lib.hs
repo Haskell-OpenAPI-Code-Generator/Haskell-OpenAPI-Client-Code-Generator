@@ -3,6 +3,7 @@
 module Lib where
 
 import Data.ByteString.Char8
+import Data.Text
 import Network.HTTP.Client
 import OpenAPI
 import OpenAPI.Common
@@ -36,3 +37,6 @@ runEchoUserAgentWithoutUserAgent =
     defaultConfiguration
       { configIncludeUserAgent = False
       }
+
+runSendAndReceiveNullableAndOptional :: MonadHTTP m => Text -> NullableAndOptionalTest -> m (Response SendAndReceiveNullableAndOptionalResponse)
+runSendAndReceiveNullableAndOptional mode body = sendAndReceiveNullableAndOptionalWithConfiguration defaultConfiguration mode body

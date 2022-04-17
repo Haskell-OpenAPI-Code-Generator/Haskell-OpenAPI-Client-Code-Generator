@@ -1,6 +1,7 @@
 module OpenAPI.Types.Test7 where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data Test7Item
 instance Show Test7Item
 instance Eq Test7Item

@@ -1,6 +1,7 @@
 module OpenAPI.Types.Cat where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data Cat
 instance Show Cat
 instance Eq Cat

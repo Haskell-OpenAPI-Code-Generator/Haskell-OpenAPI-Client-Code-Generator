@@ -79,6 +79,8 @@ data Settings = Settings
     settingRequestBodyTypeSuffix :: !Text,
     -- | The suffix which is added to the item type of an array. This is only applied to item types of top level array types which an alias is generated for.
     settingArrayItemTypeSuffix :: !Text,
+    -- | The suffix which is added to the non-nullable part of a nullable type. This is only applied to top level nullable schemas as they are the only ones which need to be referencable by name.
+    settingNonNullableTypeSuffix :: !Text,
     -- | The suffix which is added to the parameters type of operations
     settingParametersTypeSuffix :: !Text,
     -- | The prefix which is added to query parameters
@@ -134,6 +136,7 @@ combineToSettings Flags {..} mConf configurationFilePath = do
       settingResponseBodyTypeSuffix = fromMaybe "ResponseBody" $ flagResponseBodyTypeSuffix <|> mc configResponseBodyTypeSuffix
       settingRequestBodyTypeSuffix = fromMaybe "RequestBody" $ flagRequestBodyTypeSuffix <|> mc configRequestBodyTypeSuffix
       settingArrayItemTypeSuffix = fromMaybe "Item" $ flagArrayItemTypeSuffix <|> mc configArrayItemTypeSuffix
+      settingNonNullableTypeSuffix = fromMaybe "NonNullable" $ flagNonNullableTypeSuffix <|> mc configNonNullableTypeSuffix
       settingParametersTypeSuffix = fromMaybe "Parameters" $ flagParametersTypeSuffix <|> mc configParametersTypeSuffix
       settingParameterQueryPrefix = fromMaybe "query" $ flagParameterQueryPrefix <|> mc configParameterQueryPrefix
       settingParameterPathPrefix = fromMaybe "path" $ flagParameterPathPrefix <|> mc configParameterPathPrefix

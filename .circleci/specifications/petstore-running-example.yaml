@@ -563,6 +563,32 @@ paths:
                 type: string
         '400':
           description: No User-Agent header is present
+  "/nullable-optional/{mode}":
+    post:
+      summary: Test nullable and optional values
+      operationId: sendAndReceiveNullableAndOptional
+      parameters:
+      - name: mode
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Nullable and optional values as output
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NullableAndOptionalTest"
+        '400':
+          description: Input not valid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NullableAndOptionalTest"
+        description: Nullable and optional values as input
+        required: true
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -685,6 +711,37 @@ components:
           - sold
       xml:
         name: Pet
+    NullableAndOptionalTest:
+      type: object
+      required:
+        - requiredNonNullable
+        - requiredNullable
+        - referencedRequiredNonNullable
+        - referencedRequiredNullable
+      properties:
+        requiredNonNullable:
+          type: string
+        requiredNullable:
+          nullable: true
+          type: string
+        optionalNonNullable:
+          type: string
+        optionalNullable:
+          nullable: true
+          type: string
+        referencedRequiredNonNullable:
+          "$ref": "#/components/schemas/NonNullableString"
+        referencedRequiredNullable:
+          "$ref": "#/components/schemas/NullableString"
+        referencedOptionalNonNullable:
+          "$ref": "#/components/schemas/NonNullableString"
+        referencedOptionalNullable:
+          "$ref": "#/components/schemas/NullableString"
+    NullableString:
+      nullable: true
+      type: string
+    NonNullableString:
+      type: string
   requestBodies:
     Pet:
       content:
