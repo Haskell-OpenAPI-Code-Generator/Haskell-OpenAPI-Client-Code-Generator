@@ -589,6 +589,66 @@ paths:
               "$ref": "#/components/schemas/NullableAndOptionalTest"
         description: Nullable and optional values as input
         required: true
+  /query/array/form:
+    get:
+      operationId: queryArrayForm
+      parameters:
+      - name: color
+        in: query
+        required: true
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Worked
+  /query/array/form-explode:
+    get:
+      operationId: queryArrayFormExplode
+      parameters:
+      - name: color
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Worked
+  /query/object/form:
+    get:
+      operationId: queryObjectForm
+      parameters:
+      - name: color
+        in: query
+        required: true
+        style: form
+        explode: false
+        schema:
+          "$ref": "#/components/schemas/RGBObject"
+      responses:
+        '200':
+          description: Worked
+  /query/object/form-explode:
+    get:
+      operationId: queryObjectFormExplode
+      parameters:
+      - name: color
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          "$ref": "#/components/schemas/RGBObject"
+      responses:
+        '200':
+          description: Worked
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -742,6 +802,19 @@ components:
       type: string
     NonNullableString:
       type: string
+    RGBObject:
+      type: object
+      required:
+        - R
+        - G
+        - B
+      properties:
+        R:
+          type: number
+        G:
+          type: number
+        B:
+          type: number
   requestBodies:
     Pet:
       content:
