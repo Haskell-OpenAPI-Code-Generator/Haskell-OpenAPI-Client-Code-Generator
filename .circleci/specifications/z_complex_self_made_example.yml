@@ -296,6 +296,25 @@ components:
             type: integer
           prop2:
             type: string
+    Test8:
+      nullable: true
+      type: object
+      required:
+        - prop1
+        - prop3
+      properties:
+        prop1:
+          nullable: true
+          type: integer
+        prop2:
+          nullable: true
+          type: string
+        prop3:
+          nullable: true
+          type: array
+          items:
+            nullable: true
+            type: string
     CoverType:
       type: object
       properties:
@@ -310,6 +329,7 @@ components:
             - $ref: '#/components/schemas/Test5'
             - $ref: '#/components/schemas/Test6'
             - $ref: '#/components/schemas/Test7'
+            - $ref: '#/components/schemas/Test8'
   parameters:
     PetParameters:
       name: petId

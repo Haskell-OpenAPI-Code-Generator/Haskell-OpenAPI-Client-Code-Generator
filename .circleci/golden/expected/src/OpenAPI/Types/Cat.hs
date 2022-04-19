@@ -17,7 +17,9 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -47,10 +49,10 @@ data Cat = Cat {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Cat
-    where toJSON obj = Data.Aeson.Types.Internal.object ("age" Data.Aeson.Types.ToJSON..= catAge obj : "another_relative" Data.Aeson.Types.ToJSON..= catAnother_relative obj : "hunts" Data.Aeson.Types.ToJSON..= catHunts obj : "relative" Data.Aeson.Types.ToJSON..= catRelative obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("age" Data.Aeson.Types.ToJSON..= catAge obj) GHC.Base.<> (("another_relative" Data.Aeson.Types.ToJSON..= catAnother_relative obj) GHC.Base.<> (("hunts" Data.Aeson.Types.ToJSON..= catHunts obj) GHC.Base.<> ("relative" Data.Aeson.Types.ToJSON..= catRelative obj))))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON Cat
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> (((GHC.Base.pure Cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "relative"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> (((GHC.Base.pure Cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "relative"))
 -- | Create a new 'Cat' with all required fields.
 mkCat :: Cat
 mkCat = Cat{catAge = GHC.Maybe.Nothing,

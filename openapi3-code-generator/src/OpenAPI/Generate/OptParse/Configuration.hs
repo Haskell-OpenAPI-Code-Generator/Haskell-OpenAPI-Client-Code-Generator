@@ -38,6 +38,7 @@ data Configuration = Configuration
     configResponseBodyTypeSuffix :: !(Maybe Text),
     configRequestBodyTypeSuffix :: !(Maybe Text),
     configArrayItemTypeSuffix :: !(Maybe Text),
+    configNonNullableTypeSuffix :: !(Maybe Text),
     configParametersTypeSuffix :: !(Maybe Text),
     configParameterQueryPrefix :: !(Maybe Text),
     configParameterPathPrefix :: !(Maybe Text),
@@ -76,6 +77,7 @@ instance HasCodec Configuration where
         <*> optionalField "responseBodyTypeSuffix" "The suffix which is added to the response body data types" .= configResponseBodyTypeSuffix
         <*> optionalField "requestBodyTypeSuffix" "The suffix which is added to the request body data types" .= configRequestBodyTypeSuffix
         <*> optionalField "arrayItemTypeSuffix" "The suffix which is added to the item type of an array. This is only applied to item types of top level array types which an alias is generated for." .= configArrayItemTypeSuffix
+        <*> optionalField "nonNullableTypeSuffix" "The suffix which is added to the non-nullable part of a nullable type. This is only applied to top level nullable schemas as they are the only ones which need to be referencable by name." .= configNonNullableTypeSuffix
         <*> optionalField "parametersTypeSuffix" "The suffix which is added to the parameters type of operations" .= configParametersTypeSuffix
         <*> optionalField "parameterQueryPrefix" "The prefix which is added to query parameters" .= configParameterQueryPrefix
         <*> optionalField "parameterPathPrefix" "The prefix which is added to path parameters" .= configParameterPathPrefix

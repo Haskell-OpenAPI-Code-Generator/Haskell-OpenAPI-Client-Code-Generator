@@ -20,7 +20,9 @@ import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
 import qualified Data.Either
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -67,8 +69,8 @@ data LoginUserParameters = LoginUserParameters {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON LoginUserParameters
-    where toJSON obj = Data.Aeson.Types.Internal.object ("queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj : "queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj) GHC.Base.<> ("queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON LoginUserParameters
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "LoginUserParameters" (\obj -> (GHC.Base.pure LoginUserParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryPassword")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryUsername"))
 -- | Create a new 'LoginUserParameters' with all required fields.

@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Exception
-import Data.Aeson
+import Data.Aeson hiding (Null)
 import Data.Either
 import Data.HashMap.Strict (fromList)
 import qualified Data.Text as T
@@ -62,3 +62,119 @@ main =
           response <- runEchoUserAgentWithoutUserAgent
           getResponseBody response
             `shouldBe` EchoUserAgentResponse400
+
+    describe "runSendAndReceiveNullableAndOptional" $ do
+      it "should work with filled objects" $ do
+        response <-
+          runSendAndReceiveNullableAndOptional
+            "filled"
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = NonNull "x",
+                nullableAndOptionalTestOptionalNonNullable = Just "x",
+                nullableAndOptionalTestOptionalNullable = Just (NonNull "x"),
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = NonNull "x",
+                nullableAndOptionalTestReferencedOptionalNonNullable = Just "x",
+                nullableAndOptionalTestReferencedOptionalNullable = Just (NonNull "x")
+              }
+        getResponseBody response
+          `shouldBe` SendAndReceiveNullableAndOptionalResponse200
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = NonNull "x",
+                nullableAndOptionalTestOptionalNonNullable = Just "x",
+                nullableAndOptionalTestOptionalNullable = Just (NonNull "x"),
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = NonNull "x",
+                nullableAndOptionalTestReferencedOptionalNonNullable = Just "x",
+                nullableAndOptionalTestReferencedOptionalNullable = Just (NonNull "x")
+              }
+      it "should work with null values where possible" $ do
+        response <-
+          runSendAndReceiveNullableAndOptional
+            "emptyNull"
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = Null,
+                nullableAndOptionalTestOptionalNonNullable = Nothing,
+                nullableAndOptionalTestOptionalNullable = Just Null,
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = Null,
+                nullableAndOptionalTestReferencedOptionalNonNullable = Nothing,
+                nullableAndOptionalTestReferencedOptionalNullable = Just Null
+              }
+        getResponseBody response
+          `shouldBe` SendAndReceiveNullableAndOptionalResponse200
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = Null,
+                nullableAndOptionalTestOptionalNonNullable = Nothing,
+                nullableAndOptionalTestOptionalNullable = Just Null,
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = Null,
+                nullableAndOptionalTestReferencedOptionalNonNullable = Nothing,
+                nullableAndOptionalTestReferencedOptionalNullable = Just Null
+              }
+      it "should work with absent values where possible" $ do
+        response <-
+          runSendAndReceiveNullableAndOptional
+            "emptyAbsent"
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = Null,
+                nullableAndOptionalTestOptionalNonNullable = Nothing,
+                nullableAndOptionalTestOptionalNullable = Nothing,
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = Null,
+                nullableAndOptionalTestReferencedOptionalNonNullable = Nothing,
+                nullableAndOptionalTestReferencedOptionalNullable = Nothing
+              }
+        getResponseBody response
+          `shouldBe` SendAndReceiveNullableAndOptionalResponse200
+            NullableAndOptionalTest
+              { nullableAndOptionalTestRequiredNonNullable = "x",
+                nullableAndOptionalTestRequiredNullable = Null,
+                nullableAndOptionalTestOptionalNonNullable = Nothing,
+                nullableAndOptionalTestOptionalNullable = Nothing,
+                nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                nullableAndOptionalTestReferencedRequiredNullable = Null,
+                nullableAndOptionalTestReferencedOptionalNonNullable = Nothing,
+                nullableAndOptionalTestReferencedOptionalNullable = Nothing
+              }
+      describe "expected parse errors" $ do
+        let defaultRequestBodyWhichIsIgnored =
+              NullableAndOptionalTest
+                { nullableAndOptionalTestRequiredNonNullable = "x",
+                  nullableAndOptionalTestRequiredNullable = NonNull "x",
+                  nullableAndOptionalTestOptionalNonNullable = Just "x",
+                  nullableAndOptionalTestOptionalNullable = Just (NonNull "x"),
+                  nullableAndOptionalTestReferencedRequiredNonNullable = "x",
+                  nullableAndOptionalTestReferencedRequiredNullable = NonNull "x",
+                  nullableAndOptionalTestReferencedOptionalNonNullable = Just "x",
+                  nullableAndOptionalTestReferencedOptionalNullable = Just (NonNull "x")
+                }
+
+        it "should fail on null value for required key" $ do
+          response <- runSendAndReceiveNullableAndOptional "errorRequiredNonNullableWithNull" defaultRequestBodyWhichIsIgnored
+          getResponseBody response
+            `shouldBe` SendAndReceiveNullableAndOptionalResponseError
+              "Error in $.requiredNonNullable: parsing Text failed, expected String, but encountered Null"
+
+        it "should fail on no value for required key" $ do
+          response <- runSendAndReceiveNullableAndOptional "errorRequiredNonNullableWithAbsence" defaultRequestBodyWhichIsIgnored
+          getResponseBody response
+            `shouldBe` SendAndReceiveNullableAndOptionalResponseError
+              "Error in $: key \"requiredNonNullable\" not found"
+
+        it "should fail on no value for required nullable key" $ do
+          response <- runSendAndReceiveNullableAndOptional "errorRequiredNullable" defaultRequestBodyWhichIsIgnored
+          getResponseBody response
+            `shouldBe` SendAndReceiveNullableAndOptionalResponseError
+              "Error in $: key \"requiredNullable\" not found"
+
+        it "should fail on null value for optional non-nullable key" $ do
+          response <- runSendAndReceiveNullableAndOptional "errorOptionalNonNullable" defaultRequestBodyWhichIsIgnored
+          getResponseBody response
+            `shouldBe` SendAndReceiveNullableAndOptionalResponseError
+              "Error in $.optionalNonNullable: parsing Text failed, expected String, but encountered Null"

@@ -20,7 +20,9 @@ import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
 import qualified Data.Either
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -62,10 +64,10 @@ data UpdatePetWithFormRequestBody = UpdatePetWithFormRequestBody {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON UpdatePetWithFormRequestBody
-    where toJSON obj = Data.Aeson.Types.Internal.object ("name" Data.Aeson.Types.ToJSON..= updatePetWithFormRequestBodyName obj : "status" Data.Aeson.Types.ToJSON..= updatePetWithFormRequestBodyStatus obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("name" Data.Aeson.Types.ToJSON..= updatePetWithFormRequestBodyName obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= updatePetWithFormRequestBodyStatus obj))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("name" Data.Aeson.Types.ToJSON..=)) (updatePetWithFormRequestBodyName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (updatePetWithFormRequestBodyStatus obj) : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("name" Data.Aeson.Types.ToJSON..=)) (updatePetWithFormRequestBodyName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (updatePetWithFormRequestBodyStatus obj) : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON UpdatePetWithFormRequestBody
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "UpdatePetWithFormRequestBody" (\obj -> (GHC.Base.pure UpdatePetWithFormRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "UpdatePetWithFormRequestBody" (\obj -> (GHC.Base.pure UpdatePetWithFormRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status"))
 -- | Create a new 'UpdatePetWithFormRequestBody' with all required fields.
 mkUpdatePetWithFormRequestBody :: UpdatePetWithFormRequestBody
 mkUpdatePetWithFormRequestBody = UpdatePetWithFormRequestBody{updatePetWithFormRequestBodyName = GHC.Maybe.Nothing,

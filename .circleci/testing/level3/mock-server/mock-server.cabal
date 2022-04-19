@@ -23,6 +23,7 @@ library
       aeson
     , base >=4.7 && <5
     , servant-server
+    , unordered-containers
     , wai
     , warp
   default-language: Haskell2010
@@ -39,6 +40,7 @@ executable mock-server-exe
     , base
     , mock-server
     , servant-server
+    , unordered-containers
     , wai
     , warp
   default-language: Haskell2010

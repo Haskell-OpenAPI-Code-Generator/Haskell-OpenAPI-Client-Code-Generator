@@ -23,6 +23,7 @@ module OpenAPI.Common
     JsonDateTime (..),
     RequestBodyEncoding (..),
     QueryParameter (..),
+    Nullable (..),
     ClientT (..),
     ClientM,
   )
@@ -32,6 +33,7 @@ import qualified Control.Monad.IO.Class as MIO
 import qualified Control.Monad.Reader as MR
 import qualified Control.Monad.Trans.Class as MT
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Encoding as Encoding
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy.Char8 as LB8
@@ -364,3 +366,17 @@ instance Aeson.ToJSON JsonDateTime where
 
 instance Aeson.FromJSON JsonDateTime where
   parseJSON o = JsonDateTime <$> Aeson.parseJSON o
+
+data Nullable a = NonNull a | Null
+  deriving (Show, Eq)
+
+instance Aeson.ToJSON a => Aeson.ToJSON (Nullable a) where
+  toJSON Null = Aeson.Null
+  toJSON (NonNull x) = Aeson.toJSON x
+
+  toEncoding Null = Encoding.null_
+  toEncoding (NonNull x) = Aeson.toEncoding x
+
+instance Aeson.FromJSON a => Aeson.FromJSON (Nullable a) where
+  parseJSON Aeson.Null = pure Null
+  parseJSON x = NonNull <$> Aeson.parseJSON x

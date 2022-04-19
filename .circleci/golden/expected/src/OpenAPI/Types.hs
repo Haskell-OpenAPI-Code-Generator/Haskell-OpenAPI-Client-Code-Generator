@@ -11,6 +11,7 @@ module OpenAPI.Types (
   module OpenAPI.Types.PetByType,
   module OpenAPI.Types.Test6,
   module OpenAPI.Types.Test7,
+  module OpenAPI.Types.Test8,
   ) where
 
 import OpenAPI.TypeAlias
@@ -22,3 +23,4 @@ import OpenAPI.Types.PetByAge
 import OpenAPI.Types.PetByType
 import OpenAPI.Types.Test6
 import OpenAPI.Types.Test7
+import OpenAPI.Types.Test8

@@ -1,6 +1,7 @@
 module OpenAPI.Types.PetByAge where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data PetByAge
 instance Show PetByAge
 instance Eq PetByAge

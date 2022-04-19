@@ -1,6 +1,7 @@
 module OpenAPI.Types.Dog where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data Dog
 instance Show Dog
 instance Eq Dog

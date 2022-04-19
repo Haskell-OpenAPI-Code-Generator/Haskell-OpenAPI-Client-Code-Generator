@@ -1,6 +1,7 @@
 module OpenAPI.Types.Mischling where
 import Data.Aeson
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified OpenAPI.Common
 data Mischling
 instance Show Mischling
 instance Eq Mischling

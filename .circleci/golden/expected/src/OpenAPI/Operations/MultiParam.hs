@@ -20,7 +20,9 @@ import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
 import qualified Data.Either
+import qualified Data.Foldable
 import qualified Data.Functor
+import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
 import qualified Data.Text.Internal
@@ -73,10 +75,10 @@ data MultiParamParameters = MultiParamParameters {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParameters
-    where toJSON obj = Data.Aeson.Types.Internal.object ("pathStatus" Data.Aeson.Types.ToJSON..= multiParamParametersPathStatus obj : "queryFilter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryFilter obj : "queryReferenceParameter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryReferenceParameter obj : "queryStatus" Data.Aeson.Types.ToJSON..= multiParamParametersQueryStatus obj : GHC.Base.mempty)
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathStatus" Data.Aeson.Types.ToJSON..= multiParamParametersPathStatus obj) GHC.Base.<> (("queryFilter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryFilter obj) GHC.Base.<> (("queryReferenceParameter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryReferenceParameter obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= multiParamParametersQueryStatus obj))))
+    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["pathStatus" Data.Aeson.Types.ToJSON..= multiParamParametersPathStatus obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("queryFilter" Data.Aeson.Types.ToJSON..=)) (multiParamParametersQueryFilter obj) : ["queryReferenceParameter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryReferenceParameter obj] : ["queryStatus" Data.Aeson.Types.ToJSON..= multiParamParametersQueryStatus obj] : GHC.Base.mempty))
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["pathStatus" Data.Aeson.Types.ToJSON..= multiParamParametersPathStatus obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("queryFilter" Data.Aeson.Types.ToJSON..=)) (multiParamParametersQueryFilter obj) : ["queryReferenceParameter" Data.Aeson.Types.ToJSON..= multiParamParametersQueryReferenceParameter obj] : ["queryStatus" Data.Aeson.Types.ToJSON..= multiParamParametersQueryStatus obj] : GHC.Base.mempty)))
 instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParameters
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MultiParamParameters" (\obj -> (((GHC.Base.pure MultiParamParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathStatus")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryFilter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryReferenceParameter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryStatus"))
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "MultiParamParameters" (\obj -> (((GHC.Base.pure MultiParamParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathStatus")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "queryFilter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryReferenceParameter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryStatus"))
 -- | Create a new 'MultiParamParameters' with all required fields.
 mkMultiParamParameters :: MultiParamParametersPathStatus -- ^ 'multiParamParametersPathStatus'
   -> Cat -- ^ 'multiParamParametersQueryReferenceParameter'
