@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
@@ -253,7 +254,17 @@ serializeQueryParams = (>>= serializeQueryParam)
 
 serializeQueryParam :: QueryParameter -> [(B8.ByteString, B8.ByteString)]
 serializeQueryParam QueryParameter {..} =
-  let concatValues joinWith = if queryParamExplode then pure . (queryParamName,) . B8.intercalate joinWith . fmap snd else id
+  let concatValues :: B8.ByteString -> [(Maybe Text, B8.ByteString)] -> [(Text, B8.ByteString)]
+      concatValues joinWith =
+        if queryParamExplode
+          then fmap (BF.first $ Maybe.fromMaybe queryParamName)
+          else
+            pure . (queryParamName,) . B8.intercalate joinWith
+              . fmap
+                ( \case
+                    (Nothing, value) -> value
+                    (Just name, value) -> textToByte name <> joinWith <> value
+                )
    in BF.first textToByte <$> case queryParamValue of
         Nothing -> []
         Just value ->
@@ -264,17 +275,17 @@ serializeQueryParam QueryParameter {..} =
               "deepObject" -> const $ BF.second textToByte <$> jsonToFormDataPrefixed queryParamName value
               _ -> const []
           )
-            $ jsonToFormDataFlat queryParamName value
+            $ jsonToFormDataFlat Nothing value
 
 encodeStrict :: Aeson.ToJSON a => a -> B8.ByteString
 encodeStrict = LB8.toStrict . Aeson.encode
 
-jsonToFormDataFlat :: Text -> Aeson.Value -> [(Text, B8.ByteString)]
+jsonToFormDataFlat :: Maybe Text -> Aeson.Value -> [(Maybe Text, B8.ByteString)]
 jsonToFormDataFlat _ Aeson.Null = []
 jsonToFormDataFlat name (Aeson.Number a) = [(name, encodeStrict a)]
 jsonToFormDataFlat name (Aeson.String a) = [(name, textToByte a)]
 jsonToFormDataFlat name (Aeson.Bool a) = [(name, encodeStrict a)]
-jsonToFormDataFlat _ (Aeson.Object object) = HMap.toList object >>= uncurry jsonToFormDataFlat
+jsonToFormDataFlat _ (Aeson.Object object) = HMap.toList object >>= uncurry jsonToFormDataFlat . BF.first Just
 jsonToFormDataFlat name (Aeson.Array vector) = Vector.toList vector >>= jsonToFormDataFlat name
 
 -- | creates form data bytestring array

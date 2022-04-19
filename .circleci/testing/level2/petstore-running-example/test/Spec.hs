@@ -62,3 +62,32 @@ main =
         let requestExpectation = expectBody "{\"name\":\"Tag 1\",\"id\":3}" $ expectMethod "PUT" noExpectation
         response <- runMock runUpdatePetWithTag (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` UpdatePetResponse200
+
+    describe "query param styles should produce correct output" $ do
+      let arrayValues = ["blue", "black", "brown"]
+          objectValue =
+            RGBObject
+              { rGBObjectR = 100,
+                rGBObjectG = 200,
+                rGBObjectB = 150
+              }
+
+      it "array form with explode = false" $ do
+        let requestExpectation = expectURL "http://localhost:8887/query/array/form?color=blue%2Cblack%2Cbrown" $ expectMethod "GET" noExpectation
+        response <- runMock (queryArrayFormWithConfiguration defaultConfiguration arrayValues) (requestExpectation, succeededResponse)
+        getResponseBody response `shouldBe` QueryArrayFormResponse200
+
+      it "array form with explode = true" $ do
+        let requestExpectation = expectURL "http://localhost:8887/query/array/form-explode?color=blue&color=black&color=brown" $ expectMethod "GET" noExpectation
+        response <- runMock (queryArrayFormExplodeWithConfiguration defaultConfiguration arrayValues) (requestExpectation, succeededResponse)
+        getResponseBody response `shouldBe` QueryArrayFormExplodeResponse200
+
+      it "object form with explode = false" $ do
+        let requestExpectation = expectURL "http://localhost:8887/query/object/form?color=G%2C200%2CB%2C150%2CR%2C100" $ expectMethod "GET" noExpectation
+        response <- runMock (queryObjectFormWithConfiguration defaultConfiguration objectValue) (requestExpectation, succeededResponse)
+        getResponseBody response `shouldBe` QueryObjectFormResponse200
+
+      it "object form with explode = true" $ do
+        let requestExpectation = expectURL "http://localhost:8887/query/object/form-explode?G=200&B=150&R=100" $ expectMethod "GET" noExpectation
+        response <- runMock (queryObjectFormExplodeWithConfiguration defaultConfiguration objectValue) (requestExpectation, succeededResponse)
+        getResponseBody response `shouldBe` QueryObjectFormExplodeResponse200
