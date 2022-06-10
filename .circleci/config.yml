@@ -55,6 +55,15 @@ jobs:
           name: System tests level 1
           command: ./.circleci/test_system_1
 
+  system1_lts19-10:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: System tests level 1 (LTS 19.10)
+          command: ./.circleci/test_system_1_lts-19-10
+
   system2:
     <<: *defaults
     steps:
@@ -98,6 +107,9 @@ workflows:
           requires:
             - build
       - system1:
+          requires:
+            - build
+      - system1_lts19-10:
           requires:
             - build
       - system2:
