@@ -56,7 +56,9 @@ jobs:
           command: ./.circleci/test_system_1
 
   system1_lts19-10:
-    <<: *defaults
+    docker:
+      - image: joelfisch/stack-with-prebuilt-deps:lts-19.10
+    working_directory: ~/project
     steps:
       - attach_workspace:
           at: ~/project
