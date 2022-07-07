@@ -90,8 +90,8 @@ getInFromParameterObject :: OAT.ParameterObject -> OAT.ParameterObjectLocation
 getInFromParameterObject = OAT.in'
 
 -- | Generates the parameter type for an operation. See 'ParameterCardinality' for further information.
-generateParameterTypeFromOperation :: Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
-generateParameterTypeFromOperation operationName = getParametersFromOperationConcrete >=> generateParameterType operationName
+generateParameterTypeFromOperation :: [OAT.Referencable OAT.ParameterObject] -> Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
+generateParameterTypeFromOperation pathParams operationName = getParametersFromOperationConcrete pathParams >=> generateParameterType operationName
 
 generateParameterType :: Text -> [(OAT.ParameterObject, [Text])] -> OAM.Generator ParameterCardinality
 generateParameterType operationName parameters = OAM.nested "parameters" $ do
@@ -159,12 +159,20 @@ getParameterLocationPrefix =
   )
     . getInFromParameterObject
 
--- | Extracts all parameters of an operation
---
--- Concrete objects are always added. References try to get resolved to a concrete object.
--- If this fails, the parameter is skipped and a warning gets produced.
-getParametersFromOperationConcrete :: OAT.OperationObject -> OAM.Generator [(OAT.ParameterObject, [Text])]
-getParametersFromOperationConcrete =
+-- | Override parameters defined at path level with parameters which are defined at operation level
+overrideParameters :: [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])]
+overrideParameters pathParams operationParams =
+  -- According to OpenAPI specification, the unique parameter is identified by a combination of name and location.
+  -- So, we are using (name, in') as key in these maps.
+  let mkParamsMap parameters = Map.fromList [((getNameFromParameter (fst p), getInFromParameterObject (fst p)), p) | p <- parameters]
+      pathParamsMap = mkParamsMap pathParams
+      operationParamsMap = mkParamsMap operationParams
+      -- prefer operation parameters
+      allParamsMap = Map.union operationParamsMap pathParamsMap
+  in  Map.elems allParamsMap
+
+getConcreteParameters :: [OAT.Referencable OAT.ParameterObject] -> OAM.Generator [(OAT.ParameterObject, [Text])]
+getConcreteParameters =
   OAM.nested "parameters"
     . fmap Maybe.catMaybes
     . mapM
@@ -179,7 +187,16 @@ getParametersFromOperationConcrete =
             pure $ (,["components", "parameters", name]) <$> p
       )
     . zip ([0 ..] :: [Int])
-    . getParametersFromOperationReference
+
+-- | Extracts all parameters of an operation
+--
+-- Concrete objects are always added. References try to get resolved to a concrete object.
+-- If this fails, the parameter is skipped and a warning gets produced.
+getParametersFromOperationConcrete :: [OAT.Referencable OAT.ParameterObject] -> OAT.OperationObject -> OAM.Generator [(OAT.ParameterObject, [Text])]
+getParametersFromOperationConcrete pathParameters operation = do
+    operationParameters <- getConcreteParameters $ getParametersFromOperationReference operation
+    concretePathParameters <- getConcreteParameters pathParameters
+    pure $ overrideParameters concretePathParameters operationParameters
 
 getSchemaFromParameterObjectSchema :: OAT.ParameterObjectSchema -> OAM.Generator (Maybe OAS.Schema)
 getSchemaFromParameterObjectSchema (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) = pure $ Just schema
@@ -282,9 +299,9 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
         if getInFromParameterObject parameter == OAT.PathParameterObjectLocation
           then ([paramExpr], [])
           else ([], [paramExpr])
-    MultipleParameters paramDefinition ->
+    MultipleParameters paramDefinition -> do
       let toParamExpr f = BF.first (\name -> [|$(varE name) $(varE paramName)|]) <$> f paramDefinition
-       in pure (toParamExpr parameterTypeDefinitionPathParams, toParamExpr parameterTypeDefinitionQueryParams)
+      pure (toParamExpr parameterTypeDefinitionPathParams, toParamExpr parameterTypeDefinitionQueryParams)
   let queryParameters' = generateQueryParams queryParameters
       request = generateParameterizedRequestPath pathParameters requestPath
       methodLit = stringE $ T.unpack method
