@@ -91,7 +91,6 @@ haskellifyText convertToCamelCase startWithUppercase name =
       replaceReservedWord "JsonDateTime" = "JsonDateTime'"
       replaceReservedWord "RequestBodyEncoding" = "RequestBodyEncoding'"
       replaceReservedWord "QueryParameter" = "QueryParameter'"
-      replaceReservedWord "JsonObject" = "JsonObject'"
       replaceReservedWord a = a
       replacePlus ('+' : rest) = "Plus" <> replacePlus rest
       replacePlus (x : xs) = x : replacePlus xs
