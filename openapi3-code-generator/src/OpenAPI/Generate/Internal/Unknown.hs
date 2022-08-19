@@ -51,7 +51,7 @@ getProposedOptionsFromNameAndAvailableSchemas :: Text -> [Text] -> Text
 getProposedOptionsFromNameAndAvailableSchemas name = getProposedOptions . sortByLongestCommonSubstring name
 
 sortByLongestCommonSubstring :: Text -> [Text] -> [Text]
-sortByLongestCommonSubstring needle = fmap fst . L.sortOn snd . fmap (\x -> (x, - (longestCommonSubstringCount needle x)))
+sortByLongestCommonSubstring needle = fmap fst . L.sortOn snd . fmap (\x -> (x, -(longestCommonSubstringCount needle x)))
 
 getProposedOptions :: [Text] -> Text
 getProposedOptions [] = "Specification does not contain any."

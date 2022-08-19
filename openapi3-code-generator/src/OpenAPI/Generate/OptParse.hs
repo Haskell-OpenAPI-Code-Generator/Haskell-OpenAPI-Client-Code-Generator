@@ -16,7 +16,6 @@ import Control.Monad
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
 import qualified OpenAPI.Generate.Log as OAL
 import OpenAPI.Generate.OptParse.Configuration
 import OpenAPI.Generate.OptParse.Flags
@@ -174,5 +173,5 @@ flagsParser =
       unlines
         [ "Configuration file format:",
           "",
-          T.unpack $ TE.decodeUtf8 $ renderColouredSchemaViaCodec @Configuration
+          T.unpack $ renderColouredSchemaViaCodec @Configuration
         ]

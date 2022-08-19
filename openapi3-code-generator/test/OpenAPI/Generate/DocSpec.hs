@@ -17,14 +17,12 @@ newtype MultiLineString = MultiLineString String
 
 instance Validity MultiLineString
 
-instance GenUnchecked MultiLineString where
-  genUnchecked =
+instance GenValid MultiLineString where
+  genValid =
     MultiLineString
       <$> genListOf
-        ( frequency [(9, genUnchecked :: Gen Char), (1, pure '\n')]
+        ( frequency [(9, genValid :: Gen Char), (1, pure '\n')]
         )
-
-instance GenValid MultiLineString
 
 spec :: Spec
 spec = do

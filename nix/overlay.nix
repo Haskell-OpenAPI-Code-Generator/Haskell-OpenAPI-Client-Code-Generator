@@ -5,6 +5,7 @@ let
 in
 {
   generateOpenAPIClient = import ./generate-client.nix { pkgs = final; };
+  openapi3-code-generator = justStaticExecutables final.haskellPackages.openapi3-code-generator;
   haskellPackages =
     previous.haskellPackages.override (
       old:

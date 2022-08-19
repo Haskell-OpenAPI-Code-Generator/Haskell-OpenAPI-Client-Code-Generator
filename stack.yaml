@@ -5,12 +5,55 @@ nix:
   shell-file: shell.nix
 extra-deps:
 - github: NorfairKing/autodocodec
-  commit: f0cb2ead0985b4394db0627e6befd7ce23c54c22
+  commit: 98135d2b24c4c52f56f53c6650a169aeec61c7f1
   subdirs:
   - autodocodec
   - autodocodec-schema
   - autodocodec-yaml
 - github: NorfairKing/safe-coloured-text
-  commit: bd8700a555e977004e2dec24e12494a5a01ca500
+  commit: 675cb01fce5f46718416d7746de5b856ed90a63f
   subdirs:
   - safe-coloured-text
+- github: NorfairKing/validity
+  commit: 8373ac5f0f02ad66f1b83c9bf572290430e84062
+  subdirs:
+    - genvalidity
+    - genvalidity-aeson
+    - genvalidity-bytestring
+    - genvalidity-containers
+    - genvalidity-criterion
+    - genvalidity-hspec
+    - genvalidity-hspec-aeson
+    - genvalidity-hspec-binary
+    - genvalidity-hspec-cereal
+    - genvalidity-hspec-hashable
+    - genvalidity-hspec-optics
+    - genvalidity-hspec-persistent
+    - genvalidity-path
+    - genvalidity-persistent
+    - genvalidity-property
+    - genvalidity-scientific
+    - genvalidity-sydtest
+    - genvalidity-sydtest-aeson
+    - genvalidity-sydtest-hashable
+    - genvalidity-sydtest-lens
+    - genvalidity-sydtest-persistent
+    - genvalidity-text
+    - genvalidity-time
+    - genvalidity-unordered-containers
+    - genvalidity-uuid
+    - genvalidity-vector
+    - validity
+    - validity-aeson
+    - validity-bytestring
+    - validity-containers
+    - validity-path
+    - validity-persistent
+    - validity-primitive
+    - validity-scientific
+    - validity-text
+    - validity-time
+    - validity-unordered-containers
+    - validity-uuid
+    - validity-vector
+
