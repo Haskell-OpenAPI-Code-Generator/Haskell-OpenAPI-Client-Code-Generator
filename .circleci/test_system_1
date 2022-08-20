@@ -15,6 +15,7 @@ specifications=(
   spot_api.yml
   uber.json
   z_complex_self_made_example.yml
+  interactive-brokers.yml
 )
 
 outDir=openapi

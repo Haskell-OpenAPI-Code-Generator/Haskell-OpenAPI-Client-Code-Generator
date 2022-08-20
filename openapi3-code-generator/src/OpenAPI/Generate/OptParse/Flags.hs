@@ -9,6 +9,7 @@ where
 
 import Data.Text (Text)
 import qualified OpenAPI.Generate.Log as OAL
+import OpenAPI.Generate.OptParse.Types
 import Options.Applicative
 
 data Flags = Flags
@@ -43,7 +44,8 @@ data Flags = Flags
     flagParameterHeaderPrefix :: !(Maybe Text),
     flagOperationsToGenerate :: !(Maybe [Text]),
     flagOpaqueSchemas :: !(Maybe [Text]),
-    flagWhiteListedSchemas :: !(Maybe [Text])
+    flagWhiteListedSchemas :: !(Maybe [Text]),
+    flagFixedValueStrategy :: !(Maybe FixedValueStrategy)
   }
   deriving (Show, Eq)
 
@@ -82,6 +84,7 @@ parseFlags =
     <*> parseFlagOperationsToGenerate
     <*> parseFlagOpaqueSchemas
     <*> parseFlagWhiteListedSchemas
+    <*> parseFlagFixedValueStrategy
 
 parseFlagConfiguration :: Parser (Maybe Text)
 parseFlagConfiguration =
@@ -363,3 +366,13 @@ parseFlagWhiteListedSchemas =
             help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created.",
             long "white-listed-schema"
           ]
+
+parseFlagFixedValueStrategy :: Parser (Maybe FixedValueStrategy)
+parseFlagFixedValueStrategy =
+  optional $
+    option auto $
+      mconcat
+        [ metavar "STRATEGY",
+          help "In OpenAPI 3, fixed values can be defined as an enum with only one allowed value. If such a constant value is encountered as a required property of an object, the generator excludes this property by default ('exclude' strategy) and adds the value in the 'ToJSON' instance and expects the value to be there in the 'FromJSON' instance. This setting allows to change this behavior by including all fixed value fields instead ('include' strategy), i.e. just not trying to do anything smart (default: 'exclude').",
+          long "fixed-value-strategy"
+        ]

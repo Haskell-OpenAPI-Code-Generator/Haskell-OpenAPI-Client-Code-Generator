@@ -41,6 +41,7 @@ import OpenAPI.Generate.Internal.Util
 import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
+import OpenAPI.Generate.OptParse.Types
 import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
 import Prelude hiding (maximum, minimum, not)
@@ -361,7 +362,8 @@ defineOneOfSchema schemaName description schemas = do
   when (null schemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
   settings <- OAM.getSettings
   let name = haskellifyName (OAO.settingConvertToCamelCase settings) True $ schemaName <> "Variants"
-      (schemas', schemasWithFixedValues) = extractSchemasWithFixedValues schemas
+      fixedValueStrategy = OAO.settingFixedValueStrategy settings
+      (schemas', schemasWithFixedValues) = extractSchemasWithFixedValues fixedValueStrategy schemas
       indexedSchemas = zip schemas' ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
   OAM.logInfo $ "Define as oneOf named '" <> T.pack (nameBase name) <> "'"
@@ -584,7 +586,8 @@ defineObjectModelForSchema strategy schemaName schema =
       let convertToCamelCase = OAO.settingConvertToCamelCase settings
           name = haskellifyName convertToCamelCase True schemaName
           required = OAS.required schema
-          (props, propsWithFixedValues) = extractPropertiesWithFixedValues required $ Map.toList $ OAS.properties schema
+          fixedValueStrategy = OAO.settingFixedValueStrategy settings
+          (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.properties schema
           propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
           emptyCtx = pure []
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
@@ -621,25 +624,26 @@ defineObjectModelForSchema strategy schemaName schema =
           )
         )
 
-extractPropertiesWithFixedValues :: Set.Set Text -> [(Text, OAS.Schema)] -> ([(Text, OAS.Schema)], [(Text, Aeson.Value)])
-extractPropertiesWithFixedValues required =
+extractPropertiesWithFixedValues :: FixedValueStrategy -> Set.Set Text -> [(Text, OAS.Schema)] -> ([(Text, OAS.Schema)], [(Text, Aeson.Value)])
+extractPropertiesWithFixedValues fixedValueStrategy required =
   E.partitionEithers
     . fmap
       ( \(name, schema) ->
           BF.bimap (name,) (name,) $
             if name `Set.member` required
-              then extractSchemaWithFixedValue schema
+              then extractSchemaWithFixedValue fixedValueStrategy schema
               else Left schema
       )
 
-extractSchemasWithFixedValues :: [OAS.Schema] -> ([OAS.Schema], [Aeson.Value])
-extractSchemasWithFixedValues = E.partitionEithers . fmap extractSchemaWithFixedValue
+extractSchemasWithFixedValues :: FixedValueStrategy -> [OAS.Schema] -> ([OAS.Schema], [Aeson.Value])
+extractSchemasWithFixedValues fixedValueStrategy =
+  E.partitionEithers . fmap (extractSchemaWithFixedValue fixedValueStrategy)
 
-extractSchemaWithFixedValue :: OAS.Schema -> Either OAS.Schema Aeson.Value
-extractSchemaWithFixedValue schema@(OAT.Concrete OAS.SchemaObject {..}) = case enum of
+extractSchemaWithFixedValue :: FixedValueStrategy -> OAS.Schema -> Either OAS.Schema Aeson.Value
+extractSchemaWithFixedValue FixedValueStrategyExclude schema@(OAT.Concrete OAS.SchemaObject {..}) = case enum of
   [value] -> Right value
   _ -> Left schema
-extractSchemaWithFixedValue schema = Left schema
+extractSchemaWithFixedValue _ schema = Left schema
 
 createMkFunction :: Name -> [(Text, Name)] -> Set.Set Text -> Q [VarBangType] -> Q Doc
 createMkFunction name propsWithNames required bangTypes = do

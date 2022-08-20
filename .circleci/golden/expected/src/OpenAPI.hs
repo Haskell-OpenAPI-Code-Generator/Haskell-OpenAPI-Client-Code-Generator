@@ -3,8 +3,10 @@
 -- | The main module which exports all functionality.
 module OpenAPI (
   module OpenAPI.Operations.MultiParam,
+  module OpenAPI.Operations.MultiParamWithFixedEnum,
   module OpenAPI.Operations.NoParam,
   module OpenAPI.Operations.SingleParam,
+  module OpenAPI.Operations.SingleParamWithFixedEnum,
   module OpenAPI.Operations.Patch_pets,
   module OpenAPI.Operations.ShowPetById,
   module OpenAPI.Types,
@@ -18,14 +20,17 @@ module OpenAPI (
   module OpenAPI.Types.Test6,
   module OpenAPI.Types.Test7,
   module OpenAPI.Types.Test8,
+  module OpenAPI.Types.Test9,
   module OpenAPI.Configuration,
   module OpenAPI.SecuritySchemes,
   module OpenAPI.Common,
   ) where
 
 import OpenAPI.Operations.MultiParam
+import OpenAPI.Operations.MultiParamWithFixedEnum
 import OpenAPI.Operations.NoParam
 import OpenAPI.Operations.SingleParam
+import OpenAPI.Operations.SingleParamWithFixedEnum
 import OpenAPI.Operations.Patch_pets
 import OpenAPI.Operations.ShowPetById
 import OpenAPI.Types
@@ -39,6 +44,7 @@ import OpenAPI.Types.PetByType
 import OpenAPI.Types.Test6
 import OpenAPI.Types.Test7
 import OpenAPI.Types.Test8
+import OpenAPI.Types.Test9
 import OpenAPI.Configuration
 import OpenAPI.SecuritySchemes
 import OpenAPI.Common

@@ -84,6 +84,10 @@ appendToPath path = do
   p <- getCurrentPath
   pure $ p <> path
 
+-- | Allows to adjust the settings for certain parts of the generation.
+adjustSettings :: (OAO.Settings -> OAO.Settings) -> Generator a -> Generator a
+adjustSettings f = MR.local $ \g -> g {settings = f (settings g)}
+
 -- | Helper function to create a lookup function for a specific type
 createReferenceLookupM :: (Text -> Ref.ReferenceMap -> Maybe a) -> Text -> Generator (Maybe a)
 createReferenceLookupM fn key = MR.asks $ fn key . references

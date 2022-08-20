@@ -85,6 +85,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+  /pet/singleparamwithfixedenum:
+    get:
+      description: Operation with a single fixed parameter
+      operationId: singleParamWithFixedEnum
+      parameters:
+      - name: fixedenumvalue
+        in: query
+        description: A fixed value
+        required: true
+        schema:
+          type: string
+          enum:
+          - thefixedvalue
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
   /pet/multiparam/{status}:
     get:
       description: Operation with multiple parameters
@@ -120,6 +140,31 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/Cat'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+  /pet/multiparamwithfixedenum:
+    get:
+      description: Operation with multiple parameters
+      operationId: multiParamWithFixedEnum
+      parameters:
+      - name: fixedenumvalue
+        in: query
+        description: A fixed value
+        required: true
+        schema:
+          type: string
+          enum:
+          - thefixedvalue
+      - name: other
+        in: query
+        description: Some other value
+        schema:
+          type: string
       responses:
         '200':
           description: successful operation
@@ -315,6 +360,10 @@ components:
           items:
             nullable: true
             type: string
+    Test9:
+      type: string
+      enum:
+        - xxx
     CoverType:
       type: object
       properties:
@@ -330,6 +379,7 @@ components:
             - $ref: '#/components/schemas/Test6'
             - $ref: '#/components/schemas/Test7'
             - $ref: '#/components/schemas/Test8'
+            - $ref: '#/components/schemas/Test9'
   parameters:
     PetParameters:
       name: petId

@@ -8,8 +8,10 @@ library
   exposed-modules:
       OpenAPI
       OpenAPI.Operations.MultiParam
+      OpenAPI.Operations.MultiParamWithFixedEnum
       OpenAPI.Operations.NoParam
       OpenAPI.Operations.SingleParam
+      OpenAPI.Operations.SingleParamWithFixedEnum
       OpenAPI.Operations.Patch_pets
       OpenAPI.Operations.ShowPetById
       OpenAPI.Types
@@ -23,6 +25,7 @@ library
       OpenAPI.Types.Test6
       OpenAPI.Types.Test7
       OpenAPI.Types.Test8
+      OpenAPI.Types.Test9
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common

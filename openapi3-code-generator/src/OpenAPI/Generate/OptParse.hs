@@ -19,6 +19,7 @@ import qualified Data.Text as T
 import qualified OpenAPI.Generate.Log as OAL
 import OpenAPI.Generate.OptParse.Configuration
 import OpenAPI.Generate.OptParse.Flags
+import OpenAPI.Generate.OptParse.Types
 import Options.Applicative
 import Options.Applicative.Help (string)
 import Path.IO
@@ -99,7 +100,15 @@ data Settings = Settings
     -- | A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification)
     -- which need to be generated.
     -- For all other schemas only a type alias to 'Aeson.Value' is created.
-    settingWhiteListedSchemas :: ![Text]
+    settingWhiteListedSchemas :: ![Text],
+    -- | In OpenAPI 3, fixed values can be defined as an enum with only one allowed value.
+    -- If such a constant value is encountered as a required property of an object,
+    -- the generator excludes this property by default ("exclude" strategy) and
+    -- adds the value in the 'ToJSON' instance and expects the value to be there
+    -- in the 'FromJSON' instance.
+    -- This setting allows to change this behavior by including all fixed value
+    -- fields instead ("include" strategy), i.e. just not trying to do anything smart.
+    settingFixedValueStrategy :: !FixedValueStrategy
   }
   deriving (Show, Eq)
 
@@ -144,6 +153,7 @@ combineToSettings Flags {..} mConf configurationFilePath = do
       settingOperationsToGenerate = fromMaybe [] $ flagOperationsToGenerate <|> mc configOperationsToGenerate
       settingOpaqueSchemas = fromMaybe [] $ flagOpaqueSchemas <|> mc configOpaqueSchemas
       settingWhiteListedSchemas = fromMaybe [] $ flagWhiteListedSchemas <|> mc configWhiteListedSchemas
+      settingFixedValueStrategy = fromMaybe FixedValueStrategyExclude $ flagFixedValueStrategy <|> mc configFixedValueStrategy
 
   pure Settings {..}
   where

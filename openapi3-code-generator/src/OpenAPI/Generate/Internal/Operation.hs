@@ -48,6 +48,7 @@ import qualified OpenAPI.Generate.Model as Model
 import qualified OpenAPI.Generate.ModelDependencies as Dep
 import qualified OpenAPI.Generate.Monad as OAM
 import qualified OpenAPI.Generate.OptParse as OAO
+import OpenAPI.Generate.OptParse.Types
 import qualified OpenAPI.Generate.Types as OAT
 import qualified OpenAPI.Generate.Types.Schema as OAS
 
@@ -108,6 +109,7 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
   case parametersWithSchemas of
     [] -> pure NoParameters
     [((parameter, path), schema)] -> do
+      -- TODO disable fixed value generation for parameters
       (paramType, model) <- OAM.resetPath (path <> ["schema"]) $ Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (getNameFromParameter parameter)) schema
       pure $
         SingleParameter
@@ -130,9 +132,14 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
             Set.fromList $
               fst <$> filter ((OAT.required :: OAT.ParameterObject -> Bool) . fst . snd) parametersWithNames
       (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, parameterTypeDefinitionDependencies)) <-
-        Model.defineModelForSchemaNamed schemaName $
-          OAT.Concrete $
-            OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
+        -- Explicitly include fixed value properties since this is not
+        -- a user defined object schema but one that is defined by the
+        -- generator and is only here to make the usage easier.
+        -- It should therefore not change the semantics.
+        OAM.adjustSettings (\settings -> settings {OAO.settingFixedValueStrategy = FixedValueStrategyInclude}) $
+          Model.defineModelForSchemaNamed schemaName $
+            OAT.Concrete $
+              OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
       convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
       let parametersWithPropertyNames = BF.bimap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText) fst <$> parametersWithNames
           filterByType t = filter ((== t) . getInFromParameterObject . snd) parametersWithPropertyNames
