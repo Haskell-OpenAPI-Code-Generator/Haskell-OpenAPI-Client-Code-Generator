@@ -111,7 +111,7 @@ workflows:
       - system1:
           requires:
             - build
-      - system1_lts19-10:
+      - system1_lts18-16:
           requires:
             - build
       - system2:
