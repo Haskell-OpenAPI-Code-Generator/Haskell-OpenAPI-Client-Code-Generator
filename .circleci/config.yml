@@ -2,7 +2,7 @@ version: 2
 
 defaults: &defaults
   docker:
-    - image: joelfisch/stack-with-prebuilt-deps:v0.0.7
+    - image: joelfisch/stack-with-prebuilt-deps:lts-19.10
   working_directory: ~/project
 
 jobs:
@@ -55,16 +55,16 @@ jobs:
           name: System tests level 1
           command: ./.circleci/test_system_1
 
-  system1_lts19-10:
+  system1_lts18-16:
     docker:
-      - image: joelfisch/stack-with-prebuilt-deps:lts-19.10
+      - image: joelfisch/stack-with-prebuilt-deps:lts-v0.0.7
     working_directory: ~/project
     steps:
       - attach_workspace:
           at: ~/project
       - run:
-          name: System tests level 1 (LTS 19.10)
-          command: ./.circleci/test_system_1_lts-19-10
+          name: System tests level 1 (LTS 18.16)
+          command: ./.circleci/test_system_1_lts-18-16
 
   system2:
     <<: *defaults

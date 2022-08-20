@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -102,12 +103,17 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
           )
       types = paramType <> bodyType
       monadName = mkName "m"
-      createFunSignature operationName fnType' =
+      createFunSignature operationName fnType' = do
+#if MIN_VERSION_template_haskell(2,17,0)
+        tv <- plainInvisTV monadName specifiedSpec
+#else
+        let tv = plainTV monadName
+#endif
         ppr
           <$> sigD
             operationName
             ( forallT
-                [plainTV monadName]
+                [tv]
                 (cxt [appT (conT ''OC.MonadHTTP) (varT monadName)])
                 fnType'
             )

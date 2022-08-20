@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE GADTs #-}
@@ -18,13 +19,13 @@ module OpenAPI.Generate.Types
   )
 where
 
-import qualified Data.HashMap.Strict as HMap
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Yaml
 import GHC.Generics
+import OpenAPI.Common (jsonObjectToList)
 import OpenAPI.Generate.Types.ExternalDocumentation
 import OpenAPI.Generate.Types.Referencable
 import OpenAPI.Generate.Types.Schema (Schema)
@@ -246,7 +247,7 @@ instance FromJSON ResponsesObject where
             . Maybe.mapMaybe
               ( \(code, response) -> fmap (,response) . readMaybe . T.unpack $ code
               )
-            $ HMap.toList o
+            $ jsonObjectToList o
         )
 
 data ResponseObject = ResponseObject

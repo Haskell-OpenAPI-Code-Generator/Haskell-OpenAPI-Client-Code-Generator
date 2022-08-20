@@ -55,8 +55,8 @@ for specification in "${specifications[@]}"; do
   $GENERATOR_EXE "../specifications/$specification" --output-dir=$outDir --response-type-suffix="Response'" --opaque-schema="aggTrade"
   continueOnFailure "code generation" "$specification"
   cd $outDir
-  # Replace auto-generated stack file with one that points to lts-19.10 which uses aeson v2
-  echo "resolver: lts-19.10" > stack.yaml
+  # Replace auto-generated stack file with one that points to lts-18.16 which uses aeson v1
+  echo "resolver: lts-18.16 > stack.yaml
   echo "packages:" >> stack.yaml
   echo "- ." >> stack.yaml
   stack build --fast

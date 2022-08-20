@@ -5,567 +5,567 @@
 
 packages:
 - completed:
-    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
+    size: 71210
+    subdir: autodocodec
+    url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
     name: autodocodec
-    subdir: autodocodec
-    size: 71210
-    url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
-    pantry-tree:
-      sha256: b0d0dff3cbadd7c3f989a403b2a50c40bd5ed8093f9afe79e4bc23fb862d351e
-      size: 861
     version: 0.2.0.0
+    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
+    pantry-tree:
+      size: 861
+      sha256: b0d0dff3cbadd7c3f989a403b2a50c40bd5ed8093f9afe79e4bc23fb862d351e
   original:
     subdir: autodocodec
     url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
 - completed:
-    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
+    size: 71210
+    subdir: autodocodec-schema
+    url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
     name: autodocodec-schema
-    subdir: autodocodec-schema
-    size: 71210
-    url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
-    pantry-tree:
-      sha256: e84be9928f4a4f3bdeb7bc986448b3bf4ca57c00a444ebf4f763f4dae1727719
-      size: 336
     version: 0.1.0.2
+    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
+    pantry-tree:
+      size: 336
+      sha256: e84be9928f4a4f3bdeb7bc986448b3bf4ca57c00a444ebf4f763f4dae1727719
   original:
     subdir: autodocodec-schema
     url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
 - completed:
-    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
-    name: autodocodec-yaml
-    subdir: autodocodec-yaml
     size: 71210
+    subdir: autodocodec-yaml
     url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
-    pantry-tree:
-      sha256: da1c94bf1d368618fd6570e9da3342f99a2ee1915bf3952cc1bd00be234ed731
-      size: 540
+    name: autodocodec-yaml
     version: 0.2.0.2
+    sha256: 3f1ffcc027bfb57236e7e558232706fee0b4bddfcffef6d9cf409dccead5f40f
+    pantry-tree:
+      size: 540
+      sha256: da1c94bf1d368618fd6570e9da3342f99a2ee1915bf3952cc1bd00be234ed731
   original:
     subdir: autodocodec-yaml
     url: https://github.com/NorfairKing/autodocodec/archive/98135d2b24c4c52f56f53c6650a169aeec61c7f1.tar.gz
 - completed:
-    sha256: 31d9908433aa45631efeabf532fd4e6f2e128ebc6aa9d0608d9ac0cb6ea5ccd7
-    name: safe-coloured-text
-    subdir: safe-coloured-text
     size: 38624
+    subdir: safe-coloured-text
     url: https://github.com/NorfairKing/safe-coloured-text/archive/675cb01fce5f46718416d7746de5b856ed90a63f.tar.gz
-    pantry-tree:
-      sha256: b96c6deb10302f850a8e123f90ab47e0753ddc92d188a272cd82722a4ff4827c
-      size: 479
+    name: safe-coloured-text
     version: 0.2.0.1
+    sha256: 31d9908433aa45631efeabf532fd4e6f2e128ebc6aa9d0608d9ac0cb6ea5ccd7
+    pantry-tree:
+      size: 479
+      sha256: b96c6deb10302f850a8e123f90ab47e0753ddc92d188a272cd82722a4ff4827c
   original:
     subdir: safe-coloured-text
     url: https://github.com/NorfairKing/safe-coloured-text/archive/675cb01fce5f46718416d7746de5b856ed90a63f.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity
-    subdir: genvalidity
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: f7ccfd5bb6a705ccb4bcfd66f848ed3498dfbaf7dd6bc1346b754774023d6834
       size: 697
-    version: 1.0.0.1
+      sha256: f7ccfd5bb6a705ccb4bcfd66f848ed3498dfbaf7dd6bc1346b754774023d6834
   original:
     subdir: genvalidity
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-aeson
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-aeson
-    subdir: genvalidity-aeson
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
+      size: 465
       sha256: 1ff41a80bb5e2bb2a04f73f375b40098bb44d1a08d2d1641afac587b3c222497
-      size: 465
-    version: 1.0.0.1
   original:
     subdir: genvalidity-aeson
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-bytestring
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-bytestring
-    subdir: genvalidity-bytestring
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 5d91f5d9be5264667c22b5986b4babf19bfe7a172e77b5223ea4b9a2f82468cc
       size: 485
-    version: 1.0.0.0
+      sha256: 5d91f5d9be5264667c22b5986b4babf19bfe7a172e77b5223ea4b9a2f82468cc
   original:
     subdir: genvalidity-bytestring
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-containers
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-containers
-    subdir: genvalidity-containers
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 09951bbf1f9d59d8840c5e11c5cccfafecee586c8920c88057cafea32a6010b2
       size: 1014
-    version: 1.0.0.0
+      sha256: 09951bbf1f9d59d8840c5e11c5cccfafecee586c8920c88057cafea32a6010b2
   original:
     subdir: genvalidity-containers
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-criterion
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-criterion
-    subdir: genvalidity-criterion
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 6cc53a130a14e997027565fe46251617dcab8037322ee35fb9abedcb68a3d914
       size: 351
-    version: 1.0.0.0
+      sha256: 6cc53a130a14e997027565fe46251617dcab8037322ee35fb9abedcb68a3d914
   original:
     subdir: genvalidity-criterion
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec
-    subdir: genvalidity-hspec
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 6a5a7dcfaaa41411e5b5ebfa9ca0ce0908636e92479c942abea243f87b622a7c
       size: 1982
-    version: 1.0.0.0
+      sha256: 6a5a7dcfaaa41411e5b5ebfa9ca0ce0908636e92479c942abea243f87b622a7c
   original:
     subdir: genvalidity-hspec
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-aeson
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-aeson
-    subdir: genvalidity-hspec-aeson
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
+      size: 463
       sha256: de9003dbf94cb20de64404ae725e64bcdbcb2e70d835f4872c5a1c1565a33c8b
-      size: 463
-    version: 1.0.0.0
   original:
     subdir: genvalidity-hspec-aeson
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-binary
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-binary
-    subdir: genvalidity-hspec-binary
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: e6dec8f52c4be1b1bcad2474ed0f618e463da1b308a6c98359aedb7271a821c7
       size: 417
-    version: 1.0.0.0
+      sha256: e6dec8f52c4be1b1bcad2474ed0f618e463da1b308a6c98359aedb7271a821c7
   original:
     subdir: genvalidity-hspec-binary
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-cereal
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-cereal
-    subdir: genvalidity-hspec-cereal
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: fc09f7e1275cd7771b277abc2a7db8258894eec65d84e8e0650f3fd0cb88e02c
       size: 466
-    version: 1.0.0.0
+      sha256: fc09f7e1275cd7771b277abc2a7db8258894eec65d84e8e0650f3fd0cb88e02c
   original:
     subdir: genvalidity-hspec-cereal
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-hashable
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-hashable
-    subdir: genvalidity-hspec-hashable
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 690addb83ef6b50a5c4061248bb618f87de918e4f06917a58ae05eae5915549d
       size: 424
-    version: 1.0.0.0
+      sha256: 690addb83ef6b50a5c4061248bb618f87de918e4f06917a58ae05eae5915549d
   original:
     subdir: genvalidity-hspec-hashable
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-optics
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-optics
-    subdir: genvalidity-hspec-optics
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 0acd8f49e238904e9b815c17f579c31c3fdaa278b07a588dc7c20180a229c219
       size: 468
-    version: 1.0.0.0
+      sha256: 0acd8f49e238904e9b815c17f579c31c3fdaa278b07a588dc7c20180a229c219
   original:
     subdir: genvalidity-hspec-optics
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-hspec-persistent
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-hspec-persistent
-    subdir: genvalidity-hspec-persistent
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: f8034acb7eb2640b6a370f3fe3a04b93a67ca856e6885d868f8b5b4a909cdfe1
       size: 472
-    version: 1.0.0.0
+      sha256: f8034acb7eb2640b6a370f3fe3a04b93a67ca856e6885d868f8b5b4a909cdfe1
   original:
     subdir: genvalidity-hspec-persistent
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-path
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-path
-    subdir: genvalidity-path
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
+      size: 463
       sha256: a7d76485ae6f2e1d7364e6c1a48bc2bc3ae68186db0f051a35b5d534e5f7d549
-      size: 463
-    version: 1.0.0.0
   original:
     subdir: genvalidity-path
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-persistent
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-persistent
-    subdir: genvalidity-persistent
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 2fc53dec788ab2d42336ff7600b0564bee1ca38f0e9a2057a525b1a579f43c43
       size: 478
-    version: 1.0.0.0
+      sha256: 2fc53dec788ab2d42336ff7600b0564bee1ca38f0e9a2057a525b1a579f43c43
   original:
     subdir: genvalidity-persistent
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-property
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-property
-    subdir: genvalidity-property
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 494f91d56ffabd357064535a60f37f9cd33406e9f35743020a8355b12b2371e5
       size: 2022
-    version: 1.0.0.0
+      sha256: 494f91d56ffabd357064535a60f37f9cd33406e9f35743020a8355b12b2371e5
   original:
     subdir: genvalidity-property
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-scientific
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-scientific
-    subdir: genvalidity-scientific
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 75c2a4abdf97a81d16c25ebc6870dd05f5920be9ce87f27cfe4039814833816a
       size: 428
-    version: 1.0.0.0
+      sha256: 75c2a4abdf97a81d16c25ebc6870dd05f5920be9ce87f27cfe4039814833816a
   original:
     subdir: genvalidity-scientific
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-sydtest
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-sydtest
-    subdir: genvalidity-sydtest
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 19f4e6e9d8372f741f40526b8079bd560b51e75dafd7cfddd1dab6929be8e02c
       size: 3914
-    version: 1.0.0.0
+      sha256: 19f4e6e9d8372f741f40526b8079bd560b51e75dafd7cfddd1dab6929be8e02c
   original:
     subdir: genvalidity-sydtest
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-sydtest-aeson
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-sydtest-aeson
-    subdir: genvalidity-sydtest-aeson
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 24814fce1f4e0214fd08016bba642655b9de097978c192c370acc60847fc0dc2
       size: 473
-    version: 1.0.0.0
+      sha256: 24814fce1f4e0214fd08016bba642655b9de097978c192c370acc60847fc0dc2
   original:
     subdir: genvalidity-sydtest-aeson
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-sydtest-hashable
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-sydtest-hashable
-    subdir: genvalidity-sydtest-hashable
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: a57c3322659385a568a7dc0ec6287c880b55f262ec82e2fab1e40f35c80be5d3
       size: 434
-    version: 1.0.0.0
+      sha256: a57c3322659385a568a7dc0ec6287c880b55f262ec82e2fab1e40f35c80be5d3
   original:
     subdir: genvalidity-sydtest-hashable
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-sydtest-lens
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-sydtest-lens
-    subdir: genvalidity-sydtest-lens
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 95c9a71349325f30ce6536c443e82374ce723a720b552db39470d00531cb1d02
       size: 471
-    version: 1.0.0.0
+      sha256: 95c9a71349325f30ce6536c443e82374ce723a720b552db39470d00531cb1d02
   original:
     subdir: genvalidity-sydtest-lens
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-sydtest-persistent
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-sydtest-persistent
-    subdir: genvalidity-sydtest-persistent
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: b46e9ba5fe4eb2f9de4ee80b07dcfce710a1b04446d22b03b31af39a70130eb4
       size: 482
-    version: 1.0.0.0
+      sha256: b46e9ba5fe4eb2f9de4ee80b07dcfce710a1b04446d22b03b31af39a70130eb4
   original:
     subdir: genvalidity-sydtest-persistent
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-text
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-text
-    subdir: genvalidity-text
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: f4ff8a680a4f24a5120384786d928c495c3e076c5a23adb0e834e49f024151f4
-      size: 465
     version: 1.0.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 465
+      sha256: f4ff8a680a4f24a5120384786d928c495c3e076c5a23adb0e834e49f024151f4
   original:
     subdir: genvalidity-text
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-time
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-time
-    subdir: genvalidity-time
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 6bc08cc9dba64949702ab906c1a918462df9304025890451cc6e2fe3aeee8674
       size: 769
-    version: 1.0.0.0
+      sha256: 6bc08cc9dba64949702ab906c1a918462df9304025890451cc6e2fe3aeee8674
   original:
     subdir: genvalidity-time
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-unordered-containers
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-unordered-containers
-    subdir: genvalidity-unordered-containers
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: a6696d2b5ffe9f3ef36704833bcd8fb8560e10cfb20924acc49b8c5492825239
       size: 595
-    version: 1.0.0.0
+      sha256: a6696d2b5ffe9f3ef36704833bcd8fb8560e10cfb20924acc49b8c5492825239
   original:
     subdir: genvalidity-unordered-containers
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-uuid
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-uuid
-    subdir: genvalidity-uuid
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: a9171eef6b060658621afa9bb372fe53c88bb31f13d011b026f664b124d96c41
       size: 463
-    version: 1.0.0.0
+      sha256: a9171eef6b060658621afa9bb372fe53c88bb31f13d011b026f664b124d96c41
   original:
     subdir: genvalidity-uuid
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: genvalidity-vector
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: genvalidity-vector
-    subdir: genvalidity-vector
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 6cba82bf53112716b23101d3e587034891a2a7133cd23cceb088dbea00e0fcf5
-      size: 413
     version: 1.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 413
+      sha256: 6cba82bf53112716b23101d3e587034891a2a7133cd23cceb088dbea00e0fcf5
   original:
     subdir: genvalidity-vector
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity
-    subdir: validity
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 6612de71f51ff45daea388a8e3aebc3ebcc02bf43a9fa84ba9cbdc9e28a9b9e3
-      size: 391
     version: 0.12.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 391
+      sha256: 6612de71f51ff45daea388a8e3aebc3ebcc02bf43a9fa84ba9cbdc9e28a9b9e3
   original:
     subdir: validity
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-aeson
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-aeson
-    subdir: validity-aeson
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 277fa18d21ef959fad1ebedb795e65a0af78d45715578a2d81d4a3e26326b411
-      size: 405
     version: 0.2.0.5
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 405
+      sha256: 277fa18d21ef959fad1ebedb795e65a0af78d45715578a2d81d4a3e26326b411
   original:
     subdir: validity-aeson
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-bytestring
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-bytestring
-    subdir: validity-bytestring
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: ba8cdeee52f1220338c333a19040414cc57fcb0502e79c3db511aa05d0c38474
-      size: 292
     version: 0.4.1.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 292
+      sha256: ba8cdeee52f1220338c333a19040414cc57fcb0502e79c3db511aa05d0c38474
   original:
     subdir: validity-bytestring
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-containers
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-containers
-    subdir: validity-containers
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 0c2587e641fb93c272a61af7de6f6fb93f8e68eecd541792eaf61a95757a10aa
-      size: 554
     version: 0.5.0.4
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 554
+      sha256: 0c2587e641fb93c272a61af7de6f6fb93f8e68eecd541792eaf61a95757a10aa
   original:
     subdir: validity-containers
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-path
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-path
-    subdir: validity-path
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 08a1830f96825bebfa8f5dab6db2df13348e17eba5b589a2ef52b2e5137f32e8
-      size: 403
     version: 0.4.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 403
+      sha256: 08a1830f96825bebfa8f5dab6db2df13348e17eba5b589a2ef52b2e5137f32e8
   original:
     subdir: validity-path
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-persistent
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-persistent
-    subdir: validity-persistent
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 3bd3e2c517817dd9fa3f5d4698321f6a72a59ea2608f609cb460abdb1ebccb42
-      size: 285
     version: 0.0.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 285
+      sha256: 3bd3e2c517817dd9fa3f5d4698321f6a72a59ea2608f609cb460abdb1ebccb42
   original:
     subdir: validity-persistent
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-primitive
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-primitive
-    subdir: validity-primitive
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 25639d2ab249e5181175bc9696625007e3ef22e56655fa78b37eaa5c326b9900
-      size: 288
     version: 0.0.0.1
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 288
+      sha256: 25639d2ab249e5181175bc9696625007e3ef22e56655fa78b37eaa5c326b9900
   original:
     subdir: validity-primitive
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-scientific
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-scientific
-    subdir: validity-scientific
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 0.2.0.3
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: a82ffae296b56a81572086aec3f6ac439160492a408bce242fc0c8c478199208
       size: 290
-    version: 0.2.0.3
+      sha256: a82ffae296b56a81572086aec3f6ac439160492a408bce242fc0c8c478199208
   original:
     subdir: validity-scientific
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-text
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-text
-    subdir: validity-text
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 90f1a3273b2184800691918a92757540f2fdd3426597b216d57dfb23bc7369de
-      size: 280
     version: 0.3.1.3
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 280
+      sha256: 90f1a3273b2184800691918a92757540f2fdd3426597b216d57dfb23bc7369de
   original:
     subdir: validity-text
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-time
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-time
-    subdir: validity-time
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 11de2fab96f6a0fac82c4deb137770a51ad89c6e9941103b10ad5c9b5b3ceb3a
-      size: 573
     version: 0.5.0.0
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 573
+      sha256: 11de2fab96f6a0fac82c4deb137770a51ad89c6e9941103b10ad5c9b5b3ceb3a
   original:
     subdir: validity-time
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    size: 124354
+    subdir: validity-unordered-containers
+    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
     name: validity-unordered-containers
-    subdir: validity-unordered-containers
-    size: 124354
-    url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
+    version: 0.2.0.3
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
     pantry-tree:
-      sha256: 1fbbef6441fecc0803ab9ef11255120de2716e4cb9a79f5ef60385a38bb131b9
       size: 446
-    version: 0.2.0.3
+      sha256: 1fbbef6441fecc0803ab9ef11255120de2716e4cb9a79f5ef60385a38bb131b9
   original:
     subdir: validity-unordered-containers
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
-    name: validity-uuid
-    subdir: validity-uuid
     size: 124354
+    subdir: validity-uuid
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: 5ffe191ef4812ea3910b25e80af18d367fadd3a4e95065facb7aa74c05a94fc0
-      size: 278
+    name: validity-uuid
     version: 0.1.0.3
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 278
+      sha256: 5ffe191ef4812ea3910b25e80af18d367fadd3a4e95065facb7aa74c05a94fc0
   original:
     subdir: validity-uuid
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 - completed:
-    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
-    name: validity-vector
-    subdir: validity-vector
     size: 124354
+    subdir: validity-vector
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
-    pantry-tree:
-      sha256: e629550c5d2b3c4a7403514df00953664d3570b57bbf0dd6e9dcdd5aba787760
-      size: 282
+    name: validity-vector
     version: 0.2.0.3
+    sha256: e6a32088d8d0edd9e916681930cf37dc2045e66fce1f43c177bc12e1873cdfe8
+    pantry-tree:
+      size: 282
+      sha256: e629550c5d2b3c4a7403514df00953664d3570b57bbf0dd6e9dcdd5aba787760
   original:
     subdir: validity-vector
     url: https://github.com/NorfairKing/validity/archive/8373ac5f0f02ad66f1b83c9bf572290430e84062.tar.gz
 snapshots:
 - completed:
-    sha256: cdead65fca0323144b346c94286186f4969bf85594d649c49c7557295675d8a5
-    size: 586286
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/16.yaml
-  original: lts-18.16
+    size: 618509
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/10.yaml
+    sha256: 005f204647467d65c4ab549a5ca35d54b3d90a84a99a4ffc5d421a4018854fe2
+  original: lts-19.10

@@ -34,7 +34,6 @@ import qualified Data.Text.Lazy as LT
 import Data.Time.Calendar
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
-import Language.Haskell.TH.Syntax
 import qualified OpenAPI.Common as OC
 import OpenAPI.Generate.Doc (appendDoc, emptyDoc)
 import qualified OpenAPI.Generate.Doc as Doc

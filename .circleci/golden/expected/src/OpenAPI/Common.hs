@@ -17,6 +17,7 @@ module OpenAPI.Common
     textToByte,
     stringifyModel,
     anonymousSecurityScheme,
+    jsonObjectToList,
     Configuration (..),
     SecurityScheme,
     MonadHTTP (..),
