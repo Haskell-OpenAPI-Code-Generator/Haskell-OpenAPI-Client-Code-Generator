@@ -84,7 +84,7 @@ stackProjectFiles ::
 stackProjectFiles =
   [ ( "stack.yaml",
       unlines
-        [ "resolver: lts-19.10",
+        [ "resolver: lts-19.6",
           "packages:",
           "- ."
         ]
