@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 nix-build ci.nix -A test-golden-generate
 rm -rf testing/golden-output

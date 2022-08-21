@@ -103,13 +103,13 @@ data MultiParamParametersPathStatus =
 instance Data.Aeson.Types.ToJSON.ToJSON MultiParamParametersPathStatus
     where toJSON (MultiParamParametersPathStatusOther val) = val
           toJSON (MultiParamParametersPathStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
-          toJSON (MultiParamParametersPathStatusEnum1) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0)
-          toJSON (MultiParamParametersPathStatusEnum3) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0)
-          toJSON (MultiParamParametersPathStatusEnum5) = Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0)
+          toJSON (MultiParamParametersPathStatusEnum1) = Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 1 0)
+          toJSON (MultiParamParametersPathStatusEnum3) = Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 3 0)
+          toJSON (MultiParamParametersPathStatusEnum5) = Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 5 0)
 instance Data.Aeson.Types.FromJSON.FromJSON MultiParamParametersPathStatus
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 1 0) -> MultiParamParametersPathStatusEnum1
-                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 3 0) -> MultiParamParametersPathStatusEnum3
-                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.scientific 5 0) -> MultiParamParametersPathStatusEnum5
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 1 0) -> MultiParamParametersPathStatusEnum1
+                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 3 0) -> MultiParamParametersPathStatusEnum3
+                                            | val GHC.Classes.== Data.Aeson.Types.Internal.Number (Data.Scientific.Scientific 5 0) -> MultiParamParametersPathStatusEnum5
                                             | GHC.Base.otherwise -> MultiParamParametersPathStatusOther val)
 -- | Defines the enum schema located at @paths.\/pet\/multiparam\/{status}.GET.parameters.properties.queryStatus@ in the specification.
 -- 
