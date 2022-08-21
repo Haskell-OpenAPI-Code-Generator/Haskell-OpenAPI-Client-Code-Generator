@@ -1,0 +1,103 @@
+name: "Build nix derivations"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  hooks:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A pre-commit-hooks
+
+  shell:
+    name: Nix shell
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A shell
+
+  build:
+    name: Build executable
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A build
+
+  test-system-1:
+    name: Tests Level 1 (generate and compile)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A test-system-1
+
+  test-system-2:
+    name: Tests Level 2 (generate, compile and run with HTTP mock)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A test-system-2
+
+  test-system-3:
+    name: Tests Level 3 (generate, compile and run with real HTTP client code)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A test-system-3
+
+  test-golden:
+    name: Golden tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - uses: cachix/install-nix-action@v17
+    - uses: cachix/cachix-action@v10
+      with:
+        name: openapi3-code-generator
+        extraPullNames: autodocodec,validity
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix-build ci.nix -A test-golden
+

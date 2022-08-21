@@ -1,5 +1,5 @@
 # openapi3-code-generator
-[![CircleCI](https://circleci.com/gh/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator.svg?style=svg)](https://circleci.com/gh/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator)
+[![Build nix derivations](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml/badge.svg)](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml)
 
 ## How to use?
 1. install [cabal](https://www.haskell.org/cabal/)
