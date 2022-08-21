@@ -1,5 +1,6 @@
+{ sources ? import ./sources.nix
+}:
 let
-  sources = import ./sources.nix;
   pkgsv = import sources.nixpkgs;
   ourPkgs =
     pkgsv {

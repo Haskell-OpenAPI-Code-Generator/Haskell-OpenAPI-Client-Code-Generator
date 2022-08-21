@@ -86,11 +86,12 @@ cd example
 stack test
 ```
 
-Also adapt golden tests. 
-The script to generate these can found in [.cicleci/test_golden](./.cicleci/test_golden).
-As these assume to be run as root you have to manually execute the commands listed there, e.g.:
+Also adapt golden tests:
 
 ``` bash
-stack build # just to make sure the built executable is up-to-date
-.circleci/test_golden update
+nix-build ci.nix -A test-golden-generate
+rm -rf golden-output
+mkdir -p golden-output
+cp -R result/* golden-output
+chmod -R 764 golden-output
 ```
