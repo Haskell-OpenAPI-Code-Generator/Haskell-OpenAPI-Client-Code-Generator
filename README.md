@@ -89,9 +89,5 @@ stack test
 Also adapt golden tests:
 
 ``` bash
-nix-build ci.nix -A test-golden-generate
-rm -rf golden-output
-mkdir -p golden-output
-cp -R result/* golden-output
-chmod -R 764 golden-output
+./update_golden.sh
 ```
