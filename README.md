@@ -1,5 +1,5 @@
 # openapi3-code-generator
-[![CircleCI](https://circleci.com/gh/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator.svg?style=svg)](https://circleci.com/gh/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator)
+[![Build nix derivations](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml/badge.svg)](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml)
 
 ## How to use?
 1. install [cabal](https://www.haskell.org/cabal/)
@@ -86,11 +86,8 @@ cd example
 stack test
 ```
 
-Also adapt golden tests. 
-The script to generate these can found in [.cicleci/test_golden](./.cicleci/test_golden).
-As these assume to be run as root you have to manually execute the commands listed there, e.g.:
+Also adapt golden tests:
 
 ``` bash
-stack build # just to make sure the built executable is up-to-date
-.circleci/test_golden update
+./update_golden.sh
 ```

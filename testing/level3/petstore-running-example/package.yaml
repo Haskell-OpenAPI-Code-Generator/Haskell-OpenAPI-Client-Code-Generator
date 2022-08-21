@@ -9,6 +9,7 @@ dependencies:
   - openapi
   - aeson
   - unordered-containers
+  - text
 
 library:
   source-dirs: src

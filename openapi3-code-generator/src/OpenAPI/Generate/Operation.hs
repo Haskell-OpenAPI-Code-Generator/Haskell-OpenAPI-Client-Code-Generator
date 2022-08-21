@@ -32,6 +32,14 @@ import qualified OpenAPI.Generate.OptParse as OAO
 import qualified OpenAPI.Generate.Response as OAR
 import qualified OpenAPI.Generate.Types as OAT
 
+#if MIN_VERSION_template_haskell(2,17,0)
+nameToTypeVariable :: Name -> Q (TyVarBndr Specificity)
+nameToTypeVariable monadName = plainInvisTV monadName specifiedSpec
+#else
+nameToTypeVariable :: Name -> Q TyVarBndr
+nameToTypeVariable monadName = pure $ plainTV monadName
+#endif
+
 -- | Defines the operations for all paths and their methods
 defineOperationsForPath :: String -> Text -> OAT.PathItemObject -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
 defineOperationsForPath mainModuleName requestPath pathItemObject = OAM.nested requestPath $ do
@@ -104,11 +112,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       types = paramType <> bodyType
       monadName = mkName "m"
       createFunSignature operationName fnType' = do
-#if MIN_VERSION_template_haskell(2,17,0)
-        tv <- plainInvisTV monadName specifiedSpec
-#else
-        let tv = plainTV monadName
-#endif
+        tv <- nameToTypeVariable monadName
         ppr
           <$> sigD
             operationName

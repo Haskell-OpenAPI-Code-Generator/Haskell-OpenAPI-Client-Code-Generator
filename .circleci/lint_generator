@@ -1,2 +1,0 @@
-set -e
-hlint . --report --ignore-glob="example/**/*.hs"

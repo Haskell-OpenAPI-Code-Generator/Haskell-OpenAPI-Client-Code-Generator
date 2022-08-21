@@ -1,7 +1,6 @@
+{ sources ? import ./sources.nix }:
 let
-  sources = import ./sources.nix;
   nix-pre-commit-hooks = import sources.pre-commit-hooks;
-
 in
 {
   tools = with nix-pre-commit-hooks; [
@@ -17,21 +16,21 @@ in
         enable = true;
         excludes = [
           "example"
-          ".circleci"
+          "testing/golden-output"
         ];
       };
       hlint = {
         enable = true;
         excludes = [
           "example"
-          ".circleci"
+          "testing/golden-output"
         ];
       };
       ormolu = {
         enable = true;
         excludes = [
           "example"
-          ".circleci"
+          "testing/golden-output"
         ];
       };
     };

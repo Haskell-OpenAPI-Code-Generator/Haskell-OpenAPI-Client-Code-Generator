@@ -1,4 +1,4 @@
-specification: .circleci/specifications/stripe-api.yml
+specification: specifications/stripe-api.yml
 outputDir: out
 packageName: stripeapi
 moduleName: StripeAPI

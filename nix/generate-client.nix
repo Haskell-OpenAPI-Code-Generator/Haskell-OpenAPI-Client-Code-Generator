@@ -1,4 +1,5 @@
-{ pkgs ? import ./pkgs.nix
+{ sources ? import ./sources.nix
+, pkgs ? import ./pkgs.nix { inherit sources; }
 }:
 { name
 , src ? null
@@ -13,7 +14,7 @@
 with pkgs.lib;
 with pkgs.haskell.lib;
 let
-  localPkgs = import ./pkgs.nix;
+  localPkgs = import ./pkgs.nix { inherit sources; };
   extraFlagsStr = concatStringsSep " " extraFlags;
   specificationArgument = optionalString (! builtins.isNull src) src;
   omitFlag = optionalString (schemas != [ ] && operations != [ ]) "--omit-additional-operation-functions";
