@@ -2,8 +2,9 @@
 
 import Control.Exception
 import Data.Aeson hiding (Null)
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Either
-import Data.HashMap.Strict (fromList)
 import qualified Data.Text as T
 import Lib
 import Network.HTTP.Client
@@ -19,7 +20,12 @@ main =
         do
           response <- runGetInventory
           getResponseBody response
-            `shouldBe` GetInventoryResponse200 (fromList [("pet1", Number 23), ("pet2", Number 2)])
+            `shouldBe` GetInventoryResponse200
+              ( KeyMap.fromList
+                  [ (Key.fromText "pet1", Number 23),
+                    (Key.fromText "pet2", Number 2)
+                  ]
+              )
     describe "runAddPet" $
       it "add pet" $
         do

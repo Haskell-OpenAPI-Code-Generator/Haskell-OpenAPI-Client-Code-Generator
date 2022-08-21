@@ -11,9 +11,10 @@ where
 
 import Control.Monad (when)
 import Data.Aeson
+import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.TH
 import Data.Char
-import qualified Data.HashMap.Strict as HM
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -72,110 +73,110 @@ userAgentEcho Nothing = throwError err400
 
 checkNullableAndOptional :: String -> Value -> Handler Value
 checkNullableAndOptional "filled" (Object map) = do
-  when (HM.lookup "requiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "requiredNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "optionalNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "optionalNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedRequiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedRequiredNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedOptionalNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedOptionalNullable" map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Just "x") $ throwError err400
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", "x"),
-          ("requiredNullable", "x"),
-          ("optionalNonNullable", "x"),
-          ("optionalNullable", "x"),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", "x"),
-          ("referencedOptionalNonNullable", "x"),
-          ("referencedOptionalNullable", "x")
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", "x"),
+          (Key.fromText "requiredNullable", "x"),
+          (Key.fromText "optionalNonNullable", "x"),
+          (Key.fromText "optionalNullable", "x"),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", "x"),
+          (Key.fromText "referencedOptionalNonNullable", "x"),
+          (Key.fromText "referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "emptyNull" (Object map) = do
-  when (HM.lookup "requiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "requiredNullable" map /= Just Null) $ throwError err400
-  when (HM.lookup "optionalNonNullable" map /= Nothing) $ throwError err400
-  when (HM.lookup "optionalNullable" map /= Just Null) $ throwError err400
-  when (HM.lookup "referencedRequiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedRequiredNullable" map /= Just Null) $ throwError err400
-  when (HM.lookup "referencedOptionalNonNullable" map /= Nothing) $ throwError err400
-  when (HM.lookup "referencedOptionalNullable" map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Just Null) $ throwError err400
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", "x"),
-          ("requiredNullable", Null),
-          ("optionalNullable", Null),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", Null),
-          ("referencedOptionalNullable", Null)
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", "x"),
+          (Key.fromText "requiredNullable", Null),
+          (Key.fromText "optionalNullable", Null),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", Null),
+          (Key.fromText "referencedOptionalNullable", Null)
         ]
 checkNullableAndOptional "emptyAbsent" (Object map) = do
-  when (HM.lookup "requiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "requiredNullable" map /= Just Null) $ throwError err400
-  when (HM.lookup "optionalNonNullable" map /= Nothing) $ throwError err400
-  when (HM.lookup "optionalNullable" map /= Nothing) $ throwError err400
-  when (HM.lookup "referencedRequiredNonNullable" map /= Just "x") $ throwError err400
-  when (HM.lookup "referencedRequiredNullable" map /= Just Null) $ throwError err400
-  when (HM.lookup "referencedOptionalNonNullable" map /= Nothing) $ throwError err400
-  when (HM.lookup "referencedOptionalNullable" map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Nothing) $ throwError err400
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", "x"),
-          ("requiredNullable", Null),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", Null)
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", "x"),
+          (Key.fromText "requiredNullable", Null),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", Null)
         ]
 checkNullableAndOptional "errorRequiredNonNullableWithNull" (Object map) =
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", Null),
-          ("requiredNullable", "x"),
-          ("optionalNonNullable", "x"),
-          ("optionalNullable", "x"),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", "x"),
-          ("referencedOptionalNonNullable", "x"),
-          ("referencedOptionalNullable", "x")
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", Null),
+          (Key.fromText "requiredNullable", "x"),
+          (Key.fromText "optionalNonNullable", "x"),
+          (Key.fromText "optionalNullable", "x"),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", "x"),
+          (Key.fromText "referencedOptionalNonNullable", "x"),
+          (Key.fromText "referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorRequiredNonNullableWithAbsence" (Object map) =
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNullable", "x"),
-          ("optionalNonNullable", "x"),
-          ("optionalNullable", "x"),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", "x"),
-          ("referencedOptionalNonNullable", "x"),
-          ("referencedOptionalNullable", "x")
+      KeyMap.fromList
+        [ (Key.fromText "requiredNullable", "x"),
+          (Key.fromText "optionalNonNullable", "x"),
+          (Key.fromText "optionalNullable", "x"),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", "x"),
+          (Key.fromText "referencedOptionalNonNullable", "x"),
+          (Key.fromText "referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorRequiredNullable" (Object map) =
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", "x"),
-          ("optionalNonNullable", "x"),
-          ("optionalNullable", "x"),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", "x"),
-          ("referencedOptionalNonNullable", "x"),
-          ("referencedOptionalNullable", "x")
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", "x"),
+          (Key.fromText "optionalNonNullable", "x"),
+          (Key.fromText "optionalNullable", "x"),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", "x"),
+          (Key.fromText "referencedOptionalNonNullable", "x"),
+          (Key.fromText "referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorOptionalNonNullable" (Object map) =
   pure $
     Object $
-      HM.fromList
-        [ ("requiredNonNullable", "x"),
-          ("requiredNullable", "x"),
-          ("optionalNonNullable", Null),
-          ("optionalNullable", "x"),
-          ("referencedRequiredNonNullable", "x"),
-          ("referencedRequiredNullable", "x"),
-          ("referencedOptionalNonNullable", "x"),
-          ("referencedOptionalNullable", "x")
+      KeyMap.fromList
+        [ (Key.fromText "requiredNonNullable", "x"),
+          (Key.fromText "requiredNullable", "x"),
+          (Key.fromText "optionalNonNullable", Null),
+          (Key.fromText "optionalNullable", "x"),
+          (Key.fromText "referencedRequiredNonNullable", "x"),
+          (Key.fromText "referencedRequiredNullable", "x"),
+          (Key.fromText "referencedOptionalNonNullable", "x"),
+          (Key.fromText "referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional _ _ = throwError err500
