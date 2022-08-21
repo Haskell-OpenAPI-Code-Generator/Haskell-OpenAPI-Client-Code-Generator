@@ -16,24 +16,21 @@ in
         enable = true;
         excludes = [
           "example"
-          ".circleci"
-          "golden-output"
+          "testing/golden-output"
         ];
       };
       hlint = {
         enable = true;
         excludes = [
           "example"
-          ".circleci"
-          "golden-output"
+          "testing/golden-output"
         ];
       };
       ormolu = {
         enable = true;
         excludes = [
           "example"
-          ".circleci"
-          "golden-output"
+          "testing/golden-output"
         ];
       };
     };

@@ -1,7 +1,7 @@
 (import ./pkgs.nix).generateOpenAPIClient
 {
   name = "stripe-api";
-  src = ../.circleci/specifications/stripe-api.yml;
+  src = ../specifications/stripe-api.yml;
   packageName = "stripe-api";
   moduleName = "StripeAPI";
   extraFlags = [
