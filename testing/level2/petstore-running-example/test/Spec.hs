@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.Trans.Reader
+import qualified Data.Aeson.KeyMap as KeyMap
 import Data.ByteString.Char8
 import Data.Either
-import qualified Data.HashMap.Strict as HashMap
 import Lib
 import Network.HTTP.Client.Internal
 import Network.HTTP.Simple
@@ -22,19 +22,19 @@ main =
       it "should run anonymous" $ do
         let requestExpectation = expectURL "http://localhost:8887/store/inventory" $ expectMethod "GET" noExpectation
         response <- runMock runGetInventoryAnonymous (requestExpectation, succeededResponse)
-        getResponseBody response `shouldBe` GetInventoryResponse200 HashMap.empty
+        getResponseBody response `shouldBe` GetInventoryResponse200 KeyMap.empty
       it "should run with basic auth" $ do
         let requestExpectation = expectAuthorization "Basic dXNlcjpwdw==" noExpectation
         response <- runMock runGetInventoryBasicAuth (requestExpectation, succeededResponse)
-        getResponseBody response `shouldBe` GetInventoryResponse200 HashMap.empty
+        getResponseBody response `shouldBe` GetInventoryResponse200 KeyMap.empty
       it "should run with bearer auth" $ do
         let requestExpectation = expectAuthorization "Bearer token" noExpectation
         response <- runMock runGetInventoryBearerAuth (requestExpectation, succeededResponse)
-        getResponseBody response `shouldBe` GetInventoryResponse200 HashMap.empty
+        getResponseBody response `shouldBe` GetInventoryResponse200 KeyMap.empty
       it "should run multiple requests with bearer auth" $ do
         let requestExpectation = expectAuthorization "Bearer token" noExpectation
         (response1, response2) <- runMock runMultipleRequestsWithBearerAuth (requestExpectation, succeededResponse)
-        getResponseBody response1 `shouldBe` GetInventoryResponse200 HashMap.empty
+        getResponseBody response1 `shouldBe` GetInventoryResponse200 KeyMap.empty
         getResponseBody response2 `shouldBe` AddPetResponse200
     describe "runAddPet" $
       it "should encode Body" $
@@ -55,11 +55,11 @@ main =
               ]
     describe "updatePet" $ do
       it "runUpdatePet" $ do
-        let requestExpectation = expectBody "{\"photoUrls\":[],\"name\":\"Harro\"}" $ expectMethod "PUT" noExpectation
+        let requestExpectation = expectBody "{\"name\":\"Harro\",\"photoUrls\":[]}" $ expectMethod "PUT" noExpectation
         response <- runMock runUpdatePet (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` UpdatePetResponse200
       it "runUpdatePetWithTag" $ do
-        let requestExpectation = expectBody "{\"name\":\"Tag 1\",\"id\":3}" $ expectMethod "PUT" noExpectation
+        let requestExpectation = expectBody "{\"id\":3,\"name\":\"Tag 1\"}" $ expectMethod "PUT" noExpectation
         response <- runMock runUpdatePetWithTag (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` UpdatePetResponse200
 
@@ -83,11 +83,11 @@ main =
         getResponseBody response `shouldBe` QueryArrayFormExplodeResponse200
 
       it "object form with explode = false" $ do
-        let requestExpectation = expectURL "http://localhost:8887/query/object/form?color=G%2C200%2CB%2C150%2CR%2C100" $ expectMethod "GET" noExpectation
+        let requestExpectation = expectURL "http://localhost:8887/query/object/form?color=B%2C150%2CG%2C200%2CR%2C100" $ expectMethod "GET" noExpectation
         response <- runMock (queryObjectFormWithConfiguration defaultConfiguration objectValue) (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` QueryObjectFormResponse200
 
       it "object form with explode = true" $ do
-        let requestExpectation = expectURL "http://localhost:8887/query/object/form-explode?G=200&B=150&R=100" $ expectMethod "GET" noExpectation
+        let requestExpectation = expectURL "http://localhost:8887/query/object/form-explode?B=150&G=200&R=100" $ expectMethod "GET" noExpectation
         response <- runMock (queryObjectFormExplodeWithConfiguration defaultConfiguration objectValue) (requestExpectation, succeededResponse)
         getResponseBody response `shouldBe` QueryObjectFormExplodeResponse200

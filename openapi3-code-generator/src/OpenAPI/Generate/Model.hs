@@ -34,7 +34,6 @@ import qualified Data.Text.Lazy as LT
 import Data.Time.Calendar
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
-import Language.Haskell.TH.Syntax
 import qualified OpenAPI.Common as OC
 import OpenAPI.Generate.Doc (appendDoc, emptyDoc)
 import qualified OpenAPI.Generate.Doc as Doc
@@ -76,6 +75,12 @@ liftAesonValueWithOverloadedStrings useOverloadedStrings (Aeson.String a) =
    in if useOverloadedStrings
         then [|$s|]
         else [|Aeson.String $s|]
+liftAesonValueWithOverloadedStrings _ (Aeson.Number n) =
+  -- Without the manual handling of numbers, TH tries to use
+  -- `Scientific.Scientific` which is not exposed.
+  let coefficient = Scientific.coefficient n
+      base10Exponent = Scientific.base10Exponent n
+   in [|Aeson.Number (Scientific.scientific coefficient base10Exponent)|]
 liftAesonValueWithOverloadedStrings _ a = [|a|]
 
 liftAesonValue :: Aeson.Value -> Q Exp
