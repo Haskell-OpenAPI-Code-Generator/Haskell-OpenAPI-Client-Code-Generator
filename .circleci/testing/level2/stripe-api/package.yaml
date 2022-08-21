@@ -1,4 +1,4 @@
-name: petstore-running-example
+name: stripe-api
 version: 0.1.0.0
 
 dependencies:
@@ -14,7 +14,7 @@ library:
   source-dirs: src
 
 tests:
-  petstore-running-example-test:
+  stripe-api-test:
     main: Spec.hs
     source-dirs: test
     ghc-options:
@@ -22,7 +22,7 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - petstore-running-example
+      - stripe-api
       - hspec
       - transformers
       - http-types
