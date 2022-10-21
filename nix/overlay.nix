@@ -1,4 +1,4 @@
-final: previous:
+final: prev:
 with final.lib;
 with final.haskell.lib;
 let
@@ -39,7 +39,7 @@ let
     (generateCode { fileName = "petstore-running-example.yaml"; })
   ];
   haskellPackages =
-    previous.haskellPackages.override (
+    prev.haskellPackages.override (
       old:
       {
         overrides =
@@ -54,7 +54,7 @@ let
             (
               self: super:
                 {
-                  openapi3-code-generator = buildStrictly (final.haskellPackages.callCabal2nixWithOptions "openapi3-code-generator" (final.gitignoreSource ../openapi3-code-generator) "--no-hpack" { });
+                  openapi3-code-generator = buildStrictly (final.haskellPackages.callCabal2nixWithOptions "openapi3-code-generator" ../openapi3-code-generator "--no-hpack" { });
                 }
             );
       }
@@ -64,7 +64,7 @@ in
   generateOpenAPIClient = import ./generate-client.nix { pkgs = final; };
   openapi3-code-generator = justStaticExecutables final.haskellPackages.openapi3-code-generator;
   haskellPackages = haskellPackages;
-  mockServer = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "level-3-mock-server" (final.gitignoreSource (../testing/level3/mock-server)) { }));
+  mockServer = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "level-3-mock-server" (../testing/level3/mock-server) { }));
   testSystem1 = final.symlinkJoin {
     name = "test-system-1";
     paths = (builtins.map
@@ -79,9 +79,9 @@ in
       (pkg:
         let
           openapi = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-compiled" pkg.path { }));
-          base = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "level2-base" (final.gitignoreSource ../testing/level2/level2-base) { openapi = openapi; }));
+          base = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "level2-base" ../testing/level2/level2-base { openapi = openapi; }));
         in
-        disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-tests" (final.gitignoreSource (../testing/level2 + "/${pkg.name}")) { level2-base = base; openapi = openapi; }))
+        disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-tests" (../testing/level2 + "/${pkg.name}") { level2-base = base; openapi = openapi; }))
       )
       codeForSpecsLevelTwo);
   };
@@ -92,7 +92,7 @@ in
         let
           openapi = disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-compiled" pkg.path { }));
         in
-        overrideCabal (disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-tests" (final.gitignoreSource (../testing/level3 + "/${pkg.name}")) { openapi = openapi; }))) (old: {
+        overrideCabal (disableOptimization (disableLibraryProfiling (haskellPackages.callCabal2nix "${pkg.name}-tests" (../testing/level3 + "/${pkg.name}") { openapi = openapi; }))) (old: {
           preCheck = (old.preCheck or "") + ''
             ${final.killall}/bin/killall -r mock-server-exe || true
             ${final.mockServer}/bin/mock-server-exe &

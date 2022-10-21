@@ -57,3 +57,7 @@ extra-deps:
     - validity-uuid
     - validity-vector
 
+system-ghc: true
+nix:
+  enable: false
+with-hpack: hpack

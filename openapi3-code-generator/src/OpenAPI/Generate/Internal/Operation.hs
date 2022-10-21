@@ -313,11 +313,11 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                            then [|OC.doBodyCallWithConfiguration $(varE configName)|]
                            else [|OC.doBodyCallWithConfigurationM|]
                        )
-                        (T.toUpper $ T.pack $methodLit)
-                        (T.pack $(request))
-                        $(queryParameters')
-                        $(if required then [|Just $(varE bodyName)|] else varE bodyName)
-                        $(encodeExpr)
+                      (T.toUpper $ T.pack $methodLit)
+                      (T.pack $(request))
+                      $(queryParameters')
+                      $(if required then [|Just $(varE bodyName)|] else varE bodyName)
+                      $(encodeExpr)
                     )
                 |]
       _ ->
@@ -328,9 +328,9 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                      then [|OC.doCallWithConfiguration $(varE configName)|]
                      else [|OC.doCallWithConfigurationM|]
                  )
-                  (T.toUpper $ T.pack $methodLit)
-                  (T.pack $(request))
-                  $(queryParameters')
+                (T.toUpper $ T.pack $methodLit)
+                (T.pack $(request))
+                $(queryParameters')
               )
           |]
 

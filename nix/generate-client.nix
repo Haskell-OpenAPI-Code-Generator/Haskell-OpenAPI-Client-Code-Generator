@@ -1,5 +1,5 @@
-{ sources ? import ./sources.nix
-, pkgs ? import ./pkgs.nix { inherit sources; }
+{ pkgs
+, openapi3-code-generator ? pkgs.openapi3-code-generator
 }:
 { name
 , src ? null
@@ -14,7 +14,6 @@
 with pkgs.lib;
 with pkgs.haskell.lib;
 let
-  localPkgs = import ./pkgs.nix { inherit sources; };
   extraFlagsStr = concatStringsSep " " extraFlags;
   specificationArgument = optionalString (! builtins.isNull src) src;
   omitFlag = optionalString (schemas != [ ] && operations != [ ]) "--omit-additional-operation-functions";
@@ -28,7 +27,7 @@ let
   generatedCode = pkgs.stdenv.mkDerivation {
     name = "generated-${name}";
     buildInputs = [
-      localPkgs.haskellPackages.openapi3-code-generator
+      openapi3-code-generator
     ];
     buildCommand = ''
       # To make sure that we don't get issues with encodings
@@ -47,7 +46,7 @@ let
       set +x
     '';
   };
-  generatedPackage = dontHaddock (disableLibraryProfiling (pkgs.haskellPackages.callCabal2nix name generatedCode { }));
+  generatedPackage = dontHaddock (disableLibraryProfiling (pkgs.haskellPackages.callPackage ("${generatedCode}/default.nix") { }));
 in
 {
   code = generatedCode;
