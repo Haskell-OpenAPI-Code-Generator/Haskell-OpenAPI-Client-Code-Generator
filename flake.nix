@@ -42,8 +42,7 @@
       in
       {
         overlays = import ./nix/overlay.nix;
-        packages.release = pkgs.openapi3-code-generator;
-        packages.default = self.packages.${system}.release;
+        packages.default = pkgs.openapi3-code-generator;
         checks =
           let tests = import ./nix/tests.nix { inherit pkgs; };
           in
