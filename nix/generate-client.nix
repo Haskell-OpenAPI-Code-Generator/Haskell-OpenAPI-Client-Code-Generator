@@ -34,7 +34,7 @@ let
       set +x
     '';
   };
-  generatedPackage = dontHaddock (disableLibraryProfiling (haskellPackages.callPackage ("${generatedCode}/default.nix") { }));
+  generatedPackage = haskellPackages.callPackage ("${generatedCode}/default.nix") { };
 in
 {
   code = generatedCode;
