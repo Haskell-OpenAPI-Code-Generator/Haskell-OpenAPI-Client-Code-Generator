@@ -3,16 +3,13 @@ with pkgs.lib;
 with pkgs.haskell.lib;
 let
   generateCode = { fileName, extraFlags ? [ ] }:
-    let
-      name = builtins.replaceStrings [ "_" ] [ "-" ] (strings.removeSuffix ".yaml" (strings.removeSuffix ".json" (strings.removeSuffix ".yml" fileName)));
-    in
     {
-      name = name;
-      path = (pkgs.generateOpenAPIClient {
+      name = builtins.replaceStrings [ "_" ] [ "-" ] (strings.removeSuffix ".yaml" (strings.removeSuffix ".json" (strings.removeSuffix ".yml" fileName)));
+      path = pkgs.generateOpenAPIClient {
         name = "openapi";
         src = ../specifications + "/${fileName}";
         extraFlags = extraFlags;
-      }).code;
+      };
     };
   goldenTestCode = generateCode { fileName = "z_complex_self_made_example.yml"; };
   codeForSpecsLevelOne = [

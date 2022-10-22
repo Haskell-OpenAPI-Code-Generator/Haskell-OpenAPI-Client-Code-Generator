@@ -1,42 +1,28 @@
 { lib
 , stdenv
-, haskellPackages
 , openapi3-code-generator
 }:
 { name
-, src ? null
+, src
 , configFile ? null
 , extraFlags ? [ ]
 }:
 
-with lib;
-let
-  extraFlagsStr = concatStringsSep " " extraFlags;
-  specificationArgument = optionalString (! builtins.isNull src) src;
-  configFileFlag = optionalString (! builtins.isNull configFile) "--configuration ${configFile}";
-  generatedCode = stdenv.mkDerivation {
-    name = "generated-${name}";
-    buildInputs = [
-      openapi3-code-generator
-    ];
-    buildCommand = ''
-      # To make sure that we don't get issues with encodings
-      export LANG=C.utf8
-      export LC_ALL=C.utf8
+stdenv.mkDerivation {
+  name = "generated-${name}";
+  inherit src;
+  buildInputs = [ openapi3-code-generator ];
+  buildCommand = ''
+    # To make sure that we don't get issues with encodings
+    export LANG=C.utf8
+    export LC_ALL=C.utf8
 
-      set -x
+    set -x
 
-      openapi3-code-generator-exe ${specificationArgument} \
-        --output-dir "$out" \
-        ${configFileFlag} \
-        ${extraFlagsStr}
+    openapi3-code-generator-exe $src \
+      --output-dir "$out" ${lib.optionalString (!builtins.isNull configFile) "--configuration ${configFile}"} \
+      ${lib.concatStringsSep " " extraFlags}
 
-      set +x
-    '';
-  };
-  generatedPackage = haskellPackages.callPackage ("${generatedCode}/default.nix") { };
-in
-{
-  code = generatedCode;
-  package = generatedPackage;
+    set +x
+  '';
 }
