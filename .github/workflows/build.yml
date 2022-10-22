@@ -19,11 +19,11 @@ jobs:
           - .#devShells.x86_64-linux.default
           - .#packages.x86_64-linux.default
           - .#checks.x86_64-linux.pre-commit
-          - .#checks.x86_64-linux.test-golden
-          - .#checks.x86_64-linux.test-golden-generate
-          - .#checks.x86_64-linux.test-system-1
-          - .#checks.x86_64-linux.test-system-2
-          - .#checks.x86_64-linux.test-system-3
+          - .#checks.x86_64-linux.testGolden
+          - .#checks.x86_64-linux.testGoldenGenerate
+          - .#checks.x86_64-linux.testSystem1
+          - .#checks.x86_64-linux.testSystem2
+          - .#checks.x86_64-linux.testSystem3
     steps:
     - uses: actions/checkout@v2.5.0
     - uses: cachix/install-nix-action@v18

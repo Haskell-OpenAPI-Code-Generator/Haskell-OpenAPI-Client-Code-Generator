@@ -44,48 +44,52 @@
         overlays = import ./nix/overlay.nix;
         packages.release = pkgs.openapi3-code-generator;
         packages.default = self.packages.${system}.release;
-        checks = {
-          test-system-1 = pkgs.testSystem1;
-          test-system-2 = pkgs.testSystem2;
-          test-system-3 = pkgs.testSystem3;
-          test-golden = pkgs.testGolden;
-          test-golden-generate = pkgs.testGoldenGenerate;
-          pre-commit = pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixpkgs-fmt = {
-                enable = true;
-                excludes = [
-                  "example"
-                  "testing/golden-output"
-                  ".*/default.nix"
-                ];
-              };
-              hlint = {
-                enable = true;
-                excludes = [
-                  "example"
-                  "testing/golden-output"
-                ];
-              };
-              ormolu = {
-                enable = true;
-                excludes = [
-                  "example"
-                  "testing/golden-output"
-                ];
-              };
+        checks =
+          let tests = import ./nix/tests.nix { inherit pkgs; };
+          in
+          {
+            inherit (tests)
+              testSystem1
+              testSystem2
+              testSystem3
+              testGolden
+              testGoldenGenerate;
+            pre-commit = pre-commit-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                nixpkgs-fmt = {
+                  enable = true;
+                  excludes = [
+                    "example"
+                    "testing/golden-output"
+                    ".*/default.nix"
+                  ];
+                };
+                hlint = {
+                  enable = true;
+                  excludes = [
+                    "example"
+                    "testing/golden-output"
+                  ];
+                };
+                ormolu = {
+                  enable = true;
+                  excludes = [
+                    "example"
+                    "testing/golden-output"
+                  ];
+                };
 
-              cabal2nix = {
-                enable = true;
-                excludes = [
-                  "example"
-                  "testing/golden-output"
-                ];
+                cabal2nix = {
+                  enable = true;
+                  excludes = [
+                    "example"
+                    "testing/golden-output"
+                  ];
+                };
               };
             };
           };
-        };
         devShells.default = pkgs.haskellPackages.shellFor {
           name = "openapi-code-generator-shell";
           packages = (p:
