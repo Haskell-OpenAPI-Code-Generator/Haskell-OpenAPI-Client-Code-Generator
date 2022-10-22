@@ -1,5 +1,7 @@
-{ pkgs
-, openapi3-code-generator ? pkgs.openapi3-code-generator
+{ lib
+, stdenv
+, haskellPackages
+, openapi3-code-generator
 }:
 { name
 , src ? null
@@ -7,13 +9,12 @@
 , extraFlags ? [ ]
 }:
 
-with pkgs.lib;
-with pkgs.haskell.lib;
+with lib;
 let
   extraFlagsStr = concatStringsSep " " extraFlags;
   specificationArgument = optionalString (! builtins.isNull src) src;
   configFileFlag = optionalString (! builtins.isNull configFile) "--configuration ${configFile}";
-  generatedCode = pkgs.stdenv.mkDerivation {
+  generatedCode = stdenv.mkDerivation {
     name = "generated-${name}";
     buildInputs = [
       openapi3-code-generator
@@ -33,7 +34,7 @@ let
       set +x
     '';
   };
-  generatedPackage = dontHaddock (disableLibraryProfiling (pkgs.haskellPackages.callPackage ("${generatedCode}/default.nix") { }));
+  generatedPackage = dontHaddock (disableLibraryProfiling (haskellPackages.callPackage ("${generatedCode}/default.nix") { }));
 in
 {
   code = generatedCode;
