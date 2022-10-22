@@ -58,6 +58,7 @@
                 excludes = [
                   "example"
                   "testing/golden-output"
+                  ".*/default.nix"
                 ];
               };
               hlint = {

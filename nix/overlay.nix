@@ -54,7 +54,7 @@ let
             (
               self: super:
                 {
-                  openapi3-code-generator = buildStrictly (final.haskellPackages.callCabal2nixWithOptions "openapi3-code-generator" ../openapi3-code-generator "--no-hpack" { });
+                  openapi3-code-generator = buildStrictly (self.callPackage ../openapi3-code-generator { });
                 }
             );
       }
