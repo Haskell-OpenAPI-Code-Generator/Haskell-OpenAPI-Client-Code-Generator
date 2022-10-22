@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , openapi3-code-generator
+, cabal2nix
 }:
 { name
 , src
@@ -11,7 +12,7 @@
 stdenv.mkDerivation {
   name = "generated-${name}";
   inherit src;
-  buildInputs = [ openapi3-code-generator ];
+  buildInputs = [ openapi3-code-generator cabal2nix ];
   buildCommand = ''
     # To make sure that we don't get issues with encodings
     export LANG=C.utf8
@@ -22,6 +23,8 @@ stdenv.mkDerivation {
     openapi3-code-generator-exe $src \
       --output-dir "$out" ${lib.optionalString (!builtins.isNull configFile) "--configuration ${configFile}"} \
       ${lib.concatStringsSep " " extraFlags}
+    cd $out
+    cabal2nix . > default.nix
 
     set +x
   '';
