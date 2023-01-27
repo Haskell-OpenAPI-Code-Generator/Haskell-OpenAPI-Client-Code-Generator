@@ -23,7 +23,7 @@ import OpenAPI.Generate.OptParse.Types
 import Options.Applicative
 import Options.Applicative.Help (string)
 import Path.IO
-import Path.Posix
+import Path
 import System.Exit
 
 getSettings :: IO Settings
