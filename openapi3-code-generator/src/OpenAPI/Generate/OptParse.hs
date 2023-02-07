@@ -22,8 +22,8 @@ import OpenAPI.Generate.OptParse.Flags
 import OpenAPI.Generate.OptParse.Types
 import Options.Applicative
 import Options.Applicative.Help (string)
+import Path
 import Path.IO
-import Path.Posix
 import System.Exit
 
 getSettings :: IO Settings
