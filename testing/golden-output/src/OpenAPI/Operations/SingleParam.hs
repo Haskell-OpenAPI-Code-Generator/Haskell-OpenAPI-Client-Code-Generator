@@ -19,6 +19,7 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString.Char8 as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
@@ -96,13 +97,13 @@ singleParamWithConfiguration config
 -- 
 -- The same as 'singleParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
 singleParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
-  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamRaw status = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])
 -- | > GET /pet/singleparam
 -- 
 -- The same as 'singleParam' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
 singleParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> SingleParamParametersStatus -- ^ status: Status values that need to be considered for filter
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamWithConfigurationRaw config
                                 status = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparam") [OpenAPI.Common.QueryParameter (Data.Text.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.pack "form") GHC.Types.False])

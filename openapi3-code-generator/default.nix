@@ -35,4 +35,5 @@ mkDerivation {
   homepage = "https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator#readme";
   description = "OpenAPI3 Haskell Client Code Generator";
   license = lib.licenses.mit;
+  mainProgram = "openapi3-code-generator-exe";
 }

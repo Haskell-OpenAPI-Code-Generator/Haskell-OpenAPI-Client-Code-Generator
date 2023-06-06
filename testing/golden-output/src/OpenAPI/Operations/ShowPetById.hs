@@ -19,6 +19,7 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString.Char8 as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
@@ -73,13 +74,13 @@ showPetByIdWithConfiguration config
 -- 
 -- The same as 'showPetById' but returns the raw 'Data.ByteString.Char8.ByteString'.
 showPetByIdRaw :: forall m . OpenAPI.Common.MonadHTTP m => Data.Text.Internal.Text -- ^ petId: The id of the pet to retrieve
-  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 showPetByIdRaw petId = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) GHC.Base.mempty)
 -- | > GET /pets/{petId}
 -- 
 -- The same as 'showPetById' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
 showPetByIdWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> Data.Text.Internal.Text -- ^ petId: The id of the pet to retrieve
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 showPetByIdWithConfigurationRaw config
                                 petId = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/pets/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.++ ""))) GHC.Base.mempty)

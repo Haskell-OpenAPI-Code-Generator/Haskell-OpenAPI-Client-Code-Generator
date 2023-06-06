@@ -14,4 +14,5 @@ mkDerivation {
     aeson base servant-server unordered-containers wai warp
   ];
   license = lib.licenses.mit;
+  mainProgram = "mock-server-exe";
 }

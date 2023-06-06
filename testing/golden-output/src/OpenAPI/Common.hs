@@ -267,7 +267,9 @@ serializeQueryParam QueryParameter {..} =
         if queryParamExplode
           then fmap (BF.first $ Maybe.fromMaybe queryParamName)
           else
-            pure . (queryParamName,) . B8.intercalate joinWith
+            pure
+              . (queryParamName,)
+              . B8.intercalate joinWith
               . fmap
                 ( \case
                     (Nothing, value) -> value

@@ -152,7 +152,9 @@ resolveSchemaReference schemaName schema =
       p <- OAM.getSchemaReferenceM ref
       when (Maybe.isNothing p) $
         OAM.logWarning $
-          "Reference '" <> ref <> "' to schema from '"
+          "Reference '"
+            <> ref
+            <> "' to schema from '"
             <> schemaName
             <> "' could not be found and therefore will be skipped."
       pure $ (,transformReferenceToDependency ref) <$> p
@@ -208,7 +210,9 @@ defineNullableTypeAlias strategy schemaName (type', (content, dependencies)) = d
         ( varT name,
           ( content
               `appendDoc` ( ( Doc.generateHaddockComment
-                                [ "Defines a nullable type alias for '" <> schemaName <> nonNullableTypeSuffix
+                                [ "Defines a nullable type alias for '"
+                                    <> schemaName
+                                    <> nonNullableTypeSuffix
                                     <> "' as the schema located at @"
                                     <> path
                                     <> "@ in the specification is marked as nullable."
@@ -276,9 +280,9 @@ defineEnumModel schemaName schema enumValues = do
           . ( `Doc.sideBySide`
                 ( text ""
                     $$ Doc.sideComments
-                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification." :
-                        "This constructor can be used to send values to the server which are not present in the specification yet." :
-                        comments
+                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification."
+                          : "This constructor can be used to send values to the server which are not present in the specification yet."
+                          : comments
                       )
                 )
             )
@@ -317,12 +321,12 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           ( clause
               [conP fallbackName [p]]
               (normalB e)
-              [] :
-            clause
-              [conP typedName [p]]
-              (normalB [|Aeson.toJSON $e|])
-              [] :
-            (toJsonClause <$> nameValues)
+              []
+              : clause
+                [conP typedName [p]]
+                (normalB [|Aeson.toJSON $e|])
+                []
+              : (toJsonClause <$> nameValues)
           )
       toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
    in fmap ppr toJson `appendDoc` fmap ppr fromJson

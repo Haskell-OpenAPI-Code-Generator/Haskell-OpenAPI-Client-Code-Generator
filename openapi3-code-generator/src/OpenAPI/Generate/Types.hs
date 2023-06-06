@@ -50,7 +50,8 @@ instance FromJSON OpenApiSpecification where
       <*> o .: "info"
       <*> o .:? "servers" .!= []
       <*> o .: "paths"
-      <*> o .:? "components"
+      <*> o
+        .:? "components"
         .!= ComponentsObject
           { schemas = Map.empty,
             responses = Map.empty,
@@ -360,11 +361,11 @@ instance FromJSON SimpleParameterSchema where
     maybeStyle <- o .:? "style"
     SimpleParameterSchema
       <$> o .:? "style"
-        <*> o .:? "explode" .!= ((maybeStyle :: Maybe Text) == Just "form") -- The default value is true for form and false otherwise (http://spec.openapis.org/oas/v3.0.3#parameterExplode)
-        <*> o .:? "allowReserved" .!= False
-        <*> o .: "schema"
-        <*> o .:? "example"
-        <*> o .:? "examples" .!= Map.empty
+      <*> o .:? "explode" .!= ((maybeStyle :: Maybe Text) == Just "form") -- The default value is true for form and false otherwise (http://spec.openapis.org/oas/v3.0.3#parameterExplode)
+      <*> o .:? "allowReserved" .!= False
+      <*> o .: "schema"
+      <*> o .:? "example"
+      <*> o .:? "examples" .!= Map.empty
 
 newtype HeaderObject = HeaderObject ParameterObject
   deriving (Show, Eq, Generic)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-nix-build ci.nix -A test-golden-generate
+nix build .\#checks.x86_64-linux.testGoldenGenerate
 rm -rf testing/golden-output
 mkdir -p testing/golden-output
 cp -R result/* testing/golden-output

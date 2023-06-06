@@ -166,9 +166,9 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
                 [ [operationDescription [description]],
                   [paramDoc, bodyDefinition, responseBodyDefinitions]
                 ]
-                $ (<> [[Doc.emptyDoc]]) $
-                  maybe [] pure $
-                    Maybe.listToMaybe functionDefinitions
+                $ (<> [[Doc.emptyDoc]])
+                $ maybe [] pure
+                $ Maybe.listToMaybe functionDefinitions
             else zipWith (<>) comments functionDefinitions
   OAM.logTrace $ T.intercalate ", " $ Set.toList $ Set.unions [paramDependencies, bodyDependencies, responseBodyDependencies]
   pure

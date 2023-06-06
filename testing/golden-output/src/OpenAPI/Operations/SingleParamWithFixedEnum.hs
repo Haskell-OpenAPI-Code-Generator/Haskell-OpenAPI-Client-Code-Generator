@@ -19,6 +19,7 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString.Char8 as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
@@ -90,13 +91,13 @@ singleParamWithFixedEnumWithConfiguration config
 -- 
 -- The same as 'singleParamWithFixedEnum' but returns the raw 'Data.ByteString.Char8.ByteString'.
 singleParamWithFixedEnumRaw :: forall m . OpenAPI.Common.MonadHTTP m => SingleParamWithFixedEnumParametersFixedenumvalue -- ^ fixedenumvalue: A fixed value
-  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamWithFixedEnumRaw fixedenumvalue = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparamwithfixedenum") [OpenAPI.Common.QueryParameter (Data.Text.pack "fixedenumvalue") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON fixedenumvalue) (Data.Text.pack "form") GHC.Types.False])
 -- | > GET /pet/singleparamwithfixedenum
 -- 
 -- The same as 'singleParamWithFixedEnum' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
 singleParamWithFixedEnumWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> SingleParamWithFixedEnumParametersFixedenumvalue -- ^ fixedenumvalue: A fixed value
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 singleParamWithFixedEnumWithConfigurationRaw config
                                              fixedenumvalue = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/singleparamwithfixedenum") [OpenAPI.Common.QueryParameter (Data.Text.pack "fixedenumvalue") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON fixedenumvalue) (Data.Text.pack "form") GHC.Types.False])

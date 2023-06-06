@@ -19,6 +19,7 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString.Char8 as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
@@ -69,11 +70,11 @@ noParamWithConfiguration config = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (D
 -- | > GET /pet/noparam
 -- 
 -- The same as 'noParam' but returns the raw 'Data.ByteString.Char8.ByteString'.
-noParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+noParamRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 noParamRaw = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/noparam") GHC.Base.mempty)
 -- | > GET /pet/noparam
 -- 
 -- The same as 'noParam' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
 noParamWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 noParamWithConfigurationRaw config = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pet/noparam") GHC.Base.mempty)

@@ -11,7 +11,12 @@ with final.haskell.lib;
   haskellPackages = prev.haskellPackages.override (old: {
     overrides = final.lib.composeExtensions (old.overrides or (_: _: { })) (
       self: super: {
-        openapi3-code-generator = buildStrictly (self.callPackage ../openapi3-code-generator { });
+        openapi3-code-generator = overrideCabal (buildStrictly (self.callPackage ../openapi3-code-generator { })) (old: {
+          buildFlags = (old.buildFlags or [ ]) ++ [
+            "--ghc-options=-O2"
+            "--ghc-options=-fno-warn-ambiguous-fields"
+          ];
+        });
       }
     );
   });

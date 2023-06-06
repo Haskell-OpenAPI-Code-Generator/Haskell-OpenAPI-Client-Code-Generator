@@ -1,10 +1,8 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 7683995d21e1eb71ae4789ee95c827f70d4a5feb0b37a464007cd19db9450e2d
 
 name:           openapi3-code-generator
 version:        0.1.0.7

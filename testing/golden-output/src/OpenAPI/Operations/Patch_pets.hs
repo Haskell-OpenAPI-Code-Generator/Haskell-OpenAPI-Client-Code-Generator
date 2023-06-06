@@ -19,6 +19,7 @@ import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
 import qualified Data.ByteString.Char8
 import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString.Char8 as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
@@ -87,13 +88,13 @@ patch_petsWithConfiguration config
 -- 
 -- The same as 'patch_pets' but returns the raw 'Data.ByteString.Char8.ByteString'.
 patch_petsRaw :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Maybe.Maybe Patch_petsRequestBodyVariants -- ^ The request body to send
-  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 patch_petsRaw body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PATCH") (Data.Text.pack "/pets") GHC.Base.mempty body OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PATCH /pets
 -- 
 -- The same as 'patch_pets' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
 patch_petsWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> GHC.Maybe.Maybe Patch_petsRequestBodyVariants -- ^ The request body to send
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 patch_petsWithConfigurationRaw config
                                body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PATCH") (Data.Text.pack "/pets") GHC.Base.mempty body OpenAPI.Common.RequestBodyEncodingJSON)

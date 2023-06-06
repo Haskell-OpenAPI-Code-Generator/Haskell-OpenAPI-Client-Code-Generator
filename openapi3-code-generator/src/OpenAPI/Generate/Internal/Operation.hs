@@ -212,9 +212,9 @@ getNameFromParameter = OAT.name
 getParametersTypeForSignature :: [Q Type] -> Name -> Name -> Q Type
 getParametersTypeForSignature types responseTypeName monadName =
   createFunctionType
-    ( [t|OC.Configuration|] :
-      types
-        <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
+    ( [t|OC.Configuration|]
+        : types
+          <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
 -- | Same as 'getParametersTypeForSignature' but with the configuration in 'MR.ReaderT' instead of a parameter
@@ -301,25 +301,25 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
     ppr <$> case bodySchema of
       Just RequestBodyDefinition {..}
         | generateBody ->
-          let encodeExpr =
-                varE $
-                  case encoding of
-                    OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
-                    OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
-           in [d|
-                $(conP fnName $ fnPatterns <> [varP bodyName]) =
-                  $responseTransformerExp
-                    ( $( if useExplicitConfiguration
-                           then [|OC.doBodyCallWithConfiguration $(varE configName)|]
-                           else [|OC.doBodyCallWithConfigurationM|]
-                       )
-                      (T.toUpper $ T.pack $methodLit)
-                      (T.pack $(request))
-                      $(queryParameters')
-                      $(if required then [|Just $(varE bodyName)|] else varE bodyName)
-                      $(encodeExpr)
-                    )
-                |]
+            let encodeExpr =
+                  varE $
+                    case encoding of
+                      OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
+                      OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
+             in [d|
+                  $(conP fnName $ fnPatterns <> [varP bodyName]) =
+                    $responseTransformerExp
+                      ( $( if useExplicitConfiguration
+                             then [|OC.doBodyCallWithConfiguration $(varE configName)|]
+                             else [|OC.doBodyCallWithConfigurationM|]
+                         )
+                          (T.toUpper $ T.pack $methodLit)
+                          (T.pack $(request))
+                          $(queryParameters')
+                          $(if required then [|Just $(varE bodyName)|] else varE bodyName)
+                          $(encodeExpr)
+                      )
+                  |]
       _ ->
         [d|
           $(conP fnName fnPatterns) =
@@ -328,9 +328,9 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                      then [|OC.doCallWithConfiguration $(varE configName)|]
                      else [|OC.doCallWithConfigurationM|]
                  )
-                (T.toUpper $ T.pack $methodLit)
-                (T.pack $(request))
-                $(queryParameters')
+                  (T.toUpper $ T.pack $methodLit)
+                  (T.pack $(request))
+                  $(queryParameters')
               )
           |]
 
@@ -345,7 +345,7 @@ shouldGenerateRequestBody (Just RequestBodyDefinition {..}) = do
       | not generateEmptyRequestBody
           && not required
           && OAS.isSchemaEmpty s ->
-        pure False
+          pure False
     _ -> pure True
 
 -- | Extracts the request body schema from an operation and the encoding which should be used on the body data.
