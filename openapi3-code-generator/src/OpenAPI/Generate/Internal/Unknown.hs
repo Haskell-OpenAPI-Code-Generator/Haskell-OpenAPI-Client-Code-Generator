@@ -21,9 +21,9 @@ import qualified OpenAPI.Generate.Types.Schema as OAS
 -- | Warn about operations listed as CLI options which do not appear in the provided OpenAPI specification
 warnAboutUnknownOperations :: [(Text, OAT.PathItemObject)] -> OAM.Generator ()
 warnAboutUnknownOperations operationDefinitions = do
-  let getAllOperationObjectsFromPathItemObject = ([OAT.get, OAT.put, OAT.post, OAT.delete, OAT.options, OAT.head, OAT.patch, OAT.trace] <*>) . pure
+  let getAllOperationObjectsFromPathItemObject = ([OAT.pathItemObjectGet, OAT.pathItemObjectPut, OAT.pathItemObjectPost, OAT.pathItemObjectDelete, OAT.pathItemObjectOptions, OAT.pathItemObjectHead, OAT.pathItemObjectPatch, OAT.pathItemObjectTrace] <*>) . pure
       operationIds =
-        Maybe.mapMaybe OAT.operationId $
+        Maybe.mapMaybe OAT.operationObjectOperationId $
           Maybe.catMaybes $
             operationDefinitions >>= getAllOperationObjectsFromPathItemObject . snd
   operationsToGenerate <- OAM.getSetting OAO.settingOperationsToGenerate

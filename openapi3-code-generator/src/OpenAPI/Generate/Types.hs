@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -32,14 +31,14 @@ import OpenAPI.Generate.Types.Schema (Schema)
 import Text.Read (readMaybe)
 
 data OpenApiSpecification = OpenApiSpecification
-  { openapi :: Text,
-    info :: InfoObject,
-    servers :: [ServerObject],
-    paths :: PathsObject,
-    components :: ComponentsObject,
-    security :: [SecurityRequirementObject],
-    tags :: [TagObject],
-    externalDocs :: Maybe ExternalDocumentationObject
+  { openApiSpecificationOpenapi :: Text,
+    openApiSpecificationInfo :: InfoObject,
+    openApiSpecificationServers :: [ServerObject],
+    openApiSpecificationPaths :: PathsObject,
+    openApiSpecificationComponents :: ComponentsObject,
+    openApiSpecificationSecurity :: [SecurityRequirementObject],
+    openApiSpecificationTags :: [TagObject],
+    openApiSpecificationExternalDocs :: Maybe ExternalDocumentationObject
   }
   deriving (Show, Eq, Generic)
 
@@ -53,63 +52,80 @@ instance FromJSON OpenApiSpecification where
       <*> o
         .:? "components"
         .!= ComponentsObject
-          { schemas = Map.empty,
-            responses = Map.empty,
-            parameters = Map.empty,
-            examples = Map.empty,
-            requestBodies = Map.empty,
-            headers = Map.empty,
-            securitySchemes = Map.empty
+          { componentsObjectSchemas = Map.empty,
+            componentsObjectResponses = Map.empty,
+            componentsObjectParameters = Map.empty,
+            componentsObjectExamples = Map.empty,
+            componentsObjectRequestBodies = Map.empty,
+            componentsObjectHeaders = Map.empty,
+            componentsObjectSecuritySchemes = Map.empty
           }
       <*> o .:? "security" .!= []
       <*> o .:? "tags" .!= []
       <*> o .:? "externalDocs"
 
 data InfoObject = InfoObject
-  { title :: Text,
-    description :: Maybe Text,
-    termsOfService :: Maybe Text,
-    contact :: Maybe ContactObject,
-    license :: Maybe LicenseObject,
-    version :: Text
+  { infoObjectTitle :: Text,
+    infoObjectDescription :: Maybe Text,
+    infoObjectTermsOfService :: Maybe Text,
+    infoObjectContact :: Maybe ContactObject,
+    infoObjectLicense :: Maybe LicenseObject,
+    infoObjectVersion :: Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON InfoObject
+instance FromJSON InfoObject where
+  parseJSON = withObject "InfoObject" $ \o ->
+    InfoObject
+      <$> o .: "title"
+      <*> o .:? "description"
+      <*> o .:? "termsOfService"
+      <*> o .:? "contact"
+      <*> o .:? "license"
+      <*> o .: "version"
 
 data ContactObject = ContactObject
-  { name :: Maybe Text,
-    url :: Maybe Text,
-    email :: Maybe Text
+  { contactObjectName :: Maybe Text,
+    contactObjectUrl :: Maybe Text,
+    contactObjectEmail :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON ContactObject
+instance FromJSON ContactObject where
+  parseJSON = withObject "ContactObject" $ \o ->
+    ContactObject
+      <$> o .:? "name"
+      <*> o .:? "url"
+      <*> o .:? "email"
 
 data LicenseObject = LicenseObject
-  { name :: Text,
-    url :: Maybe Text
+  { licenseObjectName :: Text,
+    licenseObjectUrl :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON LicenseObject
+instance FromJSON LicenseObject where
+  parseJSON = withObject "LicenseObject" $ \o ->
+    LicenseObject
+      <$> o .: "name"
+      <*> o .:? "url"
 
 type PathsObject = Map.Map Text PathItemObject
 
 data PathItemObject = PathItemObject
-  { ref :: Maybe Text,
-    summary :: Maybe Text,
-    description :: Maybe Text,
-    get :: Maybe OperationObject,
-    put :: Maybe OperationObject,
-    post :: Maybe OperationObject,
-    delete :: Maybe OperationObject,
-    options :: Maybe OperationObject,
-    head :: Maybe OperationObject,
-    patch :: Maybe OperationObject,
-    trace :: Maybe OperationObject,
-    servers :: [ServerObject],
-    parameters :: [Referencable ParameterObject]
+  { pathItemObjectRef :: Maybe Text,
+    pathItemObjectSummary :: Maybe Text,
+    pathItemObjectDescription :: Maybe Text,
+    pathItemObjectGet :: Maybe OperationObject,
+    pathItemObjectPut :: Maybe OperationObject,
+    pathItemObjectPost :: Maybe OperationObject,
+    pathItemObjectDelete :: Maybe OperationObject,
+    pathItemObjectOptions :: Maybe OperationObject,
+    pathItemObjectHead :: Maybe OperationObject,
+    pathItemObjectPatch :: Maybe OperationObject,
+    pathItemObjectTrace :: Maybe OperationObject,
+    pathItemObjectServers :: [ServerObject],
+    pathItemObjectParameters :: [Referencable ParameterObject]
   }
   deriving (Show, Eq, Generic)
 
@@ -131,17 +147,17 @@ instance FromJSON PathItemObject where
       <*> o .:? "parameters" .!= []
 
 data OperationObject = OperationObject
-  { tags :: [Text],
-    summary :: Maybe Text,
-    description :: Maybe Text,
-    externalDocs :: Maybe ExternalDocumentationObject,
-    operationId :: Maybe Text,
-    parameters :: [Referencable ParameterObject],
-    requestBody :: Maybe (Referencable RequestBodyObject),
-    responses :: ResponsesObject,
-    deprecated :: Bool,
-    security :: [SecurityRequirementObject],
-    servers :: [ServerObject]
+  { operationObjectTags :: [Text],
+    operationObjectSummary :: Maybe Text,
+    operationObjectDescription :: Maybe Text,
+    operationObjectExternalDocs :: Maybe ExternalDocumentationObject,
+    operationObjectOperationId :: Maybe Text,
+    operationObjectParameters :: [Referencable ParameterObject],
+    operationObjectRequestBody :: Maybe (Referencable RequestBodyObject),
+    operationObjectResponses :: ResponsesObject,
+    operationObjectDeprecated :: Bool,
+    operationObjectSecurity :: [SecurityRequirementObject],
+    operationObjectServers :: [ServerObject]
     -- callbacks (http://spec.openapis.org/oas/v3.0.3#operation-object) are omitted because they are not needed
   }
   deriving (Show, Eq, Generic)
@@ -164,9 +180,9 @@ instance FromJSON OperationObject where
 type SecurityRequirementObject = Map.Map Text [Text]
 
 data RequestBodyObject = RequestBodyObject
-  { content :: Map.Map Text MediaTypeObject,
-    description :: Maybe Text,
-    required :: Bool
+  { requestBodyObjectContent :: Map.Map Text MediaTypeObject,
+    requestBodyObjectDescription :: Maybe Text,
+    requestBodyObjectRequired :: Bool
   }
   deriving (Show, Eq, Generic)
 
@@ -178,10 +194,10 @@ instance FromJSON RequestBodyObject where
       <*> o .:? "required" .!= False
 
 data MediaTypeObject = MediaTypeObject
-  { schema :: Maybe Schema,
-    example :: Maybe Value,
-    examples :: Map.Map Text (Referencable ExampleObject),
-    encoding :: Map.Map Text EncodingObject
+  { mediaTypeObjectSchema :: Maybe Schema,
+    mediaTypeObjectExample :: Maybe Value,
+    mediaTypeObjectExamples :: Map.Map Text (Referencable ExampleObject),
+    mediaTypeObjectEncoding :: Map.Map Text EncodingObject
   }
   deriving (Show, Eq, Generic)
 
@@ -194,21 +210,27 @@ instance FromJSON MediaTypeObject where
       <*> o .:? "encoding" .!= Map.empty
 
 data ExampleObject = ExampleObject
-  { summary :: Maybe Text,
-    description :: Maybe Text,
-    value :: Maybe Value, -- value and externalValue are mutually exclusive, maybe this should be encoded in this data type
-    externalValue :: Maybe Text
+  { exampleObjectSummary :: Maybe Text,
+    exampleObjectDescription :: Maybe Text,
+    exampleObjectValue :: Maybe Value, -- value and externalValue are mutually exclusive, maybe this should be encoded in this data type
+    exampleObjectExternalValue :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON ExampleObject
+instance FromJSON ExampleObject where
+  parseJSON = withObject "ExampleObject" $ \o ->
+    ExampleObject
+      <$> o .:? "summary"
+      <*> o .:? "description"
+      <*> o .:? "value"
+      <*> o .:? "externalValue"
 
 data EncodingObject = EncodingObject
-  { contentType :: Maybe Text,
-    headers :: Map.Map Text (Referencable HeaderObject),
-    style :: Maybe Text,
-    explode :: Bool,
-    allowReserved :: Bool
+  { encodingObjectContentType :: Maybe Text,
+    encodingObjectHeaders :: Map.Map Text (Referencable HeaderObject),
+    encodingObjectStyle :: Maybe Text,
+    encodingObjectExplode :: Bool,
+    encodingObjectAllowReserved :: Bool
   }
   deriving (Show, Eq, Generic)
 
@@ -222,13 +244,13 @@ instance FromJSON EncodingObject where
       <*> o .:? "allowReserved" .!= False
 
 data ResponsesObject = ResponsesObject
-  { default' :: Maybe (Referencable ResponseObject),
-    range1XX :: Maybe (Referencable ResponseObject),
-    range2XX :: Maybe (Referencable ResponseObject),
-    range3XX :: Maybe (Referencable ResponseObject),
-    range4XX :: Maybe (Referencable ResponseObject),
-    range5XX :: Maybe (Referencable ResponseObject),
-    perStatusCode :: Map.Map Int (Referencable ResponseObject)
+  { responsesObjectDefault :: Maybe (Referencable ResponseObject),
+    responsesObjectRange1XX :: Maybe (Referencable ResponseObject),
+    responsesObjectRange2XX :: Maybe (Referencable ResponseObject),
+    responsesObjectRange3XX :: Maybe (Referencable ResponseObject),
+    responsesObjectRange4XX :: Maybe (Referencable ResponseObject),
+    responsesObjectRange5XX :: Maybe (Referencable ResponseObject),
+    responsesObjectPerStatusCode :: Map.Map Int (Referencable ResponseObject)
   }
   deriving (Show, Eq, Generic)
 
@@ -252,9 +274,9 @@ instance FromJSON ResponsesObject where
         )
 
 data ResponseObject = ResponseObject
-  { description :: Text,
-    headers :: Map.Map Text (Referencable HeaderObject),
-    content :: Map.Map Text MediaTypeObject
+  { responseObjectDescription :: Text,
+    responseObjectHeaders :: Map.Map Text (Referencable HeaderObject),
+    responseObjectContent :: Map.Map Text MediaTypeObject
     -- links (http://spec.openapis.org/oas/v3.0.3#fixed-fields-14) are omitted because they are not needed
   }
   deriving (Show, Eq, Generic)
@@ -267,9 +289,9 @@ instance FromJSON ResponseObject where
       <*> o .:? "content" .!= Map.empty
 
 data ServerObject = ServerObject
-  { url :: Text,
-    description :: Maybe Text,
-    variables :: Map.Map Text ServerVariableObject
+  { serverObjectUrl :: Text,
+    serverObjectDescription :: Maybe Text,
+    serverObjectVariables :: Map.Map Text ServerVariableObject
   }
   deriving (Show, Eq, Generic)
 
@@ -281,9 +303,9 @@ instance FromJSON ServerObject where
       <*> o .:? "variables" .!= Map.empty
 
 data ServerVariableObject = ServerVariableObject
-  { enum :: [Text],
-    default' :: Text,
-    description :: Maybe Text
+  { serverVariableObjectEnum :: [Text],
+    serverVariableObjectDefault :: Text,
+    serverVariableObjectDescription :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
@@ -295,13 +317,13 @@ instance FromJSON ServerVariableObject where
       <*> o .:? "description"
 
 data ParameterObject = ParameterObject
-  { name :: Text,
-    in' :: ParameterObjectLocation,
-    description :: Maybe Text,
-    required :: Bool,
-    deprecated :: Bool,
-    allowEmptyValue :: Bool,
-    schema :: ParameterObjectSchema
+  { parameterObjectName :: Text,
+    parameterObjectIn :: ParameterObjectLocation,
+    parameterObjectDescription :: Maybe Text,
+    parameterObjectRequired :: Bool,
+    parameterObjectDeprecated :: Bool,
+    parameterObjectAllowEmptyValue :: Bool,
+    parameterObjectSchema :: ParameterObjectSchema
   }
   deriving (Show, Eq, Generic)
 
@@ -347,12 +369,12 @@ instance FromJSON ParameterObjectSchema where
       (Nothing, Nothing) -> fail "ParameterObject (http://spec.openapis.org/oas/v3.0.3#parameter-object) requires one of the properties schema and content to be present."
 
 data SimpleParameterSchema = SimpleParameterSchema
-  { style :: Maybe Text,
-    explode :: Bool,
-    allowReserved :: Bool,
-    schema :: Schema,
-    example :: Maybe Value,
-    examples :: Map.Map Text (Referencable ExampleObject)
+  { simpleParameterSchemaStyle :: Maybe Text,
+    simpleParameterSchemaExplode :: Bool,
+    simpleParameterSchemaAllowReserved :: Bool,
+    simpleParameterSchemaSchema :: Schema,
+    simpleParameterSchemaExample :: Maybe Value,
+    simpleParameterSchemaExamples :: Map.Map Text (Referencable ExampleObject)
   }
   deriving (Show, Eq, Generic)
 
@@ -382,13 +404,13 @@ instance FromJSON HeaderObject where
           )
 
 data ComponentsObject = ComponentsObject
-  { schemas :: Map.Map Text Schema,
-    responses :: Map.Map Text (Referencable ResponseObject),
-    parameters :: Map.Map Text (Referencable ParameterObject),
-    examples :: Map.Map Text (Referencable ExampleObject),
-    requestBodies :: Map.Map Text (Referencable RequestBodyObject),
-    headers :: Map.Map Text (Referencable HeaderObject),
-    securitySchemes :: Map.Map Text (Referencable SecuritySchemeObject)
+  { componentsObjectSchemas :: Map.Map Text Schema,
+    componentsObjectResponses :: Map.Map Text (Referencable ResponseObject),
+    componentsObjectParameters :: Map.Map Text (Referencable ParameterObject),
+    componentsObjectExamples :: Map.Map Text (Referencable ExampleObject),
+    componentsObjectRequestBodies :: Map.Map Text (Referencable RequestBodyObject),
+    componentsObjectHeaders :: Map.Map Text (Referencable HeaderObject),
+    componentsObjectSecuritySchemes :: Map.Map Text (Referencable SecuritySchemeObject)
     -- links and callbacks are omitted because they are not supported in the generator
   }
   deriving (Show, Eq, Generic)
@@ -422,9 +444,9 @@ instance FromJSON SecuritySchemeObject where
       _ -> fail "A SecuritySchemeObject must have a value of 'apiKey', 'http', 'oauth2' or 'openIdConnect' in the property 'type'."
 
 data ApiKeySecurityScheme = ApiKeySecurityScheme
-  { description :: Maybe Text,
-    name :: Text,
-    in' :: ApiKeySecuritySchemeLocation
+  { apiKeySecuritySchemeDescription :: Maybe Text,
+    apiKeySecuritySchemeName :: Text,
+    apiKeySecuritySchemeIn :: ApiKeySecuritySchemeLocation
   }
   deriving (Show, Eq, Generic)
 
@@ -446,55 +468,85 @@ instance FromJSON ApiKeySecuritySchemeLocation where
     _ -> fail "A SecuritySchemeObject with type 'apiKey' must have a value of 'query', 'header' or 'cookie' in the property 'in'."
 
 data HttpSecurityScheme = HttpSecurityScheme
-  { description :: Maybe Text,
-    scheme :: Text,
-    bearerFormat :: Maybe Text
+  { httpSecuritySchemeDescription :: Maybe Text,
+    httpSecuritySchemeScheme :: Text,
+    httpSecuritySchemeBearerFormat :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON HttpSecurityScheme
+instance FromJSON HttpSecurityScheme where
+  parseJSON = withObject "HttpSecurityScheme" $ \o ->
+    HttpSecurityScheme
+      <$> o .:? "description"
+      <*> o .: "scheme"
+      <*> o .:? "bearerFormat"
 
 data OAuth2SecurityScheme = OAuth2SecurityScheme
-  { description :: Maybe Text,
-    flows :: OAuthFlowsObject
+  { oAuth2SecuritySchemeDescription :: Maybe Text,
+    oAuth2SecuritySchemeFlows :: OAuthFlowsObject
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON OAuth2SecurityScheme
+instance FromJSON OAuth2SecurityScheme where
+  parseJSON = withObject "OAuth2SecurityScheme" $ \o ->
+    OAuth2SecurityScheme
+      <$> o .:? "description"
+      <*> o .: "flows"
 
 data OAuthFlowsObject = OAuthFlowsObject
-  { implicit :: Maybe OAuthFlowObject,
-    password :: Maybe OAuthFlowObject,
-    clientCredentials :: Maybe OAuthFlowObject,
-    authorizationCode :: Maybe OAuthFlowObject
+  { oAuthFlowsObjectImplicit :: Maybe OAuthFlowObject,
+    oAuthFlowsObjectPassword :: Maybe OAuthFlowObject,
+    oAuthFlowsObjectClientCredentials :: Maybe OAuthFlowObject,
+    oAuthFlowsObjectAuthorizationCode :: Maybe OAuthFlowObject
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON OAuthFlowsObject
+instance FromJSON OAuthFlowsObject where
+  parseJSON = withObject "OAuthFlowsObject" $ \o ->
+    OAuthFlowsObject
+      <$> o .:? "implicit"
+      <*> o .:? "password"
+      <*> o .:? "clientCredentials"
+      <*> o .:? "authorizationCode"
 
 data OAuthFlowObject = OAuthFlowObject
-  { authorizationUrl :: Maybe Text, -- applies only to implicit and authorizationCode
-    tokenUrl :: Maybe Text, -- applies only to password, clientCredentials and authorizationCode
-    refreshUrl :: Maybe Text,
-    scopes :: Map.Map Text Text
+  { oAuthFlowObjectAuthorizationUrl :: Maybe Text, -- applies only to implicit and authorizationCode
+    oAuthFlowObjectTokenUrl :: Maybe Text, -- applies only to password, clientCredentials and authorizationCode
+    oAuthFlowObjectRefreshUrl :: Maybe Text,
+    oAuthFlowObjectScopes :: Map.Map Text Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON OAuthFlowObject
+instance FromJSON OAuthFlowObject where
+  parseJSON = withObject "OAuthFlowObject" $ \o ->
+    OAuthFlowObject
+      <$> o .:? "authorizationUrl"
+      <*> o .:? "tokenUrl"
+      <*> o .:? "refreshUrl"
+      <*> o .: "scopes"
 
 data OpenIdConnectSecurityScheme = OpenIdConnectSecurityScheme
-  { description :: Maybe Text,
-    openIdConnectUrl :: Text
+  { openIdConnectSecuritySchemeDescription :: Maybe Text,
+    openIdConnectSecuritySchemeOpenIdConnectUrl :: Text
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON OpenIdConnectSecurityScheme
+instance FromJSON OpenIdConnectSecurityScheme where
+  parseJSON = withObject "OpenIdConnectSecurityScheme" $ \o ->
+    OpenIdConnectSecurityScheme
+      <$> o .:? "description"
+      <*> o .: "openIdConnectUrl"
 
 data TagObject = TagObject
-  { name :: Text,
-    description :: Maybe Text,
-    externalDocs :: Maybe ExternalDocumentationObject
+  { tagObjectName :: Text,
+    tagObjectDescription :: Maybe Text,
+    tagObjectExternalDocs :: Maybe ExternalDocumentationObject
   }
   deriving (Show, Eq, Generic)
 
-instance FromJSON TagObject
+instance FromJSON TagObject where
+  parseJSON = withObject "TagObject" $ \o ->
+    TagObject
+      <$> o .: "name"
+      <*> o .:? "description"
+      <*> o .:? "externalDocs"

@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module OpenAPI.Generate.OperationGetOperationDescriptionSpec where
@@ -12,44 +11,41 @@ spec :: Spec
 spec =
   let emptyResponseObject =
         OAT.ResponsesObject
-          { default' = Nothing,
-            range1XX = Nothing,
-            range2XX = Nothing,
-            range3XX = Nothing,
-            range4XX = Nothing,
-            range5XX = Nothing,
-            perStatusCode = Map.empty
+          { responsesObjectDefault = Nothing,
+            responsesObjectRange1XX = Nothing,
+            responsesObjectRange2XX = Nothing,
+            responsesObjectRange3XX = Nothing,
+            responsesObjectRange4XX = Nothing,
+            responsesObjectRange5XX = Nothing,
+            responsesObjectPerStatusCode = Map.empty
           }
       testOperation =
         OAT.OperationObject
-          { tags = [],
-            summary = Nothing,
-            description = Nothing,
-            externalDocs = Nothing,
-            operationId = Nothing,
-            parameters = [],
-            requestBody = Nothing,
-            responses = emptyResponseObject,
-            deprecated = False,
-            security = [],
-            servers = []
+          { operationObjectTags = [],
+            operationObjectSummary = Nothing,
+            operationObjectDescription = Nothing,
+            operationObjectExternalDocs = Nothing,
+            operationObjectOperationId = Nothing,
+            operationObjectParameters = [],
+            operationObjectRequestBody = Nothing,
+            operationObjectResponses = emptyResponseObject,
+            operationObjectDeprecated = False,
+            operationObjectSecurity = [],
+            operationObjectServers = []
           }
       testOperation2 =
         testOperation
-          { summary = Just "my summary"
-          } ::
-          OAT.OperationObject
+          { operationObjectSummary = Just "my summary"
+          }
       testOperation3 =
         testOperation
-          { description = Just "my description"
-          } ::
-          OAT.OperationObject
+          { operationObjectDescription = Just "my description"
+          }
       testOperation4 =
         testOperation
-          { summary = Just "my summary",
-            description = Just "my description"
-          } ::
-          OAT.OperationObject
+          { operationObjectSummary = Just "my summary",
+            operationObjectDescription = Just "my description"
+          }
    in describe "getOperationDesciption" $ do
         it
           "should return an empty string"

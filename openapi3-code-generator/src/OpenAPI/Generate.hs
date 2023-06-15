@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -36,7 +35,7 @@ runGenerator = do
             putStrLn content
             putStrLn "---\n\n"
         )
-        moduleFiles
+        outputFilesModuleFiles
     else do
       proceed <- OAI.permitProceed settings
       if proceed

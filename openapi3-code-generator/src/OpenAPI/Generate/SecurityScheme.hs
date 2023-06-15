@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -38,15 +37,15 @@ defineSupportedSecuritySchemes moduleName securitySchemes = OAM.nested "security
 -- | Defines the security scheme for one 'OAT.SecuritySchemeObject'
 defineSecurityScheme :: Text -> OAT.SecuritySchemeObject -> Maybe (Q Doc)
 defineSecurityScheme moduleName (OAT.HttpSecuritySchemeObject scheme) =
-  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.description (scheme :: OAT.HttpSecurityScheme)
-   in case OAT.scheme scheme of
+  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.httpSecuritySchemeDescription scheme
+   in case OAT.httpSecuritySchemeScheme scheme of
         "basic" -> Just $ basicAuthenticationScheme moduleName description
         "bearer" -> Just $ bearerAuthenticationScheme moduleName description
         _ -> Nothing
 defineSecurityScheme moduleName (OAT.ApiKeySecuritySchemeObject scheme) =
-  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.description (scheme :: OAT.ApiKeySecurityScheme)
-      name = OAT.name (scheme :: OAT.ApiKeySecurityScheme)
-   in case OAT.in' (scheme :: OAT.ApiKeySecurityScheme) of
+  let description = Doc.escapeText $ Maybe.fromMaybe "" $ OAT.apiKeySecuritySchemeDescription scheme
+      name = OAT.apiKeySecuritySchemeName scheme
+   in case OAT.apiKeySecuritySchemeIn scheme of
         OAT.HeaderApiKeySecuritySchemeLocation -> Just $ apiKeyInHeaderAuthenticationScheme name moduleName description
         _ -> Nothing
 defineSecurityScheme _ _ = Nothing

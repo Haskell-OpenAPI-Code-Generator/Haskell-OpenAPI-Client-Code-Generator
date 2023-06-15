@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -195,10 +194,10 @@ getHsBootFiles settings modelModules =
           modelModules
 
 data OutputFiles = OutputFiles
-  { moduleFiles :: FilesWithContent,
-    cabalFiles :: FilesWithContent,
-    stackFiles :: FilesWithContent,
-    nixFiles :: FilesWithContent
+  { outputFilesModuleFiles :: FilesWithContent,
+    outputFilesCabalFiles :: FilesWithContent,
+    outputFilesStackFiles :: FilesWithContent,
+    outputFilesNixFiles :: FilesWithContent
   }
 
 generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Settings -> IO OutputFiles
@@ -262,12 +261,12 @@ writeFiles settings OutputFiles {..} = do
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
   createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
   putStrLn "Directories created"
-  write moduleFiles
-  write cabalFiles
+  write outputFilesModuleFiles
+  write outputFilesCabalFiles
   unless (OAO.settingDoNotGenerateStackProject settings) $
-    write stackFiles
+    write outputFilesStackFiles
   when (OAO.settingGenerateNixFiles settings) $
-    write nixFiles
+    write outputFilesNixFiles
 
 writeFileWithLog :: FileWithContent -> IO ()
 writeFileWithLog (filePath, content) = do

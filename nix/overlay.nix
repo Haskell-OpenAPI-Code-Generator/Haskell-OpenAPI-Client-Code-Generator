@@ -14,7 +14,6 @@ with final.haskell.lib;
         openapi3-code-generator = overrideCabal (buildStrictly (self.callPackage ../openapi3-code-generator { })) (old: {
           buildFlags = (old.buildFlags or [ ]) ++ [
             "--ghc-options=-O2"
-            "--ghc-options=-fno-warn-ambiguous-fields"
           ];
         });
       }

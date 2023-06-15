@@ -23,11 +23,11 @@ spec = do
   let run = runGenerator (createEnvironment defaultSettings Map.empty)
   describe "nested" $ do
     it "should nest path correct with simple example" $ do
-      let (currentPath', _) = run $ nested "a" $ nested "b" $ nested "c" $ asks currentPath
+      let (currentPath', _) = run $ nested "a" $ nested "b" $ nested "c" $ asks generatorEnvironmentCurrentPath
       currentPath' `shouldBe` ["a", "b", "c"]
     it "should nest path correct with property" $
       forAllValid $ \list -> do
-        let (currentPath', _) = run $ foldr nested (asks currentPath) list
+        let (currentPath', _) = run $ foldr nested (asks generatorEnvironmentCurrentPath) list
         currentPath' `shouldBe` list
     it "should save path with logs" $
       let (_, logs) = run $
