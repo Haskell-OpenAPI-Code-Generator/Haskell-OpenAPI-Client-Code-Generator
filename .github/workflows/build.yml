@@ -1,4 +1,4 @@
-name: "Build nix derivations"
+name: "Build nix derivations - test CI"
 on:
   pull_request:
   push:
