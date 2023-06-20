@@ -42,4 +42,4 @@ jobs:
         name: openapi3-code-generator
         extraPullNames: validity,safe-coloured-text,sydtest,autodocodec
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-    - run: nix build "${{matrix.attribute}}"
+    - run: nix build -L "${{matrix.attribute}}"
