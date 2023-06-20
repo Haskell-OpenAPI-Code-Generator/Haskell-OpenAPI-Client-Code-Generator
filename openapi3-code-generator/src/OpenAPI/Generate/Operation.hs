@@ -13,7 +13,7 @@ where
 import qualified Control.Applicative as Applicative
 import Control.Monad
 import qualified Data.Bifunctor as BF
-import qualified Data.ByteString.Char8 as B8
+import qualified Data.ByteString as BS
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Data.Text (Text)
@@ -128,7 +128,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       availableOperationCombinations =
         cartesianProduct
           [ (id, responseTransformerExp, responseTypeName),
-            (addToName "Raw", [|id|], ''B8.ByteString)
+            (addToName "Raw", [|id|], ''BS.ByteString)
           ]
           [ (id, False, getParametersTypeForSignatureWithMonadTransformer),
             (addToName "WithConfiguration", True, getParametersTypeForSignature)
@@ -137,8 +137,8 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       comments =
         [ [operationDescription [description]],
           [paramDoc, bodyDefinition, responseBodyDefinitions, operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration."]],
-          [operationDescription ["The same as '" <> operationIdAsText <> "' but returns the raw 'Data.ByteString.Char8.ByteString'."]],
-          [operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'."]]
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but returns the raw 'Data.ByteString.ByteString'."]],
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'."]]
         ]
   functionDefinitions <-
     mapM

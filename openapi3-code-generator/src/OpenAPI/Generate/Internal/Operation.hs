@@ -28,7 +28,6 @@ where
 import Control.Monad
 import qualified Data.Aeson as Aeson
 import qualified Data.Bifunctor as BF
-import qualified Data.ByteString.Char8 as B8
 import qualified Data.Char as Char
 import qualified Data.List.Split as Split
 import qualified Data.Map as Map
@@ -249,7 +248,7 @@ defineOperationFunction ::
   Text ->
   -- | Schema of body
   Maybe RequestBodyDefinition ->
-  -- | An expression used to transform the response from 'B8.ByteString' to the required response type.
+  -- | An expression used to transform the response from 'BS.ByteString' to the required response type.
   -- Note that the response is nested within a HTTP monad and an 'Either'.
   Q Exp ->
   -- | Function body definition in TH
@@ -298,7 +297,7 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                              else [|OC.doBodyCallWithConfigurationM|]
                          )
                           (T.toUpper $ T.pack $methodLit)
-                          (T.pack $(request))
+                          $(request)
                           $(queryParameters')
                           $(if requestBodyDefinitionRequired then [|Just $(varE bodyName)|] else varE bodyName)
                           $(encodeExpr)
@@ -313,7 +312,7 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                      else [|OC.doCallWithConfigurationM|]
                  )
                   (T.toUpper $ T.pack $methodLit)
-                  (T.pack $(request))
+                  $(request)
                   $(queryParameters')
               )
           |]
@@ -452,7 +451,7 @@ generateParameterizedRequestPath ((paramName, param) : xs) path =
     parts = Split.splitOn ("{" <> T.unpack (OAT.parameterObjectName param) <> "}") (T.unpack path)
     partExpressiones = generateParameterizedRequestPath xs . T.pack <$> parts
     foldingFn :: Q Exp -> Q Exp -> Q Exp -> Q Exp
-    foldingFn var a b = [|$(a) ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $var) ++ $(b)|]
+    foldingFn var a b = [|$(a) <> OC.byteToText (HT.urlEncode True $ OC.textToByte $ OC.stringifyModel $var) <> $(b)|]
 generateParameterizedRequestPath _ path = stringE $ T.unpack path
 
 -- | Extracts a description from an 'OAT.OperationObject'.
