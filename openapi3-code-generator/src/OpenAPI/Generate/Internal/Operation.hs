@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -29,7 +28,6 @@ where
 import Control.Monad
 import qualified Data.Aeson as Aeson
 import qualified Data.Bifunctor as BF
-import qualified Data.ByteString.Char8 as B8
 import qualified Data.Char as Char
 import qualified Data.List.Split as Split
 import qualified Data.Map as Map
@@ -54,9 +52,9 @@ import qualified OpenAPI.Generate.Types.Schema as OAS
 
 -- | Extracted request body information which can be used for code generation
 data RequestBodyDefinition = RequestBodyDefinition
-  { schema :: OAT.Schema,
-    encoding :: OC.RequestBodyEncoding,
-    required :: Bool
+  { requestBodyDefinitionSchema :: OAT.Schema,
+    requestBodyDefinitionEncoding :: OC.RequestBodyEncoding,
+    requestBodyDefinitionRequired :: Bool
   }
 
 -- | Defines the type of a parameter bundle including the information to access the specific parameters
@@ -78,18 +76,6 @@ data ParameterCardinality
   | SingleParameter (Q Type) Dep.ModelContentWithDependencies OAT.ParameterObject
   | MultipleParameters ParameterTypeDefinition
 
--- | wrapper for ambigious usage
-getParametersFromOperationReference :: OAT.OperationObject -> [OAT.Referencable OAT.ParameterObject]
-getParametersFromOperationReference = OAT.parameters
-
--- | wrapper for ambigious usage
-getRequiredFromParameter :: OAT.ParameterObject -> Bool
-getRequiredFromParameter = OAT.required
-
--- | wrapper for ambigious usage
-getInFromParameterObject :: OAT.ParameterObject -> OAT.ParameterObjectLocation
-getInFromParameterObject = OAT.in'
-
 -- | Generates the parameter type for an operation. See 'ParameterCardinality' for further information.
 generateParameterTypeFromOperation :: Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
 generateParameterTypeFromOperation operationName = getParametersFromOperationConcrete >=> generateParameterType operationName
@@ -102,7 +88,7 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
         [ ((parameter, path), mergeDescriptionOfParameterWithSchema parameter schema)
           | ((parameter, path), Just schema) <-
               zip parameters maybeSchemas,
-            getInFromParameterObject parameter `elem` [OAT.QueryParameterObjectLocation, OAT.PathParameterObjectLocation]
+            OAT.parameterObjectIn parameter `elem` [OAT.QueryParameterObjectLocation, OAT.PathParameterObjectLocation]
         ]
       schemaName = operationName <> parametersSuffix
   when (length parameters > length parametersWithSchemas) $ OAM.logWarning "Parameters are only supported in query and path (skipping parameters in cookie and header)."
@@ -110,10 +96,10 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
     [] -> pure NoParameters
     [((parameter, path), schema)] -> do
       -- TODO disable fixed value generation for parameters
-      (paramType, model) <- OAM.resetPath (path <> ["schema"]) $ Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (getNameFromParameter parameter)) schema
+      (paramType, model) <- OAM.resetPath (path <> ["schema"]) $ Model.defineModelForSchemaNamed (schemaName <> uppercaseFirstText (OAT.parameterObjectName parameter)) schema
       pure $
         SingleParameter
-          ( if getRequiredFromParameter parameter
+          ( if OAT.parameterObjectRequired parameter
               then paramType
               else [t|Maybe $(paramType)|]
           )
@@ -124,13 +110,13 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
         mapM
           ( \((parameter, _), schema) -> do
               prefix <- getParameterLocationPrefix parameter
-              pure (prefix <> uppercaseFirstText (getNameFromParameter parameter), schema)
+              pure (prefix <> uppercaseFirstText (OAT.parameterObjectName parameter), schema)
           )
           parametersWithSchemas
       let parametersWithNames = zip (fst <$> properties) (fst <$> parametersWithSchemas)
           requiredProperties =
             Set.fromList $
-              fst <$> filter ((OAT.required :: OAT.ParameterObject -> Bool) . fst . snd) parametersWithNames
+              fst <$> filter (OAT.parameterObjectRequired . fst . snd) parametersWithNames
       (parameterTypeDefinitionType, (parameterTypeDefinitionDoc, parameterTypeDefinitionDependencies)) <-
         -- Explicitly include fixed value properties since this is not
         -- a user defined object schema but one that is defined by the
@@ -139,21 +125,21 @@ generateParameterType operationName parameters = OAM.nested "parameters" $ do
         OAM.adjustSettings (\settings -> settings {OAO.settingFixedValueStrategy = FixedValueStrategyInclude}) $
           Model.defineModelForSchemaNamed schemaName $
             OAT.Concrete $
-              OAS.defaultSchema {OAS.properties = Map.fromList properties, OAS.required = requiredProperties}
+              OAS.defaultSchema {OAS.schemaObjectProperties = Map.fromList properties, OAS.schemaObjectRequired = requiredProperties}
       convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
       let parametersWithPropertyNames = BF.bimap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText) fst <$> parametersWithNames
-          filterByType t = filter ((== t) . getInFromParameterObject . snd) parametersWithPropertyNames
+          filterByType t = filter ((== t) . OAT.parameterObjectIn . snd) parametersWithPropertyNames
           parameterTypeDefinitionQueryParams = filterByType OAT.QueryParameterObjectLocation
           parameterTypeDefinitionPathParams = filterByType OAT.PathParameterObjectLocation
       pure $ MultipleParameters ParameterTypeDefinition {..}
 
 mergeDescriptionOfParameterWithSchema :: OAT.ParameterObject -> OAS.Schema -> OAS.Schema
 mergeDescriptionOfParameterWithSchema parameter (OAT.Concrete schema) =
-  let parameterName = OAT.name (parameter :: OAT.ParameterObject)
-      descriptionParameter = Maybe.maybeToList $ OAT.description (parameter :: OAT.ParameterObject)
-      descriptionSchema = Maybe.maybeToList $ OAS.description schema
+  let parameterName = OAT.parameterObjectName parameter
+      descriptionParameter = Maybe.maybeToList $ OAT.parameterObjectDescription parameter
+      descriptionSchema = Maybe.maybeToList $ OAS.schemaObjectDescription schema
       mergedDescription = T.intercalate "\n\n" (("Represents the parameter named '" <> parameterName <> "'") : descriptionParameter <> descriptionSchema)
-   in OAT.Concrete $ schema {OAS.description = Just mergedDescription}
+   in OAT.Concrete $ schema {OAS.schemaObjectDescription = Just mergedDescription}
 mergeDescriptionOfParameterWithSchema _ schema = schema
 
 getParameterLocationPrefix :: OAT.ParameterObject -> OAM.Generator Text
@@ -164,7 +150,7 @@ getParameterLocationPrefix =
       OAT.CookieParameterObjectLocation -> OAM.getSetting OAO.settingParameterCookiePrefix
       OAT.HeaderParameterObjectLocation -> OAM.getSetting OAO.settingParameterHeaderPrefix
   )
-    . getInFromParameterObject
+    . OAT.parameterObjectIn
 
 -- | Extracts all parameters of an operation
 --
@@ -186,20 +172,17 @@ getParametersFromOperationConcrete =
             pure $ (,["components", "parameters", name]) <$> p
       )
     . zip ([0 ..] :: [Int])
-    . getParametersFromOperationReference
+    . OAT.operationObjectParameters
 
 getSchemaFromParameterObjectSchema :: OAT.ParameterObjectSchema -> OAM.Generator (Maybe OAS.Schema)
-getSchemaFromParameterObjectSchema (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) = pure $ Just schema
+getSchemaFromParameterObjectSchema (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) = pure $ Just simpleParameterSchemaSchema
 getSchemaFromParameterObjectSchema (OAT.ComplexParameterObjectSchema _) = OAM.nested "content" $ do
   OAM.logWarning "Complex parameter schemas are not supported and therefore will be skipped."
   pure Nothing
 
 -- | Reads the schema from the parameter
 getSchemaFromParameter :: OAT.ParameterObject -> OAM.Generator (Maybe OAS.Schema)
-getSchemaFromParameter OAT.ParameterObject {..} = getSchemaFromParameterObjectSchema schema
-
-getNameFromParameter :: OAT.ParameterObject -> Text
-getNameFromParameter = OAT.name
+getSchemaFromParameter = getSchemaFromParameterObjectSchema . OAT.parameterObjectSchema
 
 -- | Gets the Type definition dependent on the number of parameters/types
 --   A monadic name for which its forall structure is defined outside
@@ -212,9 +195,9 @@ getNameFromParameter = OAT.name
 getParametersTypeForSignature :: [Q Type] -> Name -> Name -> Q Type
 getParametersTypeForSignature types responseTypeName monadName =
   createFunctionType
-    ( [t|OC.Configuration|] :
-      types
-        <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
+    ( [t|OC.Configuration|]
+        : types
+          <> [[t|$(varT monadName) (HS.Response $(varT responseTypeName))|]]
     )
 
 -- | Same as 'getParametersTypeForSignature' but with the configuration in 'MR.ReaderT' instead of a parameter
@@ -231,7 +214,7 @@ createFunctionType =
     (\t1 t2 -> [t|$t1 -> $t2|])
 
 getParameterName :: OAT.ParameterObject -> OAM.Generator Name
-getParameterName parameter = haskellifyNameM False $ getNameFromParameter parameter
+getParameterName parameter = haskellifyNameM False $ OAT.parameterObjectName parameter
 
 -- | Get a description of a parameter object (the name and if available the description from the specification)
 getParameterDescription :: OAT.ParameterObject -> OAM.Generator Text
@@ -239,14 +222,14 @@ getParameterDescription parameter = do
   schema <- case getSchemaOfParameterObject parameter of
     Just schema -> Model.resolveSchemaReferenceWithoutWarning schema
     Nothing -> pure Nothing
-  let name = OAT.name (parameter :: OAT.ParameterObject)
-      description = maybe "" (": " <>) $ OAT.description (parameter :: OAT.ParameterObject)
+  let name = OAT.parameterObjectName parameter
+      description = maybe "" (": " <>) $ OAT.parameterObjectDescription parameter
       constraints = joinWith ", " $ Model.getConstraintDescriptionsOfSchema schema
   pure $ Doc.escapeText $ name <> description <> (if T.null constraints then "" else " | Constraints: " <> constraints)
 
 getSchemaOfParameterObject :: OAT.ParameterObject -> Maybe OAS.Schema
-getSchemaOfParameterObject parameterObject = case OAT.schema (parameterObject :: OAT.ParameterObject) of
-  (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> Just schema
+getSchemaOfParameterObject parameterObject = case OAT.parameterObjectSchema parameterObject of
+  (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> Just simpleParameterSchemaSchema
   OAT.ComplexParameterObjectSchema _ -> Nothing
 
 -- | Defines the body of an Operation function
@@ -265,7 +248,7 @@ defineOperationFunction ::
   Text ->
   -- | Schema of body
   Maybe RequestBodyDefinition ->
-  -- | An expression used to transform the response from 'B8.ByteString' to the required response type.
+  -- | An expression used to transform the response from 'BS.ByteString' to the required response type.
   -- Note that the response is nested within a HTTP monad and an 'Either'.
   Q Exp ->
   -- | Function body definition in TH
@@ -286,7 +269,7 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
       paramName' <- getParameterName parameter
       let paramExpr = (varE paramName', parameter)
       pure $
-        if getInFromParameterObject parameter == OAT.PathParameterObjectLocation
+        if OAT.parameterObjectIn parameter == OAT.PathParameterObjectLocation
           then ([paramExpr], [])
           else ([], [paramExpr])
     MultipleParameters paramDefinition ->
@@ -301,25 +284,25 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
     ppr <$> case bodySchema of
       Just RequestBodyDefinition {..}
         | generateBody ->
-          let encodeExpr =
-                varE $
-                  case encoding of
-                    OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
-                    OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
-           in [d|
-                $(conP fnName $ fnPatterns <> [varP bodyName]) =
-                  $responseTransformerExp
-                    ( $( if useExplicitConfiguration
-                           then [|OC.doBodyCallWithConfiguration $(varE configName)|]
-                           else [|OC.doBodyCallWithConfigurationM|]
-                       )
-                        (T.toUpper $ T.pack $methodLit)
-                        (T.pack $(request))
-                        $(queryParameters')
-                        $(if required then [|Just $(varE bodyName)|] else varE bodyName)
-                        $(encodeExpr)
-                    )
-                |]
+            let encodeExpr =
+                  varE $
+                    case requestBodyDefinitionEncoding of
+                      OC.RequestBodyEncodingFormData -> 'OC.RequestBodyEncodingFormData
+                      OC.RequestBodyEncodingJSON -> 'OC.RequestBodyEncodingJSON
+             in [d|
+                  $(conP fnName $ fnPatterns <> [varP bodyName]) =
+                    $responseTransformerExp
+                      ( $( if useExplicitConfiguration
+                             then [|OC.doBodyCallWithConfiguration $(varE configName)|]
+                             else [|OC.doBodyCallWithConfigurationM|]
+                         )
+                          (T.toUpper $ T.pack $methodLit)
+                          $(request)
+                          $(queryParameters')
+                          $(if requestBodyDefinitionRequired then [|Just $(varE bodyName)|] else varE bodyName)
+                          $(encodeExpr)
+                      )
+                  |]
       _ ->
         [d|
           $(conP fnName fnPatterns) =
@@ -329,7 +312,7 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
                      else [|OC.doCallWithConfigurationM|]
                  )
                   (T.toUpper $ T.pack $methodLit)
-                  (T.pack $(request))
+                  $(request)
                   $(queryParameters')
               )
           |]
@@ -338,14 +321,14 @@ defineOperationFunction useExplicitConfiguration fnName parameterCardinality req
 shouldGenerateRequestBody :: Maybe RequestBodyDefinition -> OAM.Generator Bool
 shouldGenerateRequestBody Nothing = pure False
 shouldGenerateRequestBody (Just RequestBodyDefinition {..}) = do
-  maybeSchema <- Model.resolveSchemaReferenceWithoutWarning schema
+  maybeSchema <- Model.resolveSchemaReferenceWithoutWarning requestBodyDefinitionSchema
   generateEmptyRequestBody <- OAM.getSetting OAO.settingGenerateOptionalEmptyRequestBody
   case maybeSchema of
     Just s
       | not generateEmptyRequestBody
-          && not required
+          && not requestBodyDefinitionRequired
           && OAS.isSchemaEmpty s ->
-        pure False
+          pure False
     _ -> pure True
 
 -- | Extracts the request body schema from an operation and the encoding which should be used on the body data.
@@ -356,25 +339,19 @@ getBodySchemaFromOperation operation = OAM.nested "requestBody" $ do
     Just (body, path) -> OAM.resetPath path $ getRequestBodySchema body
     Nothing -> pure (Nothing, [])
 
-getRequestBodyContent :: OAT.RequestBodyObject -> Map.Map Text OAT.MediaTypeObject
-getRequestBodyContent = OAT.content
-
-getSchemaFromMedia :: OAT.MediaTypeObject -> Maybe OAT.Schema
-getSchemaFromMedia = OAT.schema
-
 getRequestBodySchema :: OAT.RequestBodyObject -> OAM.Generator (Maybe RequestBodyDefinition, [Text])
 getRequestBodySchema body = OAM.nested "content" $ do
-  let content = Map.lookup "application/json" $ getRequestBodyContent body
+  let content = Map.lookup "application/json" $ OAT.requestBodyObjectContent body
       createRequestBodyDefinition encoding schema =
         Just $
           RequestBodyDefinition
-            { schema = schema,
-              encoding = encoding,
-              required = OAT.required (body :: OAT.RequestBodyObject)
+            { requestBodyDefinitionSchema = schema,
+              requestBodyDefinitionEncoding = encoding,
+              requestBodyDefinitionRequired = OAT.requestBodyObjectRequired body
             }
   case content of
     Nothing ->
-      let formContent = Map.lookup "application/x-www-form-urlencoded" $ getRequestBodyContent body
+      let formContent = Map.lookup "application/x-www-form-urlencoded" $ OAT.requestBodyObjectContent body
        in case formContent of
             Nothing -> do
               OAM.logWarning "Only content type application/json and application/x-www-form-urlencoded is supported"
@@ -382,21 +359,21 @@ getRequestBodySchema body = OAM.nested "content" $ do
             Just media -> do
               path <- OAM.appendToPath ["application/x-www-form-urlencoded", "schema"]
               pure
-                ( getSchemaFromMedia media
+                ( OAT.mediaTypeObjectSchema media
                     >>= createRequestBodyDefinition OC.RequestBodyEncodingFormData,
                   path
                 )
     Just media -> do
       path <- OAM.appendToPath ["application/json", "schema"]
       pure
-        ( getSchemaFromMedia media
+        ( OAT.mediaTypeObjectSchema media
             >>= createRequestBodyDefinition OC.RequestBodyEncodingJSON,
           path
         )
 
 getRequestBodyObject :: OAT.OperationObject -> OAM.Generator (Maybe (OAT.RequestBodyObject, [Text]))
 getRequestBodyObject operation =
-  case OAT.requestBody operation of
+  case OAT.operationObjectRequestBody operation of
     Nothing -> pure Nothing
     Just (OAT.Concrete p) -> do
       path <- OAM.getCurrentPath
@@ -412,8 +389,8 @@ getRequestBodyObject operation =
 -- A warning is logged if the response does not contain one of the supported media types.
 getResponseSchema :: OAT.ResponseObject -> OAM.Generator (Maybe OAT.Schema, [Text])
 getResponseSchema response = OAM.nested "content" $ do
-  let contentMap = OAT.content (response :: OAT.ResponseObject)
-      schema = Map.lookup "application/json" contentMap >>= getSchemaFromMedia
+  let contentMap = OAT.responseObjectContent response
+      schema = Map.lookup "application/json" contentMap >>= OAT.mediaTypeObjectSchema
   when (Maybe.isNothing schema && not (Map.null contentMap)) $ OAM.logWarning "Only content type application/json is supported for response bodies."
   path <- OAM.appendToPath ["application/json", "schema"]
   pure (schema, path)
@@ -438,16 +415,16 @@ generateQueryParams x =
   listE
     . fmap
       ( \(var, param) ->
-          let queryName = stringE $ T.unpack $ getNameFromParameter param
-              required = getRequiredFromParameter param
-              (maybeStyle, explode') = case OAT.schema (param :: OAT.ParameterObject) of
-                (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> (style, explode)
+          let queryName = stringE $ T.unpack $ OAT.parameterObjectName param
+              required = OAT.parameterObjectRequired param
+              (maybeStyle, explode') = case OAT.parameterObjectSchema param of
+                (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) -> (simpleParameterSchemaStyle, simpleParameterSchemaExplode)
                 OAT.ComplexParameterObjectSchema _ -> (Just "form", True)
               style' =
                 stringE $
                   T.unpack $
                     Maybe.fromMaybe
-                      ( case OAT.in' (param :: OAT.ParameterObject) of
+                      ( case OAT.parameterObjectIn param of
                           OAT.QueryParameterObjectLocation -> "form"
                           OAT.HeaderParameterObjectLocation -> "simple"
                           OAT.PathParameterObjectLocation -> "simple"
@@ -471,10 +448,10 @@ generateParameterizedRequestPath :: [(Q Exp, OAT.ParameterObject)] -> Text -> Q 
 generateParameterizedRequestPath ((paramName, param) : xs) path =
   foldr1 (foldingFn paramName) partExpressiones
   where
-    parts = Split.splitOn ("{" <> T.unpack (getNameFromParameter param) <> "}") (T.unpack path)
+    parts = Split.splitOn ("{" <> T.unpack (OAT.parameterObjectName param) <> "}") (T.unpack path)
     partExpressiones = generateParameterizedRequestPath xs . T.pack <$> parts
     foldingFn :: Q Exp -> Q Exp -> Q Exp -> Q Exp
-    foldingFn var a b = [|$(a) ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $var) ++ $(b)|]
+    foldingFn var a b = [|$(a) <> OC.byteToText (HT.urlEncode True $ OC.textToByte $ OC.stringifyModel $var) <> $(b)|]
 generateParameterizedRequestPath _ path = stringE $ T.unpack path
 
 -- | Extracts a description from an 'OAT.OperationObject'.
@@ -485,8 +462,8 @@ getOperationDescription operation =
   Maybe.fromMaybe "" $
     Maybe.listToMaybe $
       Maybe.catMaybes
-        [ OAT.description (operation :: OAT.OperationObject),
-          OAT.summary (operation :: OAT.OperationObject)
+        [ OAT.operationObjectDescription operation,
+          OAT.operationObjectSummary operation
         ]
 
 -- | Constructs the name of an operation.
@@ -494,6 +471,6 @@ getOperationDescription operation =
 -- If it is not available, the id is constructed based on the request path and method.
 getOperationName :: Text -> Text -> OAT.OperationObject -> OAM.Generator Name
 getOperationName requestPath method operation =
-  let operationId = OAT.operationId operation
+  let operationId = OAT.operationObjectOperationId operation
       textName = Maybe.fromMaybe (T.map Char.toLower method <> requestPath) operationId
    in haskellifyNameM False textName

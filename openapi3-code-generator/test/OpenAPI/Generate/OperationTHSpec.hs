@@ -6,7 +6,6 @@
 
 module OpenAPI.Generate.OperationTHSpec where
 
-import qualified Data.ByteString.Char8 as B8
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import Data.Text as T
@@ -32,7 +31,7 @@ spec =
       testParameter = OAT.ParameterObject "testName" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testParameterOtherName = OAT.ParameterObject "testName2" OAT.QueryParameterObjectLocation Nothing True False True testParameterSchema
       testTHName = varE $ mkName "myTestName"
-      testTHE = [|B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $testTHName)|]
+      testTHE = [|OC.byteToText (HT.urlEncode True $ OC.textToByte $ OC.stringifyModel $testTHName)|]
       monadName = mkName "m"
    in do
         describe "generateQueryParams" $
@@ -43,54 +42,54 @@ spec =
         describe "generateParameterizedRequestPath" $ do
           singleTestTH
             "should not change empty path without arguments"
-            (generateParameterizedRequestPath [] (T.pack ""))
+            (generateParameterizedRequestPath [] "")
             [|""|]
           singleTestTH
             "should not change path without arguments"
-            (generateParameterizedRequestPath [] (T.pack "/my/path/"))
+            (generateParameterizedRequestPath [] "/my/path/")
             [|"/my/path/"|]
           singleTestTH
             "should ignore params not names"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/"))
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "/my/path/")
             [|"/my/path/"|]
           singleTestTH
             "should replace one occurences at the end"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/{testName}"))
-            [|"/my/path/" ++ $(testTHE) ++ ""|]
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "/my/path/{testName}")
+            [|"/my/path/" <> $(testTHE) <> ""|]
           singleTestTH
             "should replace one occurences at the end"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/my/path/{testName}/"))
-            [|"/my/path/" ++ $(testTHE) ++ "/"|]
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "/my/path/{testName}/")
+            [|"/my/path/" <> $(testTHE) <> "/"|]
           singleTestTH
             "should replace one occurences at the beginning"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "{testName}/my/path/"))
-            [|"" ++ $(testTHE) ++ "/my/path/"|]
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "{testName}/my/path/")
+            [|"" <> $(testTHE) <> "/my/path/"|]
           singleTestTH
             "should replace one occurences at the beginning"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/{testName}/my/path/"))
-            [|"/" ++ $(testTHE) ++ "/my/path/"|]
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "/{testName}/my/path/")
+            [|"/" <> $(testTHE) <> "/my/path/"|]
           singleTestTH
             "should replace one occurences in the middle"
-            (generateParameterizedRequestPath [(testTHName, testParameter)] (T.pack "/another/test/{testName}/my/path/"))
-            [|"/another/test/" ++ $(testTHE) ++ "/my/path/"|]
+            (generateParameterizedRequestPath [(testTHName, testParameter)] "/another/test/{testName}/my/path/")
+            [|"/another/test/" <> $(testTHE) <> "/my/path/"|]
           singleTestTH
             "should ignore names not given"
-            (generateParameterizedRequestPath [] (T.pack "/another/test/{testName}/my/path/"))
+            (generateParameterizedRequestPath [] "/another/test/{testName}/my/path/")
             [|"/another/test/{testName}/my/path/"|]
           singleTestTH
             "should replace two occurences"
             ( generateParameterizedRequestPath
                 [(testTHName, testParameter), (varE $ mkName "myTestName2", testParameterOtherName)]
-                (T.pack "/{testName2}/my//test/{testName}/my/path/")
+                "/{testName2}/my//test/{testName}/my/path/"
             )
-            [|("/" ++ B8.unpack (HT.urlEncode True $ B8.pack $ OC.stringifyModel $(varE $ mkName "myTestName2")) ++ "/my//test/") ++ $(testTHE) ++ "/my/path/"|]
+            [|("/" <> OC.byteToText (HT.urlEncode True $ OC.textToByte $ OC.stringifyModel $(varE $ mkName "myTestName2")) <> "/my//test/") <> $(testTHE) <> "/my/path/"|]
           singleTestTH
             "should replace one variable twice in the path"
             ( generateParameterizedRequestPath
                 [(testTHName, testParameter)]
-                (T.pack "/{testName}/my//test/{testName}/my/path/")
+                "/{testName}/my//test/{testName}/my/path/"
             )
-            [|"/" ++ $(testTHE) ++ "/my//test/" ++ $(testTHE) ++ "/my/path/"|]
+            [|"/" <> $(testTHE) <> "/my//test/" <> $(testTHE) <> "/my/path/"|]
         describe "getParametersTypeForSignature" $ do
           let responseTypeName = mkName "Test"
               responseType = [t|$(varT monadName) (HS.Response $(varT responseTypeName))|]

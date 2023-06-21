@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -10,7 +9,6 @@ import qualified Data.Bifunctor as BF
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
-import Data.Text (Text)
 import qualified Data.Text as T
 import Language.Haskell.TH
 import Language.Haskell.TH.PprLib hiding ((<>))
@@ -29,7 +27,7 @@ import qualified OpenAPI.Generate.Types as OAT
 -- | Defines all the operations as functions and the common imports
 defineOperations :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q [Dep.ModuleDefinition], Dep.Models)
 defineOperations moduleName specification =
-  let paths = Map.toList $ OAT.paths specification
+  let paths = Map.toList $ OAT.openApiSpecificationPaths specification
    in OAM.nested "paths" $ do
         warnAboutUnknownOperations paths
         fmap
@@ -45,12 +43,11 @@ defineOperations moduleName specification =
 -- | Defines the @defaultURL@ and the @defaultConfiguration@ containing this URL.
 defineConfigurationInformation :: String -> OAT.OpenApiSpecification -> Q Doc
 defineConfigurationInformation moduleName spec =
-  let servers' = (OAT.servers :: OAT.OpenApiSpecification -> [OAT.ServerObject]) spec
-      defaultURL = getServerURL servers'
+  let defaultURL = getServerURL $ OAT.openApiSpecificationServers spec
       defaultURLName = mkName "defaultURL"
-      getServerURL = maybe "/" (OAT.url :: OAT.ServerObject -> Text) . Maybe.listToMaybe
+      getServerURL = maybe "/" OAT.serverObjectUrl . Maybe.listToMaybe
       defaultApplicationNameVarName = mkName "defaultApplicationName"
-      defaultApplicationName = OAT.title $ OAT.info spec
+      defaultApplicationName = OAT.infoObjectTitle $ OAT.openApiSpecificationInfo spec
    in Doc.addConfigurationModuleHeader moduleName
         . vcat
         <$> sequence
@@ -77,7 +74,7 @@ defineConfigurationInformation moduleName spec =
 -- | Defines all models in the components.schemas section of the 'OAT.OpenApiSpecification'
 defineModels :: String -> OAT.OpenApiSpecification -> Dep.Models -> OAM.Generator (Q [Dep.ModuleDefinition])
 defineModels moduleName spec operationDependencies =
-  let schemaDefinitions = Map.toList $ OAT.schemas $ OAT.components spec
+  let schemaDefinitions = Map.toList $ OAT.componentsObjectSchemas $ OAT.openApiSpecificationComponents spec
    in OAM.nested "components" $
         OAM.nested "schemas" $ do
           warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions
@@ -98,5 +95,5 @@ defineSecuritySchemes moduleName =
           OAT.Reference _ -> Nothing
       )
     . Map.toList
-    . OAT.securitySchemes
-    . OAT.components
+    . OAT.componentsObjectSecuritySchemes
+    . OAT.openApiSpecificationComponents

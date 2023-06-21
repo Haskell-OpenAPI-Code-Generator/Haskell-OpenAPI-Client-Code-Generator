@@ -1,5 +1,4 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -47,15 +46,15 @@ buildReferenceMap :: OAT.OpenApiSpecification -> ReferenceMap
 buildReferenceMap =
   Map.fromList
     . ( \o ->
-          buildReferencesForComponentType "schemas" SchemaReference (OAT.schemas o)
-            <> buildReferencesForComponentType "responses" ResponseReference (OAT.responses (o :: OAT.ComponentsObject))
-            <> buildReferencesForComponentType "parameters" ParameterReference (OAT.parameters (o :: OAT.ComponentsObject))
-            <> buildReferencesForComponentType "examples" ExampleReference (OAT.examples (o :: OAT.ComponentsObject))
-            <> buildReferencesForComponentType "requestBodies" RequestBodyReference (OAT.requestBodies o)
-            <> buildReferencesForComponentType "headers" HeaderReference (OAT.headers (o :: OAT.ComponentsObject))
-            <> buildReferencesForComponentType "securitySchemes" SecuritySchemeReference (OAT.securitySchemes o)
+          buildReferencesForComponentType "schemas" SchemaReference (OAT.componentsObjectSchemas o)
+            <> buildReferencesForComponentType "responses" ResponseReference (OAT.componentsObjectResponses o)
+            <> buildReferencesForComponentType "parameters" ParameterReference (OAT.componentsObjectParameters o)
+            <> buildReferencesForComponentType "examples" ExampleReference (OAT.componentsObjectExamples o)
+            <> buildReferencesForComponentType "requestBodies" RequestBodyReference (OAT.componentsObjectRequestBodies o)
+            <> buildReferencesForComponentType "headers" HeaderReference (OAT.componentsObjectHeaders o)
+            <> buildReferencesForComponentType "securitySchemes" SecuritySchemeReference (OAT.componentsObjectSecuritySchemes o)
       )
-    . OAT.components
+    . OAT.openApiSpecificationComponents
 
 -- | Maps the subtypes of components to the entries of the 'ReferenceMap' and filters references (the lookup table should only contain concrete values).
 buildReferencesForComponentType ::

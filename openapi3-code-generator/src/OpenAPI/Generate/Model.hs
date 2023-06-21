@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -152,7 +151,9 @@ resolveSchemaReference schemaName schema =
       p <- OAM.getSchemaReferenceM ref
       when (Maybe.isNothing p) $
         OAM.logWarning $
-          "Reference '" <> ref <> "' to schema from '"
+          "Reference '"
+            <> ref
+            <> "' to schema from '"
             <> schemaName
             <> "' could not be found and therefore will be skipped."
       pure $ (,transformReferenceToDependency ref) <$> p
@@ -186,13 +187,13 @@ createAlias schemaName description strategy res = do
 defineModelForSchemaConcrete :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
 defineModelForSchemaConcrete strategy schemaName schema = do
   nonNullableTypeSuffix <- OAM.getSetting OAO.settingNonNullableTypeSuffix
-  let enumValues = OAS.enum schema
-      schemaNameWithNonNullableSuffix = if OAS.nullable schema then schemaName <> nonNullableTypeSuffix else schemaName
+  let enumValues = OAS.schemaObjectEnum schema
+      schemaNameWithNonNullableSuffix = if OAS.schemaObjectNullable schema then schemaName <> nonNullableTypeSuffix else schemaName
   typeWithDeclaration <-
     if null enumValues
       then defineModelForSchemaConcreteIgnoreEnum strategy schemaNameWithNonNullableSuffix schema
       else defineEnumModel schemaNameWithNonNullableSuffix schema enumValues
-  if OAS.nullable schema
+  if OAS.schemaObjectNullable schema
     then defineNullableTypeAlias strategy schemaName typeWithDeclaration
     else pure typeWithDeclaration
 
@@ -208,7 +209,9 @@ defineNullableTypeAlias strategy schemaName (type', (content, dependencies)) = d
         ( varT name,
           ( content
               `appendDoc` ( ( Doc.generateHaddockComment
-                                [ "Defines a nullable type alias for '" <> schemaName <> nonNullableTypeSuffix
+                                [ "Defines a nullable type alias for '"
+                                    <> schemaName
+                                    <> nonNullableTypeSuffix
                                     <> "' as the schema located at @"
                                     <> path
                                     <> "@ in the specification is marked as nullable."
@@ -230,15 +233,15 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
   let schemaDescription = getDescriptionOfSchema schema
       typeAliasing = createAlias schemaName schemaDescription strategy
   case schema of
-    OAS.SchemaObject {type' = OAS.SchemaTypeArray} -> defineArrayModelForSchema strategy schemaName schema
-    OAS.SchemaObject {type' = OAS.SchemaTypeObject} ->
-      let allOfNull = null $ OAS.allOf schema
-          oneOfNull = null $ OAS.oneOf schema
-          anyOfNull = null $ OAS.anyOf schema
+    OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeArray} -> defineArrayModelForSchema strategy schemaName schema
+    OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeObject} ->
+      let allOfNull = null $ OAS.schemaObjectAllOf schema
+          oneOfNull = null $ OAS.schemaObjectOneOf schema
+          anyOfNull = null $ OAS.schemaObjectAnyOf schema
        in case (allOfNull, oneOfNull, anyOfNull) of
-            (False, _, _) -> OAM.nested "allOf" $ defineAllOfSchema schemaName schemaDescription $ OAS.allOf schema
-            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription $ OAS.oneOf schema
-            (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ OAS.anyOf schema
+            (False, _, _) -> OAM.nested "allOf" $ defineAllOfSchema schemaName schemaDescription $ OAS.schemaObjectAllOf schema
+            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription $ OAS.schemaObjectOneOf schema
+            (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ OAS.schemaObjectAnyOf schema
             _ -> defineObjectModelForSchema strategy schemaName schema
     _ ->
       typeAliasing $ pure (varT $ getSchemaType settings schema, (emptyDoc, Set.empty))
@@ -276,9 +279,9 @@ defineEnumModel schemaName schema enumValues = do
           . ( `Doc.sideBySide`
                 ( text ""
                     $$ Doc.sideComments
-                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification." :
-                        "This constructor can be used to send values to the server which are not present in the specification yet." :
-                        comments
+                      ( "This case is used if the value encountered during decoding does not match any of the provided cases in the specification."
+                          : "This constructor can be used to send values to the server which are not present in the specification yet."
+                          : comments
                       )
                 )
             )
@@ -317,12 +320,12 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           ( clause
               [conP fallbackName [p]]
               (normalB e)
-              [] :
-            clause
-              [conP typedName [p]]
-              (normalB [|Aeson.toJSON $e|])
-              [] :
-            (toJsonClause <$> nameValues)
+              []
+              : clause
+                [conP typedName [p]]
+                (normalB [|Aeson.toJSON $e|])
+                []
+              : (toJsonClause <$> nameValues)
           )
       toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
    in fmap ppr toJson `appendDoc` fmap ppr fromJson
@@ -335,8 +338,8 @@ defineAnyOfSchema :: TypeAliasStrategy -> Text -> Text -> [OAS.Schema] -> OAM.Ge
 defineAnyOfSchema strategy schemaName description schemas = do
   schemasWithDependencies <- mapMaybeM (resolveSchemaReference schemaName) schemas
   let concreteSchemas = fmap fst schemasWithDependencies
-      schemasWithoutRequired = fmap (\o -> o {OAS.required = Set.empty}) concreteSchemas
-      notObjectSchemas = filter (\o -> OAS.type' o /= OAS.SchemaTypeObject) concreteSchemas
+      schemasWithoutRequired = fmap (\o -> o {OAS.schemaObjectRequired = Set.empty}) concreteSchemas
+      notObjectSchemas = filter (\o -> OAS.schemaObjectType o /= OAS.SchemaTypeObject) concreteSchemas
       newDependencies = Set.unions $ fmap snd schemasWithDependencies
   if null notObjectSchemas
     then do
@@ -349,13 +352,13 @@ defineAnyOfSchema strategy schemaName description schemas = do
 --    this would be the correct implementation
 --    but it generates endless loop because some implementations use anyOf as a oneOf
 --    where the schema reference itself
---      let objectSchemas = filter (\o -> OAS.type' o == OAS.SchemaTypeObject) concreteSchemas
+--      let objectSchemas = filter (\o -> OAS.schemaObjectType o == OAS.SchemaTypeObject) concreteSchemas
 --      (propertiesCombined, _) <- fuseSchemasAllOf schemaName (fmap OAT.Concrete objectSchemas)
 --      if null propertiesCombined then
 --        createAlias schemaName strategy $ defineOneOfSchema schemaName schemas
 --        else
 --          let schemaPrototype = head objectSchemas
---              newSchema = schemaPrototype {OAS.properties = propertiesCombined, OAS.required = Set.empty}
+--              newSchema = schemaPrototype {OAS.schemaObjectProperties = propertiesCombined, OAS.schemaObjectRequired = Set.empty}
 --          in
 --            createAlias schemaName strategy $ defineOneOfSchema schemaName (fmap OAT.Concrete (newSchema : notObjectSchemas))
 
@@ -509,11 +512,11 @@ fuseSchemasAllOf schemaName schemas = do
 -- looks if subschemas define further subschemas
 getPropertiesForAllOf :: Text -> OAS.SchemaObject -> OAM.Generator (Map.Map Text OAS.Schema, Set.Set Text)
 getPropertiesForAllOf schemaName schema =
-  let allOf = OAS.allOf schema
-      anyOf = OAS.anyOf schema
+  let allOf = OAS.schemaObjectAllOf schema
+      anyOf = OAS.schemaObjectAnyOf schema
       relevantSubschemas = allOf <> anyOf
    in if null relevantSubschemas
-        then pure (OAS.properties schema, OAS.required schema)
+        then pure (OAS.schemaObjectProperties schema, OAS.schemaObjectRequired schema)
         else do
           (allOfProps, allOfRequired) <- fuseSchemasAllOf schemaName allOf
           (anyOfProps, _) <- fuseSchemasAllOf schemaName anyOf
@@ -542,7 +545,7 @@ defineNewSchemaForAllOf schemaName description schemas = do
       pure Nothing
     else do
       let schemaPrototype = head concreteSchemas
-          newSchema = schemaPrototype {OAS.properties = propertiesCombined, OAS.required = requiredCombined, OAS.description = Just description}
+          newSchema = schemaPrototype {OAS.schemaObjectProperties = propertiesCombined, OAS.schemaObjectRequired = requiredCombined, OAS.schemaObjectDescription = Just description}
       OAM.logTrace $ "Define allOf as record named '" <> schemaName <> "'"
       pure $ Just (newSchema, newDependencies)
 
@@ -553,7 +556,7 @@ defineArrayModelForSchema strategy schemaName schema = do
     CreateTypeAlias -> OAM.getSetting OAO.settingArrayItemTypeSuffix
     DontCreateTypeAlias -> pure "" -- The suffix is only relevant for top level declarations because only there a named type of the array even exists
   (type', (content, dependencies)) <-
-    case OAS.items schema of
+    case OAS.schemaObjectItems schema of
       Just itemSchema -> OAM.nested "items" $ defineModelForSchemaNamed (schemaName <> arrayItemTypeSuffix) itemSchema
       -- not allowed by the spec
       Nothing -> do
@@ -591,9 +594,9 @@ defineObjectModelForSchema strategy schemaName schema =
       path <- getCurrentPathEscaped
       let convertToCamelCase = OAO.settingConvertToCamelCase settings
           name = haskellifyName convertToCamelCase True schemaName
-          required = OAS.required schema
+          required = OAS.schemaObjectRequired schema
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
-          (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.properties schema
+          (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
           propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
           emptyCtx = pure []
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
@@ -646,7 +649,7 @@ extractSchemasWithFixedValues fixedValueStrategy =
   E.partitionEithers . fmap (extractSchemaWithFixedValue fixedValueStrategy)
 
 extractSchemaWithFixedValue :: FixedValueStrategy -> OAS.Schema -> Either OAS.Schema Aeson.Value
-extractSchemaWithFixedValue FixedValueStrategyExclude schema@(OAT.Concrete OAS.SchemaObject {..}) = case enum of
+extractSchemaWithFixedValue FixedValueStrategyExclude schema@(OAT.Concrete OAS.SchemaObject {..}) = case schemaObjectEnum of
   [value] -> Right value
   _ -> Left schema
 extractSchemaWithFixedValue _ schema = Left schema
@@ -781,14 +784,14 @@ propertiesToBangTypes schemaName props required = OAM.nested "properties" $ do
   foldl foldFn (pure (pure [], emptyDoc, Set.empty)) props
 
 getDescriptionOfSchema :: OAS.SchemaObject -> Text
-getDescriptionOfSchema schema = Doc.escapeText $ Maybe.fromMaybe "" $ OAS.description schema
+getDescriptionOfSchema schema = Doc.escapeText $ Maybe.fromMaybe "" $ OAS.schemaObjectDescription schema
 
 getDescriptionOfProperties :: [(Text, OAS.Schema)] -> OAM.Generator [Text]
 getDescriptionOfProperties =
   mapM
     ( \(name, schema) -> do
         schema' <- resolveSchemaReferenceWithoutWarning schema
-        let description = maybe "" (": " <>) $ schema' >>= OAS.description
+        let description = maybe "" (": " <>) $ schema' >>= OAS.schemaObjectDescription
             constraints = T.unlines $ ("* " <>) <$> getConstraintDescriptionsOfSchema schema'
         pure $ Doc.escapeText $ name <> description <> (if T.null constraints then "" else "\n\nConstraints:\n\n" <> constraints)
     )
@@ -798,43 +801,43 @@ getConstraintDescriptionsOfSchema :: Maybe OAS.SchemaObject -> [Text]
 getConstraintDescriptionsOfSchema schema =
   let showConstraint desc = showConstraintSurrounding desc ""
       showConstraintSurrounding prev after = fmap $ (prev <>) . (<> after) . T.pack . show
-      exclusiveMaximum = maybe False OAS.exclusiveMaximum schema
-      exclusiveMinimum = maybe False OAS.exclusiveMinimum schema
+      exclusiveMaximum = maybe False OAS.schemaObjectExclusiveMaximum schema
+      exclusiveMinimum = maybe False OAS.schemaObjectExclusiveMinimum schema
    in Maybe.catMaybes
-        [ showConstraint "Must be a multiple of " $ schema >>= OAS.multipleOf,
-          showConstraint ("Maxium " <> if exclusiveMaximum then " (exclusive)" else "" <> " of ") $ schema >>= OAS.maximum,
-          showConstraint ("Minimum " <> if exclusiveMinimum then " (exclusive)" else "" <> " of ") $ schema >>= OAS.minimum,
-          showConstraint "Maximum length of " $ schema >>= OAS.maxLength,
-          showConstraint "Minimum length of " $ schema >>= OAS.minLength,
-          ("Must match pattern '" <>) . (<> "'") <$> (schema >>= OAS.pattern'),
-          showConstraintSurrounding "Must have a maximum of " " items" $ schema >>= OAS.maxItems,
-          showConstraintSurrounding "Must have a minimum of " " items" $ schema >>= OAS.minItems,
+        [ showConstraint "Must be a multiple of " $ schema >>= OAS.schemaObjectMultipleOf,
+          showConstraint ("Maxium " <> if exclusiveMaximum then " (exclusive)" else "" <> " of ") $ schema >>= OAS.schemaObjectMaximum,
+          showConstraint ("Minimum " <> if exclusiveMinimum then " (exclusive)" else "" <> " of ") $ schema >>= OAS.schemaObjectMinimum,
+          showConstraint "Maximum length of " $ schema >>= OAS.schemaObjectMaxLength,
+          showConstraint "Minimum length of " $ schema >>= OAS.schemaObjectMinLength,
+          ("Must match pattern '" <>) . (<> "'") <$> (schema >>= OAS.schemaObjectPattern),
+          showConstraintSurrounding "Must have a maximum of " " items" $ schema >>= OAS.schemaObjectMaxItems,
+          showConstraintSurrounding "Must have a minimum of " " items" $ schema >>= OAS.schemaObjectMinItems,
           schema
             >>= ( \case
                     True -> Just "Must have unique items"
                     False -> Nothing
                 )
-              . OAS.uniqueItems,
-          showConstraintSurrounding "Must have a maximum of " " properties" $ schema >>= OAS.maxProperties,
-          showConstraintSurrounding "Must have a minimum of " " properties" $ schema >>= OAS.minProperties
+              . OAS.schemaObjectUniqueItems,
+          showConstraintSurrounding "Must have a maximum of " " properties" $ schema >>= OAS.schemaObjectMaxProperties,
+          showConstraintSurrounding "Must have a minimum of " " properties" $ schema >>= OAS.schemaObjectMinProperties
         ]
 
 -- | Extracts the 'Name' of a 'OAS.SchemaObject' which should be used for primitive types
 getSchemaType :: OAO.Settings -> OAS.SchemaObject -> Name
-getSchemaType OAO.Settings {settingUseIntWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Integer
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int32"} = ''Int.Int32
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger, format = Just "int64"} = ''Int.Int64
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeInteger} = ''Int
-getSchemaType OAO.Settings {settingUseFloatWithArbitraryPrecision = True} OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Scientific.Scientific
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "float"} = ''Float
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber, format = Just "double"} = ''Double
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeNumber} = ''Double
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "byte"} = ''OC.JsonByteString
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "binary"} = ''OC.JsonByteString
-getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date"} = ''Day
-getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {type' = OAS.SchemaTypeString, format = Just "date-time"} = ''OC.JsonDateTime
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeString} = ''Text
-getSchemaType _ OAS.SchemaObject {type' = OAS.SchemaTypeBool} = ''Bool
+getSchemaType OAO.Settings {settingUseIntWithArbitraryPrecision = True} OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeInteger} = ''Integer
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeInteger, schemaObjectFormat = Just "int32"} = ''Int.Int32
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeInteger, schemaObjectFormat = Just "int64"} = ''Int.Int64
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeInteger} = ''Int
+getSchemaType OAO.Settings {settingUseFloatWithArbitraryPrecision = True} OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeNumber} = ''Scientific.Scientific
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeNumber, schemaObjectFormat = Just "float"} = ''Float
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeNumber, schemaObjectFormat = Just "double"} = ''Double
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeNumber} = ''Double
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeString, schemaObjectFormat = Just "byte"} = ''OC.JsonByteString
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeString, schemaObjectFormat = Just "binary"} = ''OC.JsonByteString
+getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeString, schemaObjectFormat = Just "date"} = ''Day
+getSchemaType OAO.Settings {settingUseDateTypesAsString = True} OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeString, schemaObjectFormat = Just "date-time"} = ''OC.JsonDateTime
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeString} = ''Text
+getSchemaType _ OAS.SchemaObject {schemaObjectType = OAS.SchemaTypeBool} = ''Bool
 getSchemaType _ OAS.SchemaObject {} = ''Text
 
 getCurrentPathEscaped :: OAM.Generator Text

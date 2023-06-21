@@ -121,24 +121,24 @@ transformToModuleName name =
       toCamelCase ('\'' : y : xs) | isCasableAlpha y = '\'' : Char.toUpper y : toCamelCase xs
       toCamelCase (x : xs) = x : toCamelCase xs
       toCamelCase xs = xs
-   in T.pack $
-        uppercaseFirst $
-          generateNameForEmptyIdentifier name $
-            removeIllegalLeadingCharacters $
-              fmap
-                ( \case
-                    '\'' -> '_'
-                    c -> c
-                )
-                $ toCamelCase $
-                  T.unpack $
-                    T.map
-                      ( \case
-                          '.' -> '\''
-                          c | isValidCharaterInSuffixExceptUnderscore c -> c
-                          _ -> '_'
-                      )
-                      name
+   in T.pack
+        $ uppercaseFirst
+        $ generateNameForEmptyIdentifier name
+        $ removeIllegalLeadingCharacters
+        $ fmap
+          ( \case
+              '\'' -> '_'
+              c -> c
+          )
+        $ toCamelCase
+        $ T.unpack
+        $ T.map
+          ( \case
+              '.' -> '\''
+              c | isValidCharaterInSuffixExceptUnderscore c -> c
+              _ -> '_'
+          )
+          name
 
 uppercaseFirst :: String -> String
 uppercaseFirst (x : xs) = Char.toUpper x : xs

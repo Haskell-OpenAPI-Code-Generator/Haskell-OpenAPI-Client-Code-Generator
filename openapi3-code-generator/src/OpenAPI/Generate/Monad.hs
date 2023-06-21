@@ -18,13 +18,13 @@ import qualified OpenAPI.Generate.Types.Schema as OAS
 
 -- | The reader environment of the 'Generator' monad
 --
--- The 'currentPath' is updated using the 'nested' function to track the current position within the specification.
+-- The 'generatorEnvironmentCurrentPath' is updated using the 'nested' function to track the current position within the specification.
 -- This is used to produce tracable log messages.
--- The 'references' map is a lookup table for references within the OpenAPI specification.
+-- The 'generatorEnvironmentReferences' map is a lookup table for references within the OpenAPI specification.
 data GeneratorEnvironment = GeneratorEnvironment
-  { currentPath :: [Text],
-    references :: Ref.ReferenceMap,
-    settings :: OAO.Settings
+  { generatorEnvironmentCurrentPath :: [Text],
+    generatorEnvironmentReferences :: Ref.ReferenceMap,
+    generatorEnvironmentSettings :: OAO.Settings
   }
   deriving (Show, Eq)
 
@@ -41,9 +41,9 @@ runGenerator e (Generator g) = MR.runReader (MW.runWriterT g) e
 createEnvironment :: OAO.Settings -> Ref.ReferenceMap -> GeneratorEnvironment
 createEnvironment settings references =
   GeneratorEnvironment
-    { currentPath = [],
-      references = references,
-      settings = settings
+    { generatorEnvironmentCurrentPath = [],
+      generatorEnvironmentReferences = references,
+      generatorEnvironmentSettings = settings
     }
 
 -- | Writes a log message to a 'Generator' monad
@@ -70,14 +70,17 @@ logTrace = logMessage OAL.TraceSeverity
 
 -- | This function can be used to tell the 'Generator' monad where in the OpenAPI specification the generator currently is
 nested :: Text -> Generator a -> Generator a
-nested pathItem = MR.local $ \g -> g {currentPath = currentPath g <> [pathItem]}
+nested pathItem = MR.local $ \g ->
+  g
+    { generatorEnvironmentCurrentPath = generatorEnvironmentCurrentPath g <> [pathItem]
+    }
 
 -- | This function can be used to tell the 'Generator' monad where in the OpenAPI specification the generator currently is (ignoring any previous path changes)
 resetPath :: [Text] -> Generator a -> Generator a
-resetPath path = MR.local $ \g -> g {currentPath = path}
+resetPath path = MR.local $ \g -> g {generatorEnvironmentCurrentPath = path}
 
 getCurrentPath :: Generator [Text]
-getCurrentPath = MR.asks currentPath
+getCurrentPath = MR.asks generatorEnvironmentCurrentPath
 
 appendToPath :: [Text] -> Generator [Text]
 appendToPath path = do
@@ -86,11 +89,14 @@ appendToPath path = do
 
 -- | Allows to adjust the settings for certain parts of the generation.
 adjustSettings :: (OAO.Settings -> OAO.Settings) -> Generator a -> Generator a
-adjustSettings f = MR.local $ \g -> g {settings = f (settings g)}
+adjustSettings f = MR.local $ \g ->
+  g
+    { generatorEnvironmentSettings = f (generatorEnvironmentSettings g)
+    }
 
 -- | Helper function to create a lookup function for a specific type
 createReferenceLookupM :: (Text -> Ref.ReferenceMap -> Maybe a) -> Text -> Generator (Maybe a)
-createReferenceLookupM fn key = MR.asks $ fn key . references
+createReferenceLookupM fn key = MR.asks $ fn key . generatorEnvironmentReferences
 
 -- | Resolve a 'OAS.SchemaObject' reference from within the 'Generator' monad
 getSchemaReferenceM :: Text -> Generator (Maybe OAS.SchemaObject)
@@ -122,8 +128,8 @@ getSecuritySchemeReferenceM = createReferenceLookupM Ref.getSecuritySchemeRefere
 
 -- | Get all settings passed to the program
 getSettings :: Generator OAO.Settings
-getSettings = MR.asks settings
+getSettings = MR.asks generatorEnvironmentSettings
 
 -- | Get a specific setting selected by @f@
 getSetting :: (OAO.Settings -> a) -> Generator a
-getSetting f = MR.asks $ f . settings
+getSetting f = MR.asks $ f . generatorEnvironmentSettings

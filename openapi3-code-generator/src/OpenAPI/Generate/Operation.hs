@@ -1,5 +1,4 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskellQuotes #-}
@@ -14,7 +13,7 @@ where
 import qualified Control.Applicative as Applicative
 import Control.Monad
 import qualified Data.Bifunctor as BF
-import qualified Data.ByteString.Char8 as B8
+import qualified Data.ByteString as BS
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Data.Text (Text)
@@ -49,21 +48,21 @@ defineOperationsForPath mainModuleName requestPath pathItemObject = OAM.nested r
       (uncurry (defineModuleForOperation mainModuleName requestPath))
     $ filterEmptyAndOmittedOperations
       operationsToGenerate
-      [ ("GET", OAT.get pathItemObject),
-        ("PUT", OAT.put pathItemObject),
-        ("POST", OAT.post pathItemObject),
-        ("DELETE", OAT.delete pathItemObject),
-        ("OPTIONS", OAT.options pathItemObject),
-        ("HEAD", OAT.head pathItemObject),
-        ("PATCH", OAT.patch pathItemObject),
-        ("TRACE", OAT.trace pathItemObject)
+      [ ("GET", OAT.pathItemObjectGet pathItemObject),
+        ("PUT", OAT.pathItemObjectPut pathItemObject),
+        ("POST", OAT.pathItemObjectPost pathItemObject),
+        ("DELETE", OAT.pathItemObjectDelete pathItemObject),
+        ("OPTIONS", OAT.pathItemObjectOptions pathItemObject),
+        ("HEAD", OAT.pathItemObjectHead pathItemObject),
+        ("PATCH", OAT.pathItemObjectPatch pathItemObject),
+        ("TRACE", OAT.pathItemObjectTrace pathItemObject)
       ]
 
 filterEmptyAndOmittedOperations :: [Text] -> [(Text, Maybe OAT.OperationObject)] -> [(Text, OAT.OperationObject)]
 filterEmptyAndOmittedOperations operationsToGenerate xs =
   [ (method, operation)
     | (method, Just operation) <- xs,
-      null operationsToGenerate || OAT.operationId operation `elem` fmap Just operationsToGenerate
+      null operationsToGenerate || OAT.operationObjectOperationId operation `elem` fmap Just operationsToGenerate
   ]
 
 -- |
@@ -129,7 +128,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       availableOperationCombinations =
         cartesianProduct
           [ (id, responseTransformerExp, responseTypeName),
-            (addToName "Raw", [|id|], ''B8.ByteString)
+            (addToName "Raw", [|id|], ''BS.ByteString)
           ]
           [ (id, False, getParametersTypeForSignatureWithMonadTransformer),
             (addToName "WithConfiguration", True, getParametersTypeForSignature)
@@ -138,8 +137,8 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
       comments =
         [ [operationDescription [description]],
           [paramDoc, bodyDefinition, responseBodyDefinitions, operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration."]],
-          [operationDescription ["The same as '" <> operationIdAsText <> "' but returns the raw 'Data.ByteString.Char8.ByteString'."]],
-          [operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'."]]
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but returns the raw 'Data.ByteString.ByteString'."]],
+          [operationDescription ["The same as '" <> operationIdAsText <> "' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'."]]
         ]
   functionDefinitions <-
     mapM
@@ -166,9 +165,9 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
                 [ [operationDescription [description]],
                   [paramDoc, bodyDefinition, responseBodyDefinitions]
                 ]
-                $ (<> [[Doc.emptyDoc]]) $
-                  maybe [] pure $
-                    Maybe.listToMaybe functionDefinitions
+                $ (<> [[Doc.emptyDoc]])
+                $ maybe [] pure
+                $ Maybe.listToMaybe functionDefinitions
             else zipWith (<>) comments functionDefinitions
   OAM.logTrace $ T.intercalate ", " $ Set.toList $ Set.unions [paramDependencies, bodyDependencies, responseBodyDependencies]
   pure
@@ -186,7 +185,7 @@ getBodyType requestBody appendToOperationName = do
   generateBody <- shouldGenerateRequestBody requestBody
   case requestBody of
     Just RequestBodyDefinition {..} | generateBody -> do
-      let transformType = pure . (if required then id else appT $ varT ''Maybe)
+      let transformType = pure . (if requestBodyDefinitionRequired then id else appT $ varT ''Maybe)
       requestBodySuffix <- OAM.getSetting OAO.settingRequestBodyTypeSuffix
-      BF.first transformType <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) schema
+      BF.first transformType <$> Model.defineModelForSchemaNamed (appendToOperationName requestBodySuffix) requestBodyDefinitionSchema
     _ -> pure ([], (Doc.emptyDoc, Set.empty))

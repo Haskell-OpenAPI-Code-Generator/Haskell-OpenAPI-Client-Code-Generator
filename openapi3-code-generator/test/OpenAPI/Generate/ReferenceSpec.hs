@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module OpenAPI.Generate.ReferenceSpec where
@@ -12,38 +11,38 @@ spec :: Spec
 spec = do
   let i =
         OAT.InfoObject
-          { title = "",
-            description = Nothing,
-            termsOfService = Nothing,
-            contact = Nothing,
-            license = Nothing,
-            version = "0.0.1"
+          { infoObjectTitle = "",
+            infoObjectDescription = Nothing,
+            infoObjectTermsOfService = Nothing,
+            infoObjectContact = Nothing,
+            infoObjectLicense = Nothing,
+            infoObjectVersion = "0.0.1"
           }
-      e = OAT.ExampleObject {summary = Just "foo", description = Nothing, value = Nothing, externalValue = Just "http://example.com"}
+      e = OAT.ExampleObject {exampleObjectSummary = Just "foo", exampleObjectDescription = Nothing, exampleObjectValue = Nothing, exampleObjectExternalValue = Just "http://example.com"}
       c =
         OAT.ComponentsObject
-          { schemas = Map.empty,
-            responses = Map.empty,
-            parameters = Map.empty,
-            examples =
+          { componentsObjectSchemas = Map.empty,
+            componentsObjectResponses = Map.empty,
+            componentsObjectParameters = Map.empty,
+            componentsObjectExamples =
               Map.fromList
                 [ ("example1", OAT.Concrete e),
                   ("example2", OAT.Reference "#/components/examples/example1")
                 ],
-            requestBodies = Map.empty,
-            headers = Map.empty,
-            securitySchemes = Map.empty
+            componentsObjectRequestBodies = Map.empty,
+            componentsObjectHeaders = Map.empty,
+            componentsObjectSecuritySchemes = Map.empty
           }
       openApiSpec =
         OAT.OpenApiSpecification
-          { openapi = "3.0.3",
-            info = i,
-            servers = [],
-            paths = Map.empty,
-            components = c,
-            security = [],
-            tags = [],
-            externalDocs = Nothing
+          { openApiSpecificationOpenapi = "3.0.3",
+            openApiSpecificationInfo = i,
+            openApiSpecificationServers = [],
+            openApiSpecificationPaths = Map.empty,
+            openApiSpecificationComponents = c,
+            openApiSpecificationSecurity = [],
+            openApiSpecificationTags = [],
+            openApiSpecificationExternalDocs = Nothing
           }
   describe "buildReferenceMap" $ do
     it "should find reference" $

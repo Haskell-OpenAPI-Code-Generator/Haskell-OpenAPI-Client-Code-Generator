@@ -89,7 +89,8 @@ generateHaddockCommentWithoutNewlines [] = empty
 generateHaddockCommentWithoutNewlines [x] = haddockIntro <+> textToDoc x
 generateHaddockCommentWithoutNewlines xs =
   generateHaddockCommentWithoutNewlines (init xs)
-    $$ haddockLine <+> textToDoc (last xs)
+    $$ haddockLine
+    <+> textToDoc (last xs)
 
 -- | Escape text for use in Haddock comment
 escapeText :: Text -> Text
@@ -113,7 +114,8 @@ breakOnTokens = breakOnTokensWithReplacement ("\n  " <>)
 breakOnTokensWithReplacement :: (Text -> Text) -> [Text] -> Doc -> Doc
 breakOnTokensWithReplacement replaceFn tokens =
   let addLineBreaks = foldr (\token f -> T.replace token (replaceFn token) . f) id tokens
-   in text . T.unpack
+   in text
+        . T.unpack
         . T.unlines
         . fmap T.stripEnd
         . T.lines
@@ -198,8 +200,9 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "Data.Aeson as Data.Aeson.Types.FromJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.ToJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.Internal"
-    . importQualified "Data.ByteString.Char8"
-    . importQualified "Data.ByteString.Char8 as Data.ByteString.Internal"
+    . importQualified "Data.ByteString"
+    . importQualified "Data.ByteString as Data.ByteString.Internal"
+    . importQualified "Data.ByteString as Data.ByteString.Internal.Type"
     . importQualified "Data.Either"
     . importQualified "Data.Foldable"
     . importQualified "Data.Functor"
@@ -245,8 +248,8 @@ addModelModuleHeader mainModuleName moduleName modelModulesToImport description 
     . importQualified "Data.Aeson as Data.Aeson.Types.FromJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.ToJSON"
     . importQualified "Data.Aeson as Data.Aeson.Types.Internal"
-    . importQualified "Data.ByteString.Char8"
-    . importQualified "Data.ByteString.Char8 as Data.ByteString.Internal"
+    . importQualified "Data.ByteString"
+    . importQualified "Data.ByteString as Data.ByteString.Internal"
     . importQualified "Data.Foldable"
     . importQualified "Data.Functor"
     . importQualified "Data.Maybe"

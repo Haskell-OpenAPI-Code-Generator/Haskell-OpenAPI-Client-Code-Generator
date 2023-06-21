@@ -7,97 +7,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  hooks:
-    name: Pre-commit hooks
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A pre-commit-hooks
-
-  shell:
-    name: Nix shell
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A shell
-
   build:
-    name: Build executable
-    runs-on: ubuntu-latest
+    name: ${{ matrix.attribute }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        attribute:
+          - .#devShells.x86_64-linux.default
+          - .#packages.x86_64-linux.default
+          - .#checks.x86_64-linux.pre-commit
+          - .#checks.x86_64-linux.testGolden
+          - .#checks.x86_64-linux.testGoldenGenerate
+          - .#checks.x86_64-linux.testSystem1
+          - .#checks.x86_64-linux.testSystem2
+          - .#checks.x86_64-linux.testSystem3
     steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
+    - uses: actions/checkout@v2.5.0
+    - uses: cachix/install-nix-action@v20
+      with:
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          system-features = nixos-test benchmark big-parallel kvm
+    - name: free disk space
+      run: |
+        if [[ "${{matrix.os}}" == "ubuntu-latest" ]]
+        then
+          sudo rm -rf /opt
+        fi
+    - uses: cachix/cachix-action@v12
       with:
         name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A build
-
-  test-system-1:
-    name: Tests Level 1 (generate and compile)
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A test-system-1
-
-  test-system-2:
-    name: Tests Level 2 (generate, compile and run with HTTP mock)
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A test-system-2
-
-  test-system-3:
-    name: Tests Level 3 (generate, compile and run with real HTTP client code)
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A test-system-3
-
-  test-golden:
-    name: Golden tests
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2.4.2
-    - uses: cachix/install-nix-action@v17
-    - uses: cachix/cachix-action@v10
-      with:
-        name: openapi3-code-generator
-        extraPullNames: autodocodec,validity
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix-build ci.nix -A test-golden
-
+        extraPullNames: validity,safe-coloured-text,sydtest,autodocodec
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix build -L "${{matrix.attribute}}"

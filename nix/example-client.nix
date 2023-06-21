@@ -1,5 +1,6 @@
-(import ./pkgs.nix).generateOpenAPIClient
-{
+{ generateOpenAPIClient
+}:
+generateOpenAPIClient {
   name = "stripe-api";
   src = ../specifications/stripe-api.yml;
   packageName = "stripe-api";

@@ -78,16 +78,16 @@ getModelModulesFromModelsWithDependencies mainModuleName operationAndWhiteListDe
         (prependMainModule typesModule)
         (fmap prependMainModule (Doc.typeAliasModule : modelModuleNames))
         "Rexports all type modules (used in the operation modules)."
-    ) :
-    ( [Doc.typeAliasModule],
-      Doc.addModelModuleHeader
-        mainModuleName
-        Doc.typeAliasModule
-        (prependTypesModule <$> Set.toList (Set.difference typeAliasDependencies typeAliasModuleNames))
-        "Contains all types with cyclic dependencies (between each other or to itself)"
-        typeAliasContent
-    ) :
-    modules
+    )
+      : ( [Doc.typeAliasModule],
+          Doc.addModelModuleHeader
+            mainModuleName
+            Doc.typeAliasModule
+            (prependTypesModule <$> Set.toList (Set.difference typeAliasDependencies typeAliasModuleNames))
+            "Contains all types with cyclic dependencies (between each other or to itself)"
+            typeAliasContent
+        )
+      : modules
 
 isTypeAliasModule :: Doc -> Bool
 isTypeAliasModule =

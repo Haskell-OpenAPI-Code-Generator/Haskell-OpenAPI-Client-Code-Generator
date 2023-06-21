@@ -26,43 +26,43 @@ import Prelude hiding (maximum, minimum, not)
 type Schema = Referencable SchemaObject
 
 data SchemaObject = SchemaObject
-  { type' :: SchemaType,
-    title :: Maybe Text,
-    multipleOf :: Maybe Integer,
-    maximum :: Maybe Float,
-    exclusiveMaximum :: Bool,
-    minimum :: Maybe Float,
-    exclusiveMinimum :: Bool,
-    maxLength :: Maybe Word,
-    minLength :: Maybe Word,
-    pattern' :: Maybe Text,
-    maxItems :: Maybe Word,
-    minItems :: Maybe Word,
-    uniqueItems :: Bool,
-    maxProperties :: Maybe Word,
-    minProperties :: Maybe Word,
-    required :: Set Text,
-    enum :: [Value],
-    allOf :: [Schema],
-    oneOf :: [Schema],
-    anyOf :: [Schema],
-    not :: Maybe Schema,
-    properties :: Map.Map Text Schema,
-    additionalProperties :: AdditionalProperties,
-    description :: Maybe Text,
-    format :: Maybe Text,
+  { schemaObjectType :: SchemaType,
+    schemaObjectTitle :: Maybe Text,
+    schemaObjectMultipleOf :: Maybe Integer,
+    schemaObjectMaximum :: Maybe Float,
+    schemaObjectExclusiveMaximum :: Bool,
+    schemaObjectMinimum :: Maybe Float,
+    schemaObjectExclusiveMinimum :: Bool,
+    schemaObjectMaxLength :: Maybe Word,
+    schemaObjectMinLength :: Maybe Word,
+    schemaObjectPattern :: Maybe Text,
+    schemaObjectMaxItems :: Maybe Word,
+    schemaObjectMinItems :: Maybe Word,
+    schemaObjectUniqueItems :: Bool,
+    schemaObjectMaxProperties :: Maybe Word,
+    schemaObjectMinProperties :: Maybe Word,
+    schemaObjectRequired :: Set Text,
+    schemaObjectEnum :: [Value],
+    schemaObjectAllOf :: [Schema],
+    schemaObjectOneOf :: [Schema],
+    schemaObjectAnyOf :: [Schema],
+    schemaObjectNot :: Maybe Schema,
+    schemaObjectProperties :: Map.Map Text Schema,
+    schemaObjectAdditionalProperties :: AdditionalProperties,
+    schemaObjectDescription :: Maybe Text,
+    schemaObjectFormat :: Maybe Text,
     -- default would have the same value type as restricted by
     -- the schema. Stripe only uses Text default values
-    default' :: Maybe ConcreteValue,
-    nullable :: Bool,
-    discriminator :: Maybe DiscriminatorObject,
-    readOnly :: Bool,
-    writeOnly :: Bool,
-    xml :: Maybe XMLObject,
-    externalDocs :: Maybe ExternalDocumentationObject,
-    example :: Maybe Value,
-    deprecated :: Bool,
-    items :: Maybe Schema
+    schemaObjectDefault :: Maybe ConcreteValue,
+    schemaObjectNullable :: Bool,
+    schemaObjectDiscriminator :: Maybe DiscriminatorObject,
+    schemaObjectReadOnly :: Bool,
+    schemaObjectWriteOnly :: Bool,
+    schemaObjectXml :: Maybe XMLObject,
+    schemaObjectExternalDocs :: Maybe ExternalDocumentationObject,
+    schemaObjectExample :: Maybe Value,
+    schemaObjectDeprecated :: Bool,
+    schemaObjectItems :: Maybe Schema
   }
   deriving (Show, Eq, Generic)
 
@@ -108,51 +108,51 @@ instance FromJSON SchemaObject where
 defaultSchema :: SchemaObject
 defaultSchema =
   SchemaObject
-    { type' = SchemaTypeObject,
-      title = Nothing,
-      multipleOf = Nothing,
-      maximum = Nothing,
-      exclusiveMaximum = False,
-      minimum = Nothing,
-      exclusiveMinimum = False,
-      maxLength = Nothing,
-      minLength = Nothing,
-      pattern' = Nothing,
-      maxItems = Nothing,
-      minItems = Nothing,
-      uniqueItems = False,
-      maxProperties = Nothing,
-      minProperties = Nothing,
-      required = Set.empty,
-      enum = [],
-      allOf = [],
-      oneOf = [],
-      anyOf = [],
-      not = Nothing,
-      properties = Map.empty,
-      additionalProperties = HasAdditionalProperties,
-      OpenAPI.Generate.Types.Schema.description = Nothing,
-      format = Nothing,
-      default' = Nothing,
-      nullable = False,
-      discriminator = Nothing,
-      readOnly = False,
-      writeOnly = False,
-      xml = Nothing,
-      externalDocs = Nothing,
-      example = Nothing,
-      deprecated = False,
-      items = Nothing
+    { schemaObjectType = SchemaTypeObject,
+      schemaObjectTitle = Nothing,
+      schemaObjectMultipleOf = Nothing,
+      schemaObjectMaximum = Nothing,
+      schemaObjectExclusiveMaximum = False,
+      schemaObjectMinimum = Nothing,
+      schemaObjectExclusiveMinimum = False,
+      schemaObjectMaxLength = Nothing,
+      schemaObjectMinLength = Nothing,
+      schemaObjectPattern = Nothing,
+      schemaObjectMaxItems = Nothing,
+      schemaObjectMinItems = Nothing,
+      schemaObjectUniqueItems = False,
+      schemaObjectMaxProperties = Nothing,
+      schemaObjectMinProperties = Nothing,
+      schemaObjectRequired = Set.empty,
+      schemaObjectEnum = [],
+      schemaObjectAllOf = [],
+      schemaObjectOneOf = [],
+      schemaObjectAnyOf = [],
+      schemaObjectNot = Nothing,
+      schemaObjectProperties = Map.empty,
+      schemaObjectAdditionalProperties = HasAdditionalProperties,
+      schemaObjectDescription = Nothing,
+      schemaObjectFormat = Nothing,
+      schemaObjectDefault = Nothing,
+      schemaObjectNullable = False,
+      schemaObjectDiscriminator = Nothing,
+      schemaObjectReadOnly = False,
+      schemaObjectWriteOnly = False,
+      schemaObjectXml = Nothing,
+      schemaObjectExternalDocs = Nothing,
+      schemaObjectExample = Nothing,
+      schemaObjectDeprecated = False,
+      schemaObjectItems = Nothing
     }
 
 -- | Checks if the given schema is an empty object schema (without properties)
 isSchemaEmpty :: SchemaObject -> Bool
 isSchemaEmpty s =
-  SchemaTypeObject == type' s
-    && Map.null (properties s)
-    && null (allOf s)
-    && null (oneOf s)
-    && null (anyOf s)
+  SchemaTypeObject == schemaObjectType s
+    && Map.null (schemaObjectProperties s)
+    && null (schemaObjectAllOf s)
+    && null (schemaObjectOneOf s)
+    && null (schemaObjectAnyOf s)
 
 data SchemaType
   = SchemaTypeString
@@ -174,8 +174,8 @@ instance FromJSON SchemaType where
   parseJSON _ = fail "type must be of type string"
 
 data DiscriminatorObject = DiscriminatorObject
-  { propertyName :: Text,
-    mapping :: Map.Map Text Text
+  { discriminatorObjectPropertyName :: Text,
+    discriminatorObjectMapping :: Map.Map Text Text
   }
   deriving (Show, Eq, Ord, Generic)
 
@@ -210,11 +210,11 @@ instance FromJSON AdditionalProperties where
   parseJSON v = AdditionalPropertiesWithSchema <$> parseJSON v
 
 data XMLObject = XMLObject
-  { name :: Maybe Text,
-    namespace :: Maybe Text,
-    prefix :: Maybe Text,
-    attribute :: Bool,
-    wrapped :: Bool
+  { xMLObjectName :: Maybe Text,
+    xMLObjectNamespace :: Maybe Text,
+    xMLObjectPrefix :: Maybe Text,
+    xMLObjectAttribute :: Bool,
+    xMLObjectWrapped :: Bool
   }
   deriving (Show, Eq, Ord, Generic)
 

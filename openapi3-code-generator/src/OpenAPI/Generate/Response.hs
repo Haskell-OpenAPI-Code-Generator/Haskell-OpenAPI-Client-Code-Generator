@@ -1,5 +1,4 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -52,7 +51,7 @@ getResponseDefinitions operation appendToOperationName = OAM.nested "responses" 
   convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
   responseSuffix <- OAM.getSetting OAO.settingResponseTypeSuffix
   responseBodySuffix <- OAM.getSetting OAO.settingResponseBodyTypeSuffix
-  let responsesObject = OAT.responses (operation :: OAT.OperationObject)
+  let responsesObject = OAT.operationObjectResponses operation
       createBodyName = createResponseNameAsText convertToCamelCase appendToOperationName . (responseBodySuffix <>)
       createName = createResponseName convertToCamelCase appendToOperationName . (responseSuffix <>)
       responseName = createName ""
@@ -125,12 +124,12 @@ createResponseName convertToCamelCase appendToOperationName = mkName . T.unpack 
 getRangeResponseCases :: OAT.ResponsesObject -> [ResponseReferenceCase]
 getRangeResponseCases responsesObject =
   Maybe.catMaybes
-    [ ("1XX",examineCode [||HT.statusIsInformational||],) <$> OAT.range1XX responsesObject,
-      ("2XX",examineCode [||HT.statusIsSuccessful||],) <$> OAT.range2XX responsesObject,
-      ("3XX",examineCode [||HT.statusIsRedirection||],) <$> OAT.range3XX responsesObject,
-      ("4XX",examineCode [||HT.statusIsClientError||],) <$> OAT.range4XX responsesObject,
-      ("5XX",examineCode [||HT.statusIsServerError||],) <$> OAT.range5XX responsesObject,
-      ("Default",examineCode [||const True||],) <$> OAT.default' (responsesObject :: OAT.ResponsesObject)
+    [ ("1XX",examineCode [||HT.statusIsInformational||],) <$> OAT.responsesObjectRange1XX responsesObject,
+      ("2XX",examineCode [||HT.statusIsSuccessful||],) <$> OAT.responsesObjectRange2XX responsesObject,
+      ("3XX",examineCode [||HT.statusIsRedirection||],) <$> OAT.responsesObjectRange3XX responsesObject,
+      ("4XX",examineCode [||HT.statusIsClientError||],) <$> OAT.responsesObjectRange4XX responsesObject,
+      ("5XX",examineCode [||HT.statusIsServerError||],) <$> OAT.responsesObjectRange5XX responsesObject,
+      ("Default",examineCode [||const True||],) <$> OAT.responsesObjectDefault responsesObject
     ]
 
 -- | Generate the response cases based on the available status codes
@@ -138,7 +137,7 @@ getStatusCodeResponseCases :: OAT.ResponsesObject -> [ResponseReferenceCase]
 getStatusCodeResponseCases =
   fmap (\(code, response) -> (T.pack $ show code, examineCode [||\status -> HT.statusCode status == code||], response))
     . Map.toList
-    . OAT.perStatusCode
+    . OAT.responsesObjectPerStatusCode
 
 -- | Resolve the references in response cases
 --
@@ -191,4 +190,4 @@ createResponseTransformerFn createName schemas =
    in [|fmap (\response -> fmap (Either.either $(varE $ createName errorSuffix) id . $transformLambda response) response)|]
 
 getResponseDescription :: OAT.ResponseObject -> Text
-getResponseDescription response = Doc.escapeText $ OAT.description (response :: OAT.ResponseObject)
+getResponseDescription = Doc.escapeText . OAT.responseObjectDescription
