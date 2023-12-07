@@ -313,20 +313,22 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           (mkName "parseJSON")
           [clause [p] (normalB [|pure $fromJsonCases|]) []]
       fromJson = instanceD (cxt []) [t|Aeson.FromJSON $(varT name)|] [fromJsonFn]
-      toJsonClause (name', value) = clause [conP name' []] (normalB $ liftAesonValue $ Aeson.toJSON value) []
+      toJsonClause (name', value) = match (conP name' []) (normalB $ liftAesonValue $ Aeson.toJSON value) []
       toJsonFn =
         funD
           (mkName "toJSON")
-          ( clause
-              [conP fallbackName [p]]
-              (normalB e)
+          [ clause
               []
-              : clause
-                [conP typedName [p]]
-                (normalB [|Aeson.toJSON $e|])
-                []
-              : (toJsonClause <$> nameValues)
-          )
+              ( normalB
+                  ( lamCaseE
+                      ( (match (conP fallbackName [p]) (normalB e) [])
+                          : match (conP typedName [p]) (normalB [|Aeson.toJSON $e|]) []
+                          : (toJsonClause <$> nameValues)
+                      )
+                  )
+              )
+              []
+          ]
       toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
    in fmap ppr toJson `appendDoc` fmap ppr fromJson
 
