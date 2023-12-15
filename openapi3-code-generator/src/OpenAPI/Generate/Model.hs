@@ -313,21 +313,20 @@ defineJsonImplementationForEnum name fallbackName typedName nameValues =
           (mkName "parseJSON")
           [clause [p] (normalB [|pure $fromJsonCases|]) []]
       fromJson = instanceD (cxt []) [t|Aeson.FromJSON $(varT name)|] [fromJsonFn]
-      toJsonClause (name', value) = clause [conP name' []] (normalB $ liftAesonValue $ Aeson.toJSON value) []
-      toJsonFn =
+      toJsonFnClause n ps ex =
         funD
           (mkName "toJSON")
-          ( clause
-              [conP fallbackName [p]]
-              (normalB e)
+          [ clause
+              [conP n ps]
+              (normalB ex)
               []
-              : clause
-                [conP typedName [p]]
-                (normalB [|Aeson.toJSON $e|])
-                []
-              : (toJsonClause <$> nameValues)
-          )
-      toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
+          ]
+      toJsonClause (name', value) = toJsonFnClause name' [] $ liftAesonValue $ Aeson.toJSON value
+      toJsonFns =
+        toJsonFnClause fallbackName [p] e
+          : toJsonFnClause typedName [p] [|Aeson.toJSON $e|]
+          : (toJsonClause <$> nameValues)
+      toJson = instanceD (cxt []) [t|Aeson.ToJSON $(varT name)|] toJsonFns
    in fmap ppr toJson `appendDoc` fmap ppr fromJson
 
 -- | defines anyOf types
@@ -440,28 +439,27 @@ defineOneOfSchema schemaName description schemas = do
                   (normalB body)
                   []
               ]
-      toJsonFn =
+      toJsonFnConstructor constructorName = do
+        n <- constructorName
         funD
           (mkName "toJSON")
-          ( fmap
-              ( \constructorName -> do
-                  n <- constructorName
-                  clause
-                    [conP n [p]]
-                    (normalB [|Aeson.toJSON $e|])
-                    []
-              )
-              constructorNames
-              <> fmap
-                ( \value ->
-                    let constructorName = createConstructorNameForSchemaWithFixedValue value
-                     in clause
-                          [conP constructorName []]
-                          (normalB $ liftAesonValue value)
-                          []
-                )
-                schemasWithFixedValues
-          )
+          [ clause
+              [conP n [p]]
+              (normalB [|Aeson.toJSON $e|])
+              []
+          ]
+      toJsonFnFixedValues value =
+        let constructorName = createConstructorNameForSchemaWithFixedValue value
+         in funD
+              (mkName "toJSON")
+              [ clause
+                  [conP constructorName []]
+                  (normalB $ liftAesonValue value)
+                  []
+              ]
+      toJsonFns =
+        fmap toJsonFnConstructor constructorNames
+          <> fmap toJsonFnFixedValues schemasWithFixedValues
       dataDefinition =
         ( Doc.generateHaddockComment
             [ "Defines the oneOf schema located at @" <> path <> "@ in the specification.",
@@ -485,7 +483,7 @@ defineOneOfSchema schemaName description schemas = do
                   conT ''Eq
                 ]
             ]
-      toJson = ppr <$> instanceD emptyCtx [t|Aeson.ToJSON $(varT name)|] [toJsonFn]
+      toJson = ppr <$> instanceD emptyCtx [t|Aeson.ToJSON $(varT name)|] toJsonFns
       fromJson = ppr <$> instanceD emptyCtx [t|Aeson.FromJSON $(varT name)|] [fromJsonFn]
       innerRes = (varT name, (variantDefinitions `appendDoc` dataDefinition `appendDoc` toJson `appendDoc` fromJson, dependencies))
   pure innerRes

@@ -46,10 +46,10 @@ data Test8NonNullable = Test8NonNullable {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test8NonNullable
-    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["prop1" Data.Aeson.Types.ToJSON..= test8NonNullableProp1 obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test8NonNullableProp2 obj) : ["prop3" Data.Aeson.Types.ToJSON..= test8NonNullableProp3 obj] : GHC.Base.mempty))
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["prop1" Data.Aeson.Types.ToJSON..= test8NonNullableProp1 obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test8NonNullableProp2 obj) : ["prop3" Data.Aeson.Types.ToJSON..= test8NonNullableProp3 obj] : GHC.Base.mempty)))
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["prop1" Data.Aeson.Types.ToJSON..= test8NonNullableProp1 obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test8NonNullableProp2 obj) : ["prop3" Data.Aeson.Types.ToJSON..= test8NonNullableProp3 obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["prop1" Data.Aeson.Types.ToJSON..= test8NonNullableProp1 obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test8NonNullableProp2 obj) : ["prop3" Data.Aeson.Types.ToJSON..= test8NonNullableProp3 obj] : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Test8NonNullable
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "Test8NonNullable" (\obj -> ((GHC.Base.pure Test8NonNullable GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop3"))
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Test8NonNullable" (\obj -> ((GHC.Base.pure Test8NonNullable GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop3"))}
 -- | Create a new 'Test8NonNullable' with all required fields.
 mkTest8NonNullable :: OpenAPI.Common.Nullable GHC.Types.Int -- ^ 'test8NonNullableProp1'
   -> OpenAPI.Common.Nullable ([OpenAPI.Common.Nullable Data.Text.Internal.Text]) -- ^ 'test8NonNullableProp3'
