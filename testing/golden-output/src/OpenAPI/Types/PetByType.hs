@@ -44,10 +44,10 @@ data PetByType = PetByType {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByType
-    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty))
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty)))
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON PetByType
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))}
 -- | Create a new 'PetByType' with all required fields.
 mkPetByType :: PetByTypePet_type -- ^ 'petByTypePet_type'
   -> PetByType
@@ -63,11 +63,11 @@ data PetByTypePet_type =
   | PetByTypePet_typeEnumDog -- ^ Represents the JSON value @"Dog"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByTypePet_type
-    where toJSON (PetByTypePet_typeOther val) = val
-          toJSON (PetByTypePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
-          toJSON (PetByTypePet_typeEnumCat) = "Cat"
-          toJSON (PetByTypePet_typeEnumDog) = "Dog"
+    where {toJSON (PetByTypePet_typeOther val) = val;
+           toJSON (PetByTypePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
+           toJSON (PetByTypePet_typeEnumCat) = "Cat";
+           toJSON (PetByTypePet_typeEnumDog) = "Dog"}
 instance Data.Aeson.Types.FromJSON.FromJSON PetByTypePet_type
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumCat
-                                            | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumDog
-                                            | GHC.Base.otherwise -> PetByTypePet_typeOther val)
+    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumCat
+                                             | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumDog
+                                             | GHC.Base.otherwise -> PetByTypePet_typeOther val)}
