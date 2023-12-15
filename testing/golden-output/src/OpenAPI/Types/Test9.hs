@@ -42,9 +42,9 @@ data Test9 =
   | Test9EnumXxx -- ^ Represents the JSON value @"xxx"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test9
-    where toJSON (Test9Other val) = val
-          toJSON (Test9Typed val) = Data.Aeson.Types.ToJSON.toJSON val
-          toJSON (Test9EnumXxx) = "xxx"
+    where {toJSON (Test9Other val) = val;
+           toJSON (Test9Typed val) = Data.Aeson.Types.ToJSON.toJSON val;
+           toJSON (Test9EnumXxx) = "xxx"}
 instance Data.Aeson.Types.FromJSON.FromJSON Test9
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "xxx" -> Test9EnumXxx
-                                            | GHC.Base.otherwise -> Test9Other val)
+    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "xxx" -> Test9EnumXxx
+                                             | GHC.Base.otherwise -> Test9Other val)}

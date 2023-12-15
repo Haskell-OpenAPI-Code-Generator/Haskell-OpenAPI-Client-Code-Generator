@@ -43,11 +43,11 @@ data Test6 =
   | Test6EnumThere -- ^ Represents the JSON value @"there"@
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test6
-    where toJSON (Test6Other val) = val
-          toJSON (Test6Typed val) = Data.Aeson.Types.ToJSON.toJSON val
-          toJSON (Test6EnumHello) = "hello"
-          toJSON (Test6EnumThere) = "there"
+    where {toJSON (Test6Other val) = val;
+           toJSON (Test6Typed val) = Data.Aeson.Types.ToJSON.toJSON val;
+           toJSON (Test6EnumHello) = "hello";
+           toJSON (Test6EnumThere) = "there"}
 instance Data.Aeson.Types.FromJSON.FromJSON Test6
-    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "hello" -> Test6EnumHello
-                                            | val GHC.Classes.== "there" -> Test6EnumThere
-                                            | GHC.Base.otherwise -> Test6Other val)
+    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "hello" -> Test6EnumHello
+                                             | val GHC.Classes.== "there" -> Test6EnumThere
+                                             | GHC.Base.otherwise -> Test6Other val)}
