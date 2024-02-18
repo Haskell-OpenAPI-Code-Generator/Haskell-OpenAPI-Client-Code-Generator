@@ -5,7 +5,7 @@
 -- | Contains all supported security schemes defined in the specification
 module OpenAPI.SecuritySchemes where
 
-import qualified Data.Text.Internal
+import qualified Data.Text as Data.Text.Internal
 import qualified GHC.Base
 import qualified GHC.Classes
 import qualified GHC.Show

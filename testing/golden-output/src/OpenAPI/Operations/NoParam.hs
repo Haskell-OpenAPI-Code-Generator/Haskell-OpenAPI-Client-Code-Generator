@@ -26,7 +26,7 @@ import qualified Data.Functor
 import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
-import qualified Data.Text.Internal
+import qualified Data.Text as Data.Text.Internal
 import qualified Data.Time.Calendar as Data.Time.Calendar.Days
 import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
