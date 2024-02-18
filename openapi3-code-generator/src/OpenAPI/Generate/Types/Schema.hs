@@ -28,7 +28,7 @@ type Schema = Referencable SchemaObject
 data SchemaObject = SchemaObject
   { schemaObjectType :: SchemaType,
     schemaObjectTitle :: Maybe Text,
-    schemaObjectMultipleOf :: Maybe Integer,
+    schemaObjectMultipleOf :: Maybe Float,
     schemaObjectMaximum :: Maybe Float,
     schemaObjectExclusiveMaximum :: Bool,
     schemaObjectMinimum :: Maybe Float,
