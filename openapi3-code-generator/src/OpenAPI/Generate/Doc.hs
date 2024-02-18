@@ -209,7 +209,7 @@ addOperationsModuleHeader mainModuleName moduleName operationId =
     . importQualified "Data.Maybe"
     . importQualified "Data.Scientific"
     . importQualified "Data.Text"
-    . importQualified "Data.Text.Internal"
+    . importQualified "Data.Text as Data.Text.Internal"
     . importQualified "Data.Time.Calendar as Data.Time.Calendar.Days"
     . importQualified "Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime"
     . importQualified "Data.Vector"
@@ -255,7 +255,7 @@ addModelModuleHeader mainModuleName moduleName modelModulesToImport description 
     . importQualified "Data.Maybe"
     . importQualified "Data.Scientific"
     . importQualified "Data.Text"
-    . importQualified "Data.Text.Internal"
+    . importQualified "Data.Text as Data.Text.Internal"
     . importQualified "Data.Time.Calendar as Data.Time.Calendar.Days"
     . importQualified "Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime"
     . importQualified "GHC.Base"
@@ -277,7 +277,7 @@ addSecuritySchemesModuleHeader moduleName =
     . moduleDescription "Contains all supported security schemes defined in the specification"
     . moduleDeclaration moduleName "SecuritySchemes"
     . emptyLine
-    . importQualified "Data.Text.Internal"
+    . importQualified "Data.Text as Data.Text.Internal"
     . importQualified "GHC.Base"
     . importQualified "GHC.Classes"
     . importQualified "GHC.Show"
@@ -296,7 +296,7 @@ addConfigurationModuleHeader moduleName =
     . moduleDeclaration moduleName "Configuration"
     . emptyLine
     . importQualified "Data.Text"
-    . importQualified "Data.Text.Internal"
+    . importQualified "Data.Text as Data.Text.Internal"
     . importQualified "GHC.Types "
     . importQualified (moduleName <> ".Common")
     . emptyLine
