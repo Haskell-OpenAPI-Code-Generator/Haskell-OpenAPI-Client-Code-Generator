@@ -62,12 +62,20 @@ data Mischling = Mischling {
   -- | first_relative
   , mischlingFirst_relative :: (GHC.Maybe.Maybe MischlingFirst_relative)
   -- | float
+  -- 
+  -- Constraints:
+  -- 
+  -- * Must be a multiple of 1.0e-2
   , mischlingFloat :: (GHC.Maybe.Maybe GHC.Types.Float)
   -- | huntssecond
   , mischlingHuntssecond :: (GHC.Maybe.Maybe GHC.Types.Bool)
   -- | int32
   , mischlingInt32 :: (GHC.Maybe.Maybe GHC.Int.Int32)
   -- | int64
+  -- 
+  -- Constraints:
+  -- 
+  -- * Must be a multiple of 4.0
   , mischlingInt64 :: (GHC.Maybe.Maybe GHC.Int.Int64)
   -- | integer
   , mischlingInteger :: (GHC.Maybe.Maybe GHC.Types.Int)

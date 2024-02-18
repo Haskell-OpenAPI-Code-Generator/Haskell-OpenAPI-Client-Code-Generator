@@ -50,10 +50,18 @@ data Dog = Dog {
   -- | father
   , dogFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | float
+  -- 
+  -- Constraints:
+  -- 
+  -- * Must be a multiple of 1.0e-2
   , dogFloat :: (GHC.Maybe.Maybe GHC.Types.Float)
   -- | int32
   , dogInt32 :: (GHC.Maybe.Maybe GHC.Int.Int32)
   -- | int64
+  -- 
+  -- Constraints:
+  -- 
+  -- * Must be a multiple of 4.0
   , dogInt64 :: (GHC.Maybe.Maybe GHC.Int.Int64)
   -- | integer
   , dogInteger :: (GHC.Maybe.Maybe GHC.Types.Int)

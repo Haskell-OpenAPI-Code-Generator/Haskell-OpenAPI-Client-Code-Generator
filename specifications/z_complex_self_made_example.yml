@@ -235,11 +235,13 @@ components:
         int64:
           type: integer
           format: int64
+          multipleOf: 4
         number:
           type: number
         float:
           type: number
           format: float
+          multipleOf: 0.01
         double:
           type: number
           format: double
