@@ -49,7 +49,7 @@ paths:
         default:
           description: Expected response to a valid request
           content:
-            application/json:
+            application/json;charset=utf-8:
               schema:
                 $ref: "#/components/schemas/Dog"
   /pet/noparam:

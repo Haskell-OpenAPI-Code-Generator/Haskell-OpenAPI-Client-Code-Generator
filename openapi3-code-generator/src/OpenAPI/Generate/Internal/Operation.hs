@@ -341,7 +341,8 @@ getBodySchemaFromOperation operation = OAM.nested "requestBody" $ do
 
 getRequestBodySchema :: OAT.RequestBodyObject -> OAM.Generator (Maybe RequestBodyDefinition, [Text])
 getRequestBodySchema body = OAM.nested "content" $ do
-  let content = Map.lookup "application/json" $ OAT.requestBodyObjectContent body
+  let contentMap = OAT.requestBodyObjectContent body
+      content = getValueByContentTypeIgnoringCharset "application/json" contentMap
       createRequestBodyDefinition encoding schema =
         Just $
           RequestBodyDefinition
@@ -351,7 +352,7 @@ getRequestBodySchema body = OAM.nested "content" $ do
             }
   case content of
     Nothing ->
-      let formContent = Map.lookup "application/x-www-form-urlencoded" $ OAT.requestBodyObjectContent body
+      let formContent = getValueByContentTypeIgnoringCharset "application/x-www-form-urlencoded" contentMap
        in case formContent of
             Nothing -> do
               OAM.logWarning "Only content type application/json and application/x-www-form-urlencoded is supported"
@@ -390,10 +391,18 @@ getRequestBodyObject operation =
 getResponseSchema :: OAT.ResponseObject -> OAM.Generator (Maybe OAT.Schema, [Text])
 getResponseSchema response = OAM.nested "content" $ do
   let contentMap = OAT.responseObjectContent response
-      schema = Map.lookup "application/json" contentMap >>= OAT.mediaTypeObjectSchema
+      schema = getValueByContentTypeIgnoringCharset "application/json" contentMap >>= OAT.mediaTypeObjectSchema
   when (Maybe.isNothing schema && not (Map.null contentMap)) $ OAM.logWarning "Only content type application/json is supported for response bodies."
   path <- OAM.appendToPath ["application/json", "schema"]
   pure (schema, path)
+
+getValueByContentTypeIgnoringCharset :: Text -> Map.Map Text OAT.MediaTypeObject -> Maybe OAT.MediaTypeObject
+getValueByContentTypeIgnoringCharset contentType contentMap =
+  case Map.lookup contentType contentMap of
+    Just content -> Just content
+    Nothing -> case Map.elems $ Map.filterWithKey (\key _ -> Maybe.listToMaybe (T.splitOn ";" key) == Just contentType) contentMap of
+      [] -> Nothing
+      content : _ -> Just content
 
 -- | Resolve a possibly referenced response to a concrete value.
 --
