@@ -69,6 +69,23 @@ main =
           getResponseBody response
             `shouldBe` EchoUserAgentResponse400
 
+    describe "runEchoPath" $ do
+      it "returns enum value 'test'" $
+        do
+          response <- runEchoPath EchoPathParametersPathEnumTest
+          getResponseBody response
+            `shouldBe` EchoPathResponse200 "test"
+      it "returns enum value 'foo'" $
+        do
+          response <- runEchoPath EchoPathParametersPathEnumFoo
+          getResponseBody response
+            `shouldBe` EchoPathResponse200 "foo"
+      it "works with custom value" $
+        do
+          response <- runEchoPath $ EchoPathParametersPathTyped "xyz"
+          getResponseBody response
+            `shouldBe` EchoPathResponse200 "xyz"
+
     describe "runSendAndReceiveNullableAndOptional" $ do
       it "should work with filled objects" $ do
         response <-

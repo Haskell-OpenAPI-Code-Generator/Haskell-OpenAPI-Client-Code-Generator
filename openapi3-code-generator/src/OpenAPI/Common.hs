@@ -22,7 +22,6 @@ module OpenAPI.Common
     Configuration (..),
     SecurityScheme,
     MonadHTTP (..),
-    StringifyModel,
     JsonByteString (..),
     JsonDateTime (..),
     RequestBodyEncoding (..),
@@ -38,6 +37,7 @@ import qualified Control.Monad.Reader as MR
 import qualified Control.Monad.Trans.Class as MT
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Encoding as Encoding
+import Data.Aeson.Text (encodeToTextBuilder)
 import qualified Data.Bifunctor as BF
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
@@ -47,6 +47,8 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Data.Text.Encoding.Error (lenientDecode)
+import Data.Text.Lazy (toStrict)
+import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Time.LocalTime as Time
 import qualified Data.Vector as Vector
 import qualified Network.HTTP.Client as HC
@@ -338,30 +340,13 @@ jsonToFormDataPrefixed prefix (Aeson.Object object) =
 jsonToFormDataPrefixed prefix (Aeson.Array vector) =
   Vector.toList vector >>= jsonToFormDataPrefixed (prefix <> "[]")
 
--- | This type class makes the code generation for URL parameters easier as it allows to stringify a value
+-- | This function makes the code generation for URL parameters easier as it allows to stringify a value
 --
 -- The 'Show' class is not sufficient as strings should not be stringified with quotes.
-class Show a => StringifyModel a where
-  -- | Stringifies a showable value
-  --
-  -- >>> stringifyModel "Test"
-  -- "Test"
-  --
-  -- >>> stringifyModel 123
-  -- "123"
-  stringifyModel :: a -> Text
-
-instance StringifyModel String where
-  -- stringifyModel :: String -> String
-  stringifyModel = T.pack
-
-instance StringifyModel Text where
-  -- stringifyModel :: Text -> String
-  stringifyModel = id
-
-instance {-# OVERLAPS #-} Show a => StringifyModel a where
-  -- stringifyModel :: Show a => a -> String
-  stringifyModel = T.pack . show
+stringifyModel :: Aeson.ToJSON a => a -> Text
+stringifyModel x = case Aeson.toJSON x of
+  Aeson.String s -> s
+  v -> toStrict $ toLazyText $ encodeToTextBuilder v
 
 -- | Wraps a 'BS.ByteString' to implement 'Aeson.ToJSON' and 'Aeson.FromJSON'
 newtype JsonByteString = JsonByteString BS.ByteString

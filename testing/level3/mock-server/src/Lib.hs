@@ -34,6 +34,7 @@ type API =
     :<|> "pet" :> "findByStatus" :> QueryParam "status" String :> Get '[JSON] [Pet]
     :<|> "pet" :> ReqBody '[JSON] Pet :> Post '[JSON] NoContent
     :<|> "echo" :> Header "User-Agent" String :> Get '[JSON] String
+    :<|> "echo" :> Capture "path" String :> Get '[JSON] String
     :<|> "nullable-optional" :> Capture "mode" String :> ReqBody '[JSON] Value :> Post '[JSON] Value
 
 startApp :: IO ()
@@ -46,7 +47,7 @@ api :: Proxy API
 api = Proxy
 
 server :: Server API
-server = pure getInventory :<|> findByStatus :<|> addPet :<|> userAgentEcho :<|> checkNullableAndOptional
+server = pure getInventory :<|> findByStatus :<|> addPet :<|> userAgentEcho :<|> pathEcho :<|> checkNullableAndOptional
 
 getInventory :: Value
 getInventory = object ["pet1" .= Number 23, "pet2" .= Number 2]
@@ -70,6 +71,9 @@ addPet _ = throwError err405
 userAgentEcho :: Maybe String -> Handler String
 userAgentEcho (Just userAgent) = pure userAgent
 userAgentEcho Nothing = throwError err400
+
+pathEcho :: String -> Handler String
+pathEcho = pure
 
 checkNullableAndOptional :: String -> Value -> Handler Value
 checkNullableAndOptional "filled" (Object map) = do

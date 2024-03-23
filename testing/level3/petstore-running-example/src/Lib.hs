@@ -38,5 +38,8 @@ runEchoUserAgentWithoutUserAgent =
       { configIncludeUserAgent = False
       }
 
+runEchoPath :: MonadHTTP m => EchoPathParametersPath -> m (Response EchoPathResponse)
+runEchoPath = echoPathWithConfiguration defaultConfiguration
+
 runSendAndReceiveNullableAndOptional :: MonadHTTP m => Text -> NullableAndOptionalTest -> m (Response SendAndReceiveNullableAndOptionalResponse)
 runSendAndReceiveNullableAndOptional mode body = sendAndReceiveNullableAndOptionalWithConfiguration defaultConfiguration mode body

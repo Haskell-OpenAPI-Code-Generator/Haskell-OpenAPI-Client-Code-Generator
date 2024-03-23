@@ -84,7 +84,6 @@ haskellifyText convertToCamelCase startWithUppercase name =
       replaceReservedWord "where" = "where'"
       replaceReservedWord "Configuration" = "Configuration'"
       replaceReservedWord "MonadHTTP" = "MonadHTTP'"
-      replaceReservedWord "StringifyModel" = "StringifyModel'"
       replaceReservedWord "SecurityScheme" = "SecurityScheme'"
       replaceReservedWord "AnonymousSecurityScheme" = "AnonymousSecurityScheme'"
       replaceReservedWord "JsonByteString" = "JsonByteString'"
