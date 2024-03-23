@@ -563,6 +563,27 @@ paths:
                 type: string
         '400':
           description: No User-Agent header is present
+  "/echo/{path}":
+    get:
+      summary: Echo the path
+      operationId: echoPath
+      parameters:
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+            - test
+            - foo
+            - bar
+      responses:
+        '200':
+          description: The path parameter
+          content:
+            application/json:
+              schema:
+                type: string
   "/nullable-optional/{mode}":
     post:
       summary: Test nullable and optional values
