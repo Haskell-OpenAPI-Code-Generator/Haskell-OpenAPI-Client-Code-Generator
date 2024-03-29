@@ -366,6 +366,11 @@ components:
       type: string
       enum:
         - xxx
+    Test10:
+      type: array
+      items:
+        type: string
+      minItems: 1
     CoverType:
       type: object
       properties:
@@ -382,6 +387,7 @@ components:
             - $ref: '#/components/schemas/Test7'
             - $ref: '#/components/schemas/Test8'
             - $ref: '#/components/schemas/Test9'
+            - $ref: '#/components/schemas/Test10'
   parameters:
     PetParameters:
       name: petId
