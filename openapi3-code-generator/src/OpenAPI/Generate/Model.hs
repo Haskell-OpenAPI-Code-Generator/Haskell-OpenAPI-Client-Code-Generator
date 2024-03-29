@@ -23,6 +23,7 @@ import qualified Data.Bifunctor as BF
 import qualified Data.Either as E
 import qualified Data.Int as Int
 import qualified Data.List as List
+import Data.List.NonEmpty (NonEmpty)
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.Scientific as Scientific
@@ -560,7 +561,10 @@ defineArrayModelForSchema strategy schemaName schema = do
       Nothing -> do
         OAM.logWarning "Array type was defined without a items schema and therefore cannot be defined correctly"
         pure ([t|Aeson.Object|], (emptyDoc, Set.empty))
-  let arrayType = appT listT type'
+  let arrayType =
+        case OAS.schemaObjectMinItems schema of
+          Just w | w > 0 -> appT [t|NonEmpty|] type'
+          _ -> appT listT type'
   schemaName' <- haskellifyNameM True schemaName
   OAM.logTrace $ "Define as list named '" <> T.pack (nameBase schemaName') <> "'"
   path <- getCurrentPathEscaped
