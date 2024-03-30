@@ -42,4 +42,4 @@ runEchoPath :: MonadHTTP m => EchoPathParametersPath -> m (Response EchoPathResp
 runEchoPath = echoPathWithConfiguration defaultConfiguration
 
 runSendAndReceiveNullableAndOptional :: MonadHTTP m => Text -> NullableAndOptionalTest -> m (Response SendAndReceiveNullableAndOptionalResponse)
-runSendAndReceiveNullableAndOptional mode body = sendAndReceiveNullableAndOptionalWithConfiguration defaultConfiguration mode body
+runSendAndReceiveNullableAndOptional = sendAndReceiveNullableAndOptionalWithConfiguration defaultConfiguration

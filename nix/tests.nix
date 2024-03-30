@@ -12,6 +12,7 @@ let
       };
     };
   goldenTestCode = generateCode { fileName = "z_complex_self_made_example.yml"; };
+  exampleGeneratedCode = generateCode { fileName = "petstore.yaml"; };
   codeForSpecsLevelOne = [
     (generateCode { fileName = "google-payment.json"; })
     (generateCode { fileName = "hetzner.json"; })
@@ -92,4 +93,15 @@ in
       cp -R ${goldenTestCode.path} $out
     '';
   };
+  exampleGenerate = pkgs.stdenv.mkDerivation {
+    name = "example-generate";
+    buildCommand = ''
+      cp -R ${exampleGeneratedCode.path} $out
+    '';
+  };
+  testExample =
+    let
+      openapi = disableOptimization (disableLibraryProfiling (pkgs.haskellPackages.callCabal2nix "example-generated-compiled" ../example/generatedCode { }));
+    in
+    dontCheck (disableOptimization (disableLibraryProfiling (pkgs.haskellPackages.callCabal2nix "example-compiled" ../example { openapi = openapi; })));
 }

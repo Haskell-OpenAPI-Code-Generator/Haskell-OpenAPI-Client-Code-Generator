@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Lib where
 
 import Data.ByteString.Char8
@@ -23,6 +24,7 @@ runGetInventory :: MonadHTTP m => m (Response GetInventoryResponse)
 runGetInventory = runWithConfiguration defaultConfiguration getInventory
 
 runFindPetsByStatus :: MonadHTTP m => m (Response FindPetsByStatusResponse)
-runFindPetsByStatus = runWithConfiguration
-                        defaultConfiguration
-                        (findPetsByStatus [FindPetsByStatusParametersStatusEnumPending])
+runFindPetsByStatus =
+  runWithConfiguration
+    defaultConfiguration
+    (findPetsByStatus [FindPetsByStatusParametersStatusEnumPending])

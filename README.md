@@ -72,22 +72,9 @@ The following features are not supported
 - `xml`
 
 ## Development
-Re-generate the code found in the [example](./example/) directory if you made changes to the output generator.
-You can do this using the [example-configuration.yml](./example-configuration.yml):
+
+Make sure to update the example and the golden tests:
 
 ``` bash
-openapi3-code-generator-exe --configuration example-configuration.yml
-```
-
-Also make sure that the tests there run fine:
-
-``` bash
-cd example
-stack test
-```
-
-Also adapt golden tests:
-
-``` bash
-./update_golden.sh
+./update_golden_and_example.sh
 ```
