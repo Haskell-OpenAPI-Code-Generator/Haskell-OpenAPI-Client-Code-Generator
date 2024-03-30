@@ -17,15 +17,16 @@ import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
-import qualified Data.ByteString.Char8
-import qualified Data.ByteString.Char8 as Data.ByteString.Internal
+import qualified Data.ByteString
+import qualified Data.ByteString as Data.ByteString.Internal
+import qualified Data.ByteString as Data.ByteString.Internal.Type
 import qualified Data.Either
 import qualified Data.Foldable
 import qualified Data.Functor
 import qualified Data.Maybe
 import qualified Data.Scientific
 import qualified Data.Text
-import qualified Data.Text.Internal
+import qualified Data.Text as Data.Text.Internal
 import qualified Data.Time.Calendar as Data.Time.Calendar.Days
 import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
@@ -52,8 +53,8 @@ loginUser :: forall m . OpenAPI.Common.MonadHTTP m => LoginUserParameters -- ^ C
 loginUser parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either LoginUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> LoginUserResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                     Data.Text.Internal.Text)
                                                                                                                                                            | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right LoginUserResponse400
-                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/user/login") [OpenAPI.Common.QueryParameter (Data.Text.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.pack "form") GHC.Types.False,
-                                                                                                                                                                                                                                                                                                                                                                                          OpenAPI.Common.QueryParameter (Data.Text.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.pack "form") GHC.Types.False])
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/login" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.Internal.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                  OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.Internal.pack "form") GHC.Types.False])
 -- | Defines the object schema located at @paths.\/user\/login.GET.parameters@ in the specification.
 -- 
 -- 
@@ -69,10 +70,10 @@ data LoginUserParameters = LoginUserParameters {
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON LoginUserParameters
-    where toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty))
-          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty)))
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["queryPassword" Data.Aeson.Types.ToJSON..= loginUserParametersQueryPassword obj] : ["queryUsername" Data.Aeson.Types.ToJSON..= loginUserParametersQueryUsername obj] : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON LoginUserParameters
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "LoginUserParameters" (\obj -> (GHC.Base.pure LoginUserParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryPassword")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryUsername"))
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "LoginUserParameters" (\obj -> (GHC.Base.pure LoginUserParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryPassword")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryUsername"))}
 -- | Create a new 'LoginUserParameters' with all required fields.
 mkLoginUserParameters :: Data.Text.Internal.Text -- ^ 'loginUserParametersQueryPassword'
   -> Data.Text.Internal.Text -- ^ 'loginUserParametersQueryUsername'
@@ -97,21 +98,21 @@ loginUserWithConfiguration config
                            parameters = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either LoginUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> LoginUserResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
                                                                                                                                                                                                                                                                                                                                                                                                                      Data.Text.Internal.Text)
                                                                                                                                                                             | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right LoginUserResponse400
-                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/user/login") [OpenAPI.Common.QueryParameter (Data.Text.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.pack "form") GHC.Types.False,
-                                                                                                                                                                                                                                                                                                                                                                                                                 OpenAPI.Common.QueryParameter (Data.Text.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.pack "form") GHC.Types.False])
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/login" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.Internal.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                         OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.Internal.pack "form") GHC.Types.False])
 -- | > GET /user/login
 -- 
--- The same as 'loginUser' but returns the raw 'Data.ByteString.Char8.ByteString'.
+-- The same as 'loginUser' but returns the raw 'Data.ByteString.ByteString'.
 loginUserRaw :: forall m . OpenAPI.Common.MonadHTTP m => LoginUserParameters -- ^ Contains all available parameters of this operation (query and path parameters)
-  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
-loginUserRaw parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/user/login") [OpenAPI.Common.QueryParameter (Data.Text.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.pack "form") GHC.Types.False,
-                                                                                                                                                                   OpenAPI.Common.QueryParameter (Data.Text.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.pack "form") GHC.Types.False])
+  -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
+loginUserRaw parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/login" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.Internal.pack "form") GHC.Types.False,
+                                                                                                                                                           OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.Internal.pack "form") GHC.Types.False])
 -- | > GET /user/login
 -- 
--- The same as 'loginUser' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+-- The same as 'loginUser' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
 loginUserWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> LoginUserParameters -- ^ Contains all available parameters of this operation (query and path parameters)
-  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 loginUserWithConfigurationRaw config
-                              parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/user/login") [OpenAPI.Common.QueryParameter (Data.Text.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.pack "form") GHC.Types.False,
-                                                                                                                                                                                          OpenAPI.Common.QueryParameter (Data.Text.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.pack "form") GHC.Types.False])
+                              parameters = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/login" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "username") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryUsername parameters)) (Data.Text.Internal.pack "form") GHC.Types.False,
+                                                                                                                                                                                  OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "password") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (loginUserParametersQueryPassword parameters)) (Data.Text.Internal.pack "form") GHC.Types.False])

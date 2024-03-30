@@ -24,6 +24,7 @@ jobs:
           - .#checks.x86_64-linux.testSystem1
           - .#checks.x86_64-linux.testSystem2
           - .#checks.x86_64-linux.testSystem3
+          - .#checks.x86_64-linux.testExample
     steps:
     - uses: actions/checkout@v2.5.0
     - uses: cachix/install-nix-action@v20

@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Exception
@@ -55,10 +56,12 @@ main =
         do
           response <- runEchoUserAgent
           getResponseBody response
-            `shouldSatisfy` ( \body -> case body of
+            `shouldSatisfy` ( \case
                                 EchoUserAgentResponse200 text ->
-                                  "XYZ" `T.isInfixOf` text
-                                    && "openapi3-code-generator" `T.isInfixOf` text
+                                  "XYZ"
+                                    `T.isInfixOf` text
+                                    && "openapi3-code-generator"
+                                    `T.isInfixOf` text
                                 _ -> False
                             )
 

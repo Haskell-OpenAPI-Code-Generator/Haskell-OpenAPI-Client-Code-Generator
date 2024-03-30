@@ -6,16 +6,17 @@
 module OpenAPI.Configuration where
 
 import qualified Data.Text
+import qualified Data.Text as Data.Text.Internal
 import qualified GHC.Types 
 import qualified OpenAPI.Common
 
 -- | The default url specified by the OpenAPI specification
 -- 
 -- @https://petstore.swagger.io/v2@
-defaultURL = Data.Text.pack "https://petstore.swagger.io/v2"
+defaultURL = Data.Text.Internal.pack "https://petstore.swagger.io/v2"
 -- | The default application name used in the @User-Agent@ header which is based on the @info.title@ field of the specification
 -- 
 -- @Swagger Petstore@
-defaultApplicationName = Data.Text.pack "Swagger Petstore"
+defaultApplicationName = Data.Text.Internal.pack "Swagger Petstore"
 -- | The default configuration containing the 'defaultURL' and no authorization
 defaultConfiguration = OpenAPI.Common.Configuration defaultURL OpenAPI.Common.anonymousSecurityScheme GHC.Types.True defaultApplicationName

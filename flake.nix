@@ -49,14 +49,16 @@
             testSystem2
             testSystem3
             testGolden
-            testGoldenGenerate;
+            testGoldenGenerate
+            exampleGenerate
+            testExample;
           pre-commit = pre-commit-hooks.lib.${system}.run {
             src = ./.;
             hooks = {
               nixpkgs-fmt = {
                 enable = true;
                 excludes = [
-                  "example"
+                  "example/generatedCode"
                   "testing/golden-output"
                   ".*/default.nix"
                 ];
@@ -64,14 +66,14 @@
               hlint = {
                 enable = true;
                 excludes = [
-                  "example"
+                  "example/generatedCode"
                   "testing/golden-output"
                 ];
               };
               ormolu = {
                 enable = true;
                 excludes = [
-                  "example"
+                  "example/generatedCode"
                   "testing/golden-output"
                 ];
               };
@@ -79,7 +81,7 @@
               cabal2nix = {
                 enable = true;
                 excludes = [
-                  "example"
+                  "example/generatedCode"
                   "testing/golden-output"
                 ];
               };
