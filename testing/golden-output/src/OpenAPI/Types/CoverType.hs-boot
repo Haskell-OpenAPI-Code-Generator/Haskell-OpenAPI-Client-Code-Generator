@@ -1,14 +1,13 @@
 module OpenAPI.Types.CoverType where
-import Data.Aeson
-import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson
 import qualified OpenAPI.Common
 data CoverType
 instance Show CoverType
 instance Eq CoverType
-instance FromJSON CoverType
-instance ToJSON CoverType
+instance Data.Aeson.FromJSON CoverType
+instance Data.Aeson.ToJSON CoverType
 data CoverTypeCoverVariants
 instance Show CoverTypeCoverVariants
 instance Eq CoverTypeCoverVariants
-instance FromJSON CoverTypeCoverVariants
-instance ToJSON CoverTypeCoverVariants
+instance Data.Aeson.FromJSON CoverTypeCoverVariants
+instance Data.Aeson.ToJSON CoverTypeCoverVariants

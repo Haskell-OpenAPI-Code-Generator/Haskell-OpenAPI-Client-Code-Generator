@@ -1,9 +1,8 @@
 module OpenAPI.Types.ApiResponse where
-import Data.Aeson
-import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson
 import qualified OpenAPI.Common
 data ApiResponse
 instance Show ApiResponse
 instance Eq ApiResponse
-instance FromJSON ApiResponse
-instance ToJSON ApiResponse
+instance Data.Aeson.FromJSON ApiResponse
+instance Data.Aeson.ToJSON ApiResponse

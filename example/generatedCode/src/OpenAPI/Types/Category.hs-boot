@@ -1,9 +1,8 @@
 module OpenAPI.Types.Category where
-import Data.Aeson
-import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson
 import qualified OpenAPI.Common
 data Category
 instance Show Category
 instance Eq Category
-instance FromJSON Category
-instance ToJSON Category
+instance Data.Aeson.FromJSON Category
+instance Data.Aeson.ToJSON Category
