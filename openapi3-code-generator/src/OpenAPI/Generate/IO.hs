@@ -160,8 +160,7 @@ getHsBootFiles settings modelModules =
             . ( \xs -> case xs of
                   x : xs' ->
                     x
-                      : "import Data.Aeson"
-                      : "import qualified Data.Aeson as Data.Aeson.Types.Internal"
+                      : "import qualified Data.Aeson"
                       : "import qualified " <> T.pack moduleName <> ".Common"
                       : xs'
                   _ -> xs
@@ -173,8 +172,8 @@ getHsBootFiles settings modelModules =
                           [ l,
                             "instance Show" <> suffix,
                             "instance Eq" <> suffix,
-                            "instance FromJSON" <> suffix,
-                            "instance ToJSON" <> suffix
+                            "instance Data.Aeson.FromJSON" <> suffix,
+                            "instance Data.Aeson.ToJSON" <> suffix
                           ]
                       )
                       $ T.stripPrefix "data" l

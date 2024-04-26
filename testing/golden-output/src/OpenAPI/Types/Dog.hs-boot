@@ -1,14 +1,13 @@
 module OpenAPI.Types.Dog where
-import Data.Aeson
-import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson
 import qualified OpenAPI.Common
 data Dog
 instance Show Dog
 instance Eq Dog
-instance FromJSON Dog
-instance ToJSON Dog
+instance Data.Aeson.FromJSON Dog
+instance Data.Aeson.ToJSON Dog
 data DogBreed
 instance Show DogBreed
 instance Eq DogBreed
-instance FromJSON DogBreed
-instance ToJSON DogBreed
+instance Data.Aeson.FromJSON DogBreed
+instance Data.Aeson.ToJSON DogBreed

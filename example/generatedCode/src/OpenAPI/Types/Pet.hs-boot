@@ -1,14 +1,13 @@
 module OpenAPI.Types.Pet where
-import Data.Aeson
-import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson
 import qualified OpenAPI.Common
 data Pet
 instance Show Pet
 instance Eq Pet
-instance FromJSON Pet
-instance ToJSON Pet
+instance Data.Aeson.FromJSON Pet
+instance Data.Aeson.ToJSON Pet
 data PetStatus
 instance Show PetStatus
 instance Eq PetStatus
-instance FromJSON PetStatus
-instance ToJSON PetStatus
+instance Data.Aeson.FromJSON PetStatus
+instance Data.Aeson.ToJSON PetStatus
