@@ -11,6 +11,7 @@
     safe-coloured-text.flake = false;
     sydtest.url = "github:NorfairKing/sydtest";
     sydtest.flake = false;
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
@@ -21,9 +22,10 @@
     , safe-coloured-text
     , sydtest
     , autodocodec
+    , flake-utils
     }:
+    flake-utils.lib.eachDefaultSystem (system:
     let
-      system = "x86_64-linux";
       pkgsFor = nixpkgs: import nixpkgs {
         inherit system;
         overlays = [
@@ -38,9 +40,9 @@
 
     in
     {
-      overlays.${system} = import ./nix/overlay.nix;
-      packages.${system}.default = pkgs.openapi3-code-generator;
-      checks.${system} =
+      overlays = import ./nix/overlay.nix;
+      packages.default = pkgs.openapi3-code-generator;
+      checks =
         let tests = import ./nix/tests.nix { inherit pkgs; };
         in
         {
@@ -88,7 +90,7 @@
             };
           };
         };
-      devShells.${system}.default = pkgs.haskellPackages.shellFor {
+      devShells.default = pkgs.haskellPackages.shellFor {
         name = "openapi-code-generator-shell";
         packages = (p:
           [ p.openapi3-code-generator ]
@@ -98,6 +100,7 @@
         buildInputs = (with pkgs; [
           zlib
           cabal-install
+          stack
         ]) ++ (with pre-commit-hooks.packages.${system};
           [
             hlint
@@ -108,5 +111,5 @@
           ]);
         shellHook = self.checks.${system}.pre-commit.shellHook;
       };
-    };
+    });
 }
