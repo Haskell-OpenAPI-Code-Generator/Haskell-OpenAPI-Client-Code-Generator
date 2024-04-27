@@ -10,6 +10,7 @@ node_modules
 public
 dist
 dist-newstyle
+.direnv
 
 build
 
