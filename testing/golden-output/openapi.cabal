@@ -26,6 +26,7 @@ library
       OpenAPI.Types.Test7
       OpenAPI.Types.Test8
       OpenAPI.Types.Test9
+      OpenAPI.Types.Value
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common

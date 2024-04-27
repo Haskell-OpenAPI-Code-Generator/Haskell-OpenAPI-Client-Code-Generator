@@ -21,6 +21,7 @@ module OpenAPI (
   module OpenAPI.Types.Test7,
   module OpenAPI.Types.Test8,
   module OpenAPI.Types.Test9,
+  module OpenAPI.Types.Value,
   module OpenAPI.Configuration,
   module OpenAPI.SecuritySchemes,
   module OpenAPI.Common,
@@ -45,6 +46,7 @@ import OpenAPI.Types.Test6
 import OpenAPI.Types.Test7
 import OpenAPI.Types.Test8
 import OpenAPI.Types.Test9
+import OpenAPI.Types.Value
 import OpenAPI.Configuration
 import OpenAPI.SecuritySchemes
 import OpenAPI.Common

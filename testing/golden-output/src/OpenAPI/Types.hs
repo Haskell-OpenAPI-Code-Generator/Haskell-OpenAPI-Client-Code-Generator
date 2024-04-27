@@ -13,6 +13,7 @@ module OpenAPI.Types (
   module OpenAPI.Types.Test7,
   module OpenAPI.Types.Test8,
   module OpenAPI.Types.Test9,
+  module OpenAPI.Types.Value,
   ) where
 
 import OpenAPI.TypeAlias
@@ -26,3 +27,4 @@ import OpenAPI.Types.Test6
 import OpenAPI.Types.Test7
 import OpenAPI.Types.Test8
 import OpenAPI.Types.Test9
+import OpenAPI.Types.Value

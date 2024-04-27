@@ -371,6 +371,10 @@ components:
       items:
         type: string
       minItems: 1
+    Value:
+      type: string
+      enum:
+        - yyy
     CoverType:
       type: object
       properties:
@@ -388,6 +392,7 @@ components:
             - $ref: '#/components/schemas/Test8'
             - $ref: '#/components/schemas/Test9'
             - $ref: '#/components/schemas/Test10'
+            - $ref: '#/components/schemas/Value'
   parameters:
     PetParameters:
       name: petId
