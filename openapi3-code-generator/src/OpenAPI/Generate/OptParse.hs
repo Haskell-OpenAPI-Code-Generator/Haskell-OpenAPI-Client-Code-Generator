@@ -101,6 +101,8 @@ data Settings = Settings
     -- which need to be generated.
     -- For all other schemas only a type alias to 'Aeson.Value' is created.
     settingWhiteListedSchemas :: ![Text],
+    -- | Output all schemas.
+    settingOutputAllSchemas :: !Bool,
     -- | In OpenAPI 3, fixed values can be defined as an enum with only one allowed value.
     -- If such a constant value is encountered as a required property of an object,
     -- the generator excludes this property by default ("exclude" strategy) and
@@ -153,6 +155,7 @@ combineToSettings Flags {..} mConf configurationFilePath = do
       settingOperationsToGenerate = fromMaybe [] $ flagOperationsToGenerate <|> mc configOperationsToGenerate
       settingOpaqueSchemas = fromMaybe [] $ flagOpaqueSchemas <|> mc configOpaqueSchemas
       settingWhiteListedSchemas = fromMaybe [] $ flagWhiteListedSchemas <|> mc configWhiteListedSchemas
+      settingOutputAllSchemas = fromMaybe False $ flagOutputAllSchemas <|> mc configOutputAllSchemas
       settingFixedValueStrategy = fromMaybe FixedValueStrategyExclude $ flagFixedValueStrategy <|> mc configFixedValueStrategy
 
   pure Settings {..}

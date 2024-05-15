@@ -45,6 +45,7 @@ data Flags = Flags
     flagOperationsToGenerate :: !(Maybe [Text]),
     flagOpaqueSchemas :: !(Maybe [Text]),
     flagWhiteListedSchemas :: !(Maybe [Text]),
+    flagOutputAllSchemas :: !(Maybe Bool),
     flagFixedValueStrategy :: !(Maybe FixedValueStrategy)
   }
   deriving (Show, Eq)
@@ -84,6 +85,7 @@ parseFlags =
     <*> parseFlagOperationsToGenerate
     <*> parseFlagOpaqueSchemas
     <*> parseFlagWhiteListedSchemas
+    <*> parseFlagOutputAllSchemas
     <*> parseFlagFixedValueStrategy
 
 parseFlagConfiguration :: Parser (Maybe Text)
@@ -366,6 +368,10 @@ parseFlagWhiteListedSchemas =
             help "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created.",
             long "white-listed-schema"
           ]
+
+parseFlagOutputAllSchemas :: Parser (Maybe Bool)
+parseFlagOutputAllSchemas =
+  booleanFlag "Output all component schemas" "output-all-schemas" Nothing
 
 parseFlagFixedValueStrategy :: Parser (Maybe FixedValueStrategy)
 parseFlagFixedValueStrategy =

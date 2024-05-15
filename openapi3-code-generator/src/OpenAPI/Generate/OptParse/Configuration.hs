@@ -48,6 +48,7 @@ data Configuration = Configuration
     configOperationsToGenerate :: !(Maybe [Text]),
     configOpaqueSchemas :: !(Maybe [Text]),
     configWhiteListedSchemas :: !(Maybe [Text]),
+    configOutputAllSchemas :: !(Maybe Bool),
     configFixedValueStrategy :: !(Maybe FixedValueStrategy)
   }
   deriving stock (Show, Eq)
@@ -88,6 +89,7 @@ instance HasCodec Configuration where
         <*> optionalField "operationsToGenerate" "If not all operations should be generated, this option can be used to specify all of them which should be generated. The value has to correspond to the value in the 'operationId' field in the OpenAPI 3 specification." .= configOperationsToGenerate
         <*> optionalField "opaqueSchemas" "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which are not further investigated while generating code from the specification. Only a type alias to 'Aeson.Value' is created for these schemas." .= configOpaqueSchemas
         <*> optionalField "whiteListedSchemas" "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created." .= configWhiteListedSchemas
+        <*> optionalField "outputAllSchemas" "Output all component schemas" .= configOutputAllSchemas
         <*> optionalField "fixedValueStrategy" "In OpenAPI 3, fixed values can be defined as an enum with only one allowed value. If such a constant value is encountered as a required property of an object, the generator excludes this property by default ('exclude' strategy) and adds the value in the 'ToJSON' instance and expects the value to be there in the 'FromJSON' instance. This setting allows to change this behavior by including all fixed value fields instead ('include' strategy), i.e. just not trying to do anything smart." .= configFixedValueStrategy
 
 getConfiguration :: Text -> IO (Maybe Configuration)
