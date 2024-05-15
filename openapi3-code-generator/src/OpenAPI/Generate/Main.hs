@@ -80,8 +80,9 @@ defineModels moduleName spec operationDependencies =
           warnAboutUnknownWhiteListedOrOpaqueSchemas schemaDefinitions
           models <- mapM (uncurry Model.defineModelForSchema) schemaDefinitions
           whiteListedSchemas <- OAM.getSetting OAO.settingWhiteListedSchemas
+          outputAllSchemas <- OAM.getSetting OAO.settingOutputAllSchemas
           let dependencies = Set.union operationDependencies $ Set.fromList $ fmap transformToModuleName whiteListedSchemas
-          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies models
+          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies models outputAllSchemas
 
 -- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
 defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)
