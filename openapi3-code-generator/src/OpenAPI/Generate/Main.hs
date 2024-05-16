@@ -82,7 +82,7 @@ defineModels moduleName spec operationDependencies =
           whiteListedSchemas <- OAM.getSetting OAO.settingWhiteListedSchemas
           outputAllSchemas <- OAM.getSetting OAO.settingOutputAllSchemas
           let dependencies = Set.union operationDependencies $ Set.fromList $ fmap transformToModuleName whiteListedSchemas
-          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies models outputAllSchemas
+          pure $ Dep.getModelModulesFromModelsWithDependencies moduleName dependencies outputAllSchemas models
 
 -- | Defines all supported security schemes from the 'OAT.OpenApiSpecification'.
 defineSecuritySchemes :: String -> OAT.OpenApiSpecification -> OAM.Generator (Q Doc)
