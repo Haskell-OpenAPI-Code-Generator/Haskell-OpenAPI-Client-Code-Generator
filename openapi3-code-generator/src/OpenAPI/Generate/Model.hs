@@ -128,7 +128,8 @@ defineModelForSchemaNamedWithTypeAliasStrategy strategy schemaName schema =
     OAT.Reference reference -> do
       refName <- haskellifyNameM True $ getSchemaNameFromReference reference
       OAM.logTrace $ "Encountered reference '" <> reference <> "' which references the type '" <> T.pack (nameBase refName) <> "'"
-      pure (varT refName, (emptyDoc, transformReferenceToDependency reference))
+      createAlias schemaName "" strategy $
+        pure (varT refName, (emptyDoc, transformReferenceToDependency reference))
 
 getSchemaNameFromReference :: Text -> Text
 getSchemaNameFromReference = T.replace "#/components/schemas/" ""
