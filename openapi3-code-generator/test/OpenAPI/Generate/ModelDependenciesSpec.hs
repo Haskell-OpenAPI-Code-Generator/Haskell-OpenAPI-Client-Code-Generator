@@ -14,7 +14,7 @@ import Test.Hspec
 spec :: Spec
 spec =
   describe "getModelModulesFromModelsWithDependencies" $ do
-    let sut = getModelModulesFromModelsWithDependencies "OpenAPI" (Set.fromList ["A", "B", "C", "D", "E", "F", "G"])
+    let sut = getModelModulesFromModelsWithDependencies "OpenAPI" (Set.fromList ["A", "B", "C", "D", "E", "F", "G"]) False
         t = pure . text
     it "should split string into pieces" $ do
       result <-
