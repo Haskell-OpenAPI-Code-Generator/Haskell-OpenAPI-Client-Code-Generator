@@ -31,6 +31,7 @@ import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
 import qualified OpenAPI.Common
+import {-# SOURCE #-} OpenAPI.Types.Cat
 import {-# SOURCE #-} OpenAPI.Types.Dog
 
 
@@ -63,3 +64,8 @@ type Test10 = GHC.Base.NonEmpty Data.Text.Internal.Text
 -- 
 -- 
 type Test = Data.Text.Internal.Text
+
+-- | Defines an alias for the schema located at @components.schemas.CatWrapper@ in the specification.
+-- 
+-- 
+type CatWrapper = Cat

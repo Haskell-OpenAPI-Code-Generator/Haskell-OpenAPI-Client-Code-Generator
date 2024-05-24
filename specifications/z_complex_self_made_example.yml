@@ -393,6 +393,8 @@ components:
             - $ref: '#/components/schemas/Test9'
             - $ref: '#/components/schemas/Test10'
             - $ref: '#/components/schemas/Value'
+    CatWrapper:
+      $ref: '#/components/schemas/Cat'
   parameters:
     PetParameters:
       name: petId
