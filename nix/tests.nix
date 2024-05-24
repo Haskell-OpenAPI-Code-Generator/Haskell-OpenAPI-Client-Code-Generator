@@ -11,7 +11,7 @@ let
         extraFlags = extraFlags;
       };
     };
-  goldenTestCode = generateCode { fileName = "z_complex_self_made_example.yml"; };
+  goldenTestCode = generateCode { fileName = "z_complex_self_made_example.yml"; extraFlags = [ "--output-all-schemas" ]; };
   exampleGeneratedCode = generateCode { fileName = "petstore.yaml"; };
   codeForSpecsLevelOne = [
     (generateCode { fileName = "google-payment.json"; })
