@@ -60,7 +60,7 @@ paths:
         '200':
           description: successful operation
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Dog"
   /pet/singleparam:

@@ -342,7 +342,7 @@ getBodySchemaFromOperation operation = OAM.nested "requestBody" $ do
 getRequestBodySchema :: OAT.RequestBodyObject -> OAM.Generator (Maybe RequestBodyDefinition, [Text])
 getRequestBodySchema body = OAM.nested "content" $ do
   let contentMap = OAT.requestBodyObjectContent body
-      content = getValueByContentTypeIgnoringCharset "application/json" contentMap
+      content = getJsonMediaTypeObject contentMap
       createRequestBodyDefinition encoding schema =
         Just $
           RequestBodyDefinition
@@ -391,7 +391,7 @@ getRequestBodyObject operation =
 getResponseSchema :: OAT.ResponseObject -> OAM.Generator (Maybe OAT.Schema, [Text])
 getResponseSchema response = OAM.nested "content" $ do
   let contentMap = OAT.responseObjectContent response
-      schema = getValueByContentTypeIgnoringCharset "application/json" contentMap >>= OAT.mediaTypeObjectSchema
+      schema = getJsonMediaTypeObject contentMap >>= OAT.mediaTypeObjectSchema
   when (Maybe.isNothing schema && not (Map.null contentMap)) $ OAM.logWarning "Only content type application/json is supported for response bodies."
   path <- OAM.appendToPath ["application/json", "schema"]
   pure (schema, path)
@@ -400,9 +400,25 @@ getValueByContentTypeIgnoringCharset :: Text -> Map.Map Text OAT.MediaTypeObject
 getValueByContentTypeIgnoringCharset contentType contentMap =
   case Map.lookup contentType contentMap of
     Just content -> Just content
-    Nothing -> case Map.elems $ Map.filterWithKey (\key _ -> Maybe.listToMaybe (T.splitOn ";" key) == Just contentType) contentMap of
+    Nothing -> case Map.elems $ Map.filterWithKey (\key _ -> getMediaTypeWithoutCharset key == Just contentType) contentMap of
       [] -> Nothing
       content : _ -> Just content
+
+getMediaTypeWithoutCharset :: Text -> Maybe Text
+getMediaTypeWithoutCharset = Maybe.listToMaybe . T.splitOn ";"
+
+getJsonMediaTypeObject :: Map.Map Text OAT.MediaTypeObject -> Maybe OAT.MediaTypeObject
+getJsonMediaTypeObject contentMap =
+  case getValueByContentTypeIgnoringCharset "application/json" contentMap of
+    Just content -> Just content
+    Nothing -> case Map.elems $ Map.filterWithKey (\key _ -> maybe False isCustomJsonMediaType $ Maybe.listToMaybe (T.splitOn ";" key)) contentMap of
+      [] -> Nothing
+      content : _ -> Just content
+
+isCustomJsonMediaType :: Text -> Bool
+isCustomJsonMediaType mediaType = case T.splitOn "+" mediaType of
+  [_, "json"] -> True
+  _ -> False
 
 -- | Resolve a possibly referenced response to a concrete value.
 --
