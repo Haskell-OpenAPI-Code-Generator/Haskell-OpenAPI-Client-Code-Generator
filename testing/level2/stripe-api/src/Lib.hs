@@ -36,17 +36,17 @@ checkoutSession =
       postCheckoutSessionsRequestBodyPaymentMethodTypes = Just [PostCheckoutSessionsRequestBodyPaymentMethodTypes'EnumCard]
     }
 
-runCheckoutSession :: MonadHTTP m => m (Response PostCheckoutSessionsResponse)
+runCheckoutSession :: (MonadHTTP m) => m (Response PostCheckoutSessionsResponse)
 runCheckoutSession =
   runWithConfiguration defaultConfiguration $
     postCheckoutSessions checkoutSession
 
-runCheckoutSessionRaw :: MonadHTTP m => m (Response ByteString)
+runCheckoutSessionRaw :: (MonadHTTP m) => m (Response ByteString)
 runCheckoutSessionRaw =
   runWithConfiguration defaultConfiguration $
     postCheckoutSessionsRaw checkoutSession
 
-runGetPaymentIntent :: MonadHTTP m => m (Response GetPaymentIntentsResponse)
+runGetPaymentIntent :: (MonadHTTP m) => m (Response GetPaymentIntentsResponse)
 runGetPaymentIntent =
   getPaymentIntentsWithConfiguration
     defaultConfiguration {configBaseURL = "http://test.url"}
@@ -62,7 +62,7 @@ runGetPaymentIntent =
           getPaymentIntentsParametersQueryStartingAfter = Just "the last string"
         }
 
-runPostPaymentIntent :: MonadHTTP m => m (Response PostPaymentIntentsResponse)
+runPostPaymentIntent :: (MonadHTTP m) => m (Response PostPaymentIntentsResponse)
 runPostPaymentIntent = postPaymentIntentsWithConfiguration defaultConfiguration myPaymentIntent
   where
     myPaymentIntent =

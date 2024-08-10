@@ -61,7 +61,7 @@ main =
                                   "XYZ"
                                     `T.isInfixOf` text
                                     && "openapi3-code-generator"
-                                    `T.isInfixOf` text
+                                      `T.isInfixOf` text
                                 _ -> False
                             )
 

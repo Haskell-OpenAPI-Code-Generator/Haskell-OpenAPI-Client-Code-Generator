@@ -17,7 +17,7 @@ data Referencable a
     Concrete a
   deriving (Show, Eq, Ord)
 
-instance FromJSON a => FromJSON (Referencable a) where
+instance (FromJSON a) => FromJSON (Referencable a) where
   parseJSON (Object v) = do
     maybeReference <- v .:? "$ref"
     case maybeReference of

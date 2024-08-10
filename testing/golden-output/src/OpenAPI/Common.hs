@@ -64,17 +64,17 @@ import qualified Data.HashMap.Strict as HMap
 
 -- | Abstracts the usage of 'Network.HTTP.Simple.httpBS' away,
 --  so that it can be used for testing
-class Monad m => MonadHTTP m where
+class (Monad m) => MonadHTTP m where
   httpBS :: HS.Request -> m (HS.Response BS.ByteString)
 
 -- | This instance is the default instance used for production code
 instance MonadHTTP IO where
   httpBS = HS.httpBS
 
-instance MonadHTTP m => MonadHTTP (MR.ReaderT r m) where
+instance (MonadHTTP m) => MonadHTTP (MR.ReaderT r m) where
   httpBS = MT.lift . httpBS
 
-instance MonadHTTP m => MonadHTTP (ClientT m) where
+instance (MonadHTTP m) => MonadHTTP (ClientT m) where
   httpBS = MT.lift . httpBS
 
 -- | The monad in which the operations can be run.
@@ -87,7 +87,7 @@ newtype ClientT m a = ClientT (MR.ReaderT Configuration m a)
 instance MT.MonadTrans ClientT where
   lift = ClientT . MT.lift
 
-instance MIO.MonadIO m => MIO.MonadIO (ClientT m) where
+instance (MIO.MonadIO m) => MIO.MonadIO (ClientT m) where
   liftIO = ClientT . MIO.liftIO
 
 -- | Utility type which uses 'IO' as underlying monad
@@ -156,7 +156,7 @@ anonymousSecurityScheme = id
 --
 --   It makes a concrete Call to a Server without a body
 doCallWithConfiguration ::
-  MonadHTTP m =>
+  (MonadHTTP m) =>
   -- | Configuration options like base URL and security scheme
   Configuration ->
   -- | HTTP method (GET, POST, etc.)
@@ -173,7 +173,7 @@ doCallWithConfiguration config method path queryParams =
 -- | Same as 'doCallWithConfiguration' but run in a 'MR.ReaderT' environment which contains the configuration.
 -- This is useful if multiple calls have to be executed with the same configuration.
 doCallWithConfigurationM ::
-  MonadHTTP m =>
+  (MonadHTTP m) =>
   Text ->
   Text ->
   [QueryParameter] ->
@@ -291,7 +291,7 @@ serializeQueryParam QueryParameter {..} =
           )
             $ jsonToFormDataFlat Nothing value
 
-encodeStrict :: Aeson.ToJSON a => a -> BS.ByteString
+encodeStrict :: (Aeson.ToJSON a) => a -> BS.ByteString
 encodeStrict = LBS.toStrict . Aeson.encode
 
 jsonToFormDataFlat :: Maybe Text -> Aeson.Value -> [(Maybe Text, BS.ByteString)]
@@ -343,7 +343,7 @@ jsonToFormDataPrefixed prefix (Aeson.Array vector) =
 -- | This function makes the code generation for URL parameters easier as it allows to stringify a value
 --
 -- The 'Show' class is not sufficient as strings should not be stringified with quotes.
-stringifyModel :: Aeson.ToJSON a => a -> Text
+stringifyModel :: (Aeson.ToJSON a) => a -> Text
 stringifyModel x = case Aeson.toJSON x of
   Aeson.String s -> s
   v -> toStrict $ toLazyText $ encodeToTextBuilder v
@@ -378,14 +378,14 @@ instance Aeson.FromJSON JsonDateTime where
 data Nullable a = NonNull a | Null
   deriving (Show, Eq)
 
-instance Aeson.ToJSON a => Aeson.ToJSON (Nullable a) where
+instance (Aeson.ToJSON a) => Aeson.ToJSON (Nullable a) where
   toJSON Null = Aeson.Null
   toJSON (NonNull x) = Aeson.toJSON x
 
   toEncoding Null = Encoding.null_
   toEncoding (NonNull x) = Aeson.toEncoding x
 
-instance Aeson.FromJSON a => Aeson.FromJSON (Nullable a) where
+instance (Aeson.FromJSON a) => Aeson.FromJSON (Nullable a) where
   parseJSON Aeson.Null = pure Null
   parseJSON x = NonNull <$> Aeson.parseJSON x
 

@@ -101,7 +101,7 @@ data Mischling = Mischling {
   -- | strDateTime
   , mischlingStrDateTime :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | tags
-  , mischlingTags :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
+  , mischlingTags :: (GHC.Maybe.Maybe [Data.Text.Internal.Text])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Mischling
@@ -164,7 +164,7 @@ data MischlingAnother_relativeVariants =
   | MischlingAnother_relativeCat Cat
   | MischlingAnother_relativePetByType PetByType
   | MischlingAnother_relativeText Data.Text.Internal.Text
-  | MischlingAnother_relativeListTText ([Data.Text.Internal.Text])
+  | MischlingAnother_relativeListTText [Data.Text.Internal.Text]
   | MischlingAnother_relativeMischlingAnother_relativeOneOf5 MischlingAnother_relativeOneOf5
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeVariants
