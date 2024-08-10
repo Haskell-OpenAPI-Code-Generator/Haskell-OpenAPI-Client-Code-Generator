@@ -92,7 +92,7 @@ data PetByAgeAnother_relativeVariants =
   | PetByAgeAnother_relativeCat Cat
   | PetByAgeAnother_relativePetByType PetByType
   | PetByAgeAnother_relativeText Data.Text.Internal.Text
-  | PetByAgeAnother_relativeListTText ([Data.Text.Internal.Text])
+  | PetByAgeAnother_relativeListTText [Data.Text.Internal.Text]
   | PetByAgeAnother_relativePetByAgeAnother_relativeOneOf5 PetByAgeAnother_relativeOneOf5
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeAnother_relativeVariants

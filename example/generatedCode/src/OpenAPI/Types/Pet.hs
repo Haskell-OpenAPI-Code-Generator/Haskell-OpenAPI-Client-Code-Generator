@@ -46,11 +46,11 @@ data Pet = Pet {
   -- | name
   , petName :: Data.Text.Internal.Text
   -- | photoUrls
-  , petPhotoUrls :: ([Data.Text.Internal.Text])
+  , petPhotoUrls :: [Data.Text.Internal.Text]
   -- | status: pet status in the store
   , petStatus :: (GHC.Maybe.Maybe PetStatus)
   -- | tags
-  , petTags :: (GHC.Maybe.Maybe ([Tag]))
+  , petTags :: (GHC.Maybe.Maybe [Tag])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Pet

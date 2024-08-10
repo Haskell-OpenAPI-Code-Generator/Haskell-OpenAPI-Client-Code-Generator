@@ -27,10 +27,10 @@ bearerConfiguration =
     { configSecurityScheme = bearerAuthenticationSecurityScheme "token"
     }
 
-runGetInventoryAnonymous :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventoryAnonymous :: (MonadHTTP m) => m (Response GetInventoryResponse)
 runGetInventoryAnonymous = getInventoryWithConfiguration defaultConfiguration
 
-runGetInventoryBasicAuth :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventoryBasicAuth :: (MonadHTTP m) => m (Response GetInventoryResponse)
 runGetInventoryBasicAuth =
   getInventoryWithConfiguration $
     defaultConfiguration
@@ -42,24 +42,24 @@ runGetInventoryBasicAuth =
               }
       }
 
-runGetInventoryBearerAuth :: MonadHTTP m => m (Response GetInventoryResponse)
+runGetInventoryBearerAuth :: (MonadHTTP m) => m (Response GetInventoryResponse)
 runGetInventoryBearerAuth = getInventoryWithConfiguration bearerConfiguration
 
-runMultipleRequestsWithBearerAuth :: MonadHTTP m => m (Response GetInventoryResponse, Response AddPetResponse)
+runMultipleRequestsWithBearerAuth :: (MonadHTTP m) => m (Response GetInventoryResponse, Response AddPetResponse)
 runMultipleRequestsWithBearerAuth =
   runWithConfiguration bearerConfiguration $ do
     response1 <- getInventory
     response2 <- addPet myPet
     pure (response1, response2)
 
-runAddPet :: MonadHTTP m => m (Response AddPetResponse)
+runAddPet :: (MonadHTTP m) => m (Response AddPetResponse)
 runAddPet = addPetWithConfiguration defaultConfiguration myPet
 
-runGetAllPetsAsOneOf :: MonadHTTP m => m (Response GetAllPetsAsOneOfResponse)
+runGetAllPetsAsOneOf :: (MonadHTTP m) => m (Response GetAllPetsAsOneOfResponse)
 runGetAllPetsAsOneOf = getAllPetsAsOneOfWithConfiguration defaultConfiguration
 
-runUpdatePet :: MonadHTTP m => m (Response UpdatePetResponse)
+runUpdatePet :: (MonadHTTP m) => m (Response UpdatePetResponse)
 runUpdatePet = updatePetWithConfiguration defaultConfiguration (UpdatePetRequestBodyPet myPet)
 
-runUpdatePetWithTag :: MonadHTTP m => m (Response UpdatePetResponse)
+runUpdatePetWithTag :: (MonadHTTP m) => m (Response UpdatePetResponse)
 runUpdatePetWithTag = updatePetWithConfiguration defaultConfiguration (UpdatePetRequestBodyTag myTag)

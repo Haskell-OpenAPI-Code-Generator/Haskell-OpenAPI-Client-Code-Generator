@@ -83,7 +83,7 @@ data Dog = Dog {
   -- | strDateTime
   , dogStrDateTime :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | tags
-  , dogTags :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
+  , dogTags :: (GHC.Maybe.Maybe [Data.Text.Internal.Text])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Dog

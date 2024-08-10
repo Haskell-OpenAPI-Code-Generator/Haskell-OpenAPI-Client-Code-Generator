@@ -6,11 +6,11 @@ import Network.HTTP.Client
 import OpenAPI
 import OpenAPI.Common
 
-runListPets :: MonadHTTP m => m (Response ListPetsResponse)
+runListPets :: (MonadHTTP m) => m (Response ListPetsResponse)
 runListPets = listPetsWithConfiguration defaultConfiguration Nothing
 
-runCreatePets :: MonadHTTP m => m (Response CreatePetsResponse)
+runCreatePets :: (MonadHTTP m) => m (Response CreatePetsResponse)
 runCreatePets = createPetsWithConfiguration defaultConfiguration
 
-runShowPetById :: MonadHTTP m => Text -> m (Response ShowPetByIdResponse)
+runShowPetById :: (MonadHTTP m) => Text -> m (Response ShowPetByIdResponse)
 runShowPetById = showPetByIdWithConfiguration defaultConfiguration

@@ -155,7 +155,7 @@ joinWithPoint :: [String] -> String
 joinWithPoint = joinWith "."
 
 -- | Concat a list of values separated by an other value
-joinWith :: Monoid a => a -> [a] -> a
+joinWith :: (Monoid a) => a -> [a] -> a
 joinWith _ [] = mempty
 joinWith separator xs =
   foldr1
@@ -165,10 +165,10 @@ joinWith separator xs =
 
 -- | A version of 'Data.Maybe.mapMaybe' that works with a monadic predicate.
 -- from https://hackage.haskell.org/package/extra-1.7.1/docs/src/Control.Monad.Extra.html#mapMaybeM copied
-mapMaybeM :: Monad m => (a -> m (Maybe b)) -> [a] -> m [b]
+mapMaybeM :: (Monad m) => (a -> m (Maybe b)) -> [a] -> m [b]
 mapMaybeM op = foldr f (pure [])
   where
-    f x xs = do x' <- op x; case x' of { Nothing -> xs; Just x'' -> do { xs' <- xs; pure $ x'' : xs' } }
+    f x xs = do x' <- op x; case x' of Nothing -> xs; Just x'' -> do xs' <- xs; pure $ x'' : xs'
 
 -- | Lifted version of '<>' which can be used with 'Semigroup's inside 'Applicative's
 liftedAppend :: (Applicative f, Semigroup a) => f a -> f a -> f a

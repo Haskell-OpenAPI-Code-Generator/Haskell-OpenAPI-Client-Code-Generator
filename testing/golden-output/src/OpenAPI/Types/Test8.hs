@@ -42,7 +42,7 @@ data Test8NonNullable = Test8NonNullable {
   -- | prop2
   , test8NonNullableProp2 :: (GHC.Maybe.Maybe (OpenAPI.Common.Nullable Data.Text.Internal.Text))
   -- | prop3
-  , test8NonNullableProp3 :: (OpenAPI.Common.Nullable ([OpenAPI.Common.Nullable Data.Text.Internal.Text]))
+  , test8NonNullableProp3 :: (OpenAPI.Common.Nullable [OpenAPI.Common.Nullable Data.Text.Internal.Text])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test8NonNullable
@@ -52,7 +52,7 @@ instance Data.Aeson.Types.FromJSON.FromJSON Test8NonNullable
     where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Test8NonNullable" (\obj -> ((GHC.Base.pure Test8NonNullable GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prop3"))}
 -- | Create a new 'Test8NonNullable' with all required fields.
 mkTest8NonNullable :: OpenAPI.Common.Nullable GHC.Types.Int -- ^ 'test8NonNullableProp1'
-  -> OpenAPI.Common.Nullable ([OpenAPI.Common.Nullable Data.Text.Internal.Text]) -- ^ 'test8NonNullableProp3'
+  -> OpenAPI.Common.Nullable [OpenAPI.Common.Nullable Data.Text.Internal.Text] -- ^ 'test8NonNullableProp3'
   -> Test8NonNullable
 mkTest8NonNullable test8NonNullableProp1 test8NonNullableProp3 = Test8NonNullable{test8NonNullableProp1 = test8NonNullableProp1,
                                                                                   test8NonNullableProp2 = GHC.Maybe.Nothing,
