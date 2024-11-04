@@ -49,7 +49,8 @@ data Configuration = Configuration
     configOpaqueSchemas :: !(Maybe [Text]),
     configWhiteListedSchemas :: !(Maybe [Text]),
     configOutputAllSchemas :: !(Maybe Bool),
-    configFixedValueStrategy :: !(Maybe FixedValueStrategy)
+    configFixedValueStrategy :: !(Maybe FixedValueStrategy),
+    configUseSingleFieldNames :: !(Maybe Bool)
   }
   deriving stock (Show, Eq)
   deriving (FromJSON, ToJSON) via (Autodocodec Configuration)
@@ -91,6 +92,7 @@ instance HasCodec Configuration where
         <*> optionalField "whiteListedSchemas" "A list of schema names (exactly as they are named in the components.schemas section of the corresponding OpenAPI 3 specification) which need to be generated. For all other schemas only a type alias to 'Aeson.Value' is created." .= configWhiteListedSchemas
         <*> optionalField "outputAllSchemas" "Output all component schemas" .= configOutputAllSchemas
         <*> optionalField "fixedValueStrategy" "In OpenAPI 3, fixed values can be defined as an enum with only one allowed value. If such a constant value is encountered as a required property of an object, the generator excludes this property by default ('exclude' strategy) and adds the value in the 'ToJSON' instance and expects the value to be there in the 'FromJSON' instance. This setting allows to change this behavior by including all fixed value fields instead ('include' strategy), i.e. just not trying to do anything smart." .= configFixedValueStrategy
+        <*> optionalField "useSingleFieldNames" "Instead of numbering oneof branches as OneOfN, name oneof branches after a single field where possible" .= configUseSingleFieldNames
 
 getConfiguration :: Text -> IO (Maybe Configuration)
 getConfiguration path = resolveFile' (T.unpack path) >>= readYamlConfigFile

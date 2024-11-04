@@ -114,7 +114,7 @@ errorSuffix = "Error"
 
 -- | Create the name as 'Text' of the response type / data constructor based on a suffix
 createResponseNameAsText :: Bool -> (Text -> Text) -> Text -> Text
-createResponseNameAsText convertToCamelCase appendToOperationName = T.pack . haskellifyText convertToCamelCase True . appendToOperationName
+createResponseNameAsText convertToCamelCase appendToOperationName = haskellifyText convertToCamelCase True . appendToOperationName
 
 -- | Create the name as 'Name' of the response type / data constructor based on a suffix
 createResponseName :: Bool -> (Text -> Text) -> Text -> Name

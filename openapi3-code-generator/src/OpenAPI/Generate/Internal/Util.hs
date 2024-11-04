@@ -49,7 +49,7 @@ haskellifyText ::
   -- | The identifier to transform
   Text ->
   -- | The resulting identifier
-  String
+  Text
 haskellifyText convertToCamelCase startWithUppercase name =
   let casefn = if startWithUppercase then Char.toUpper else Char.toLower
       replaceChar '.' = '\''
@@ -94,18 +94,19 @@ haskellifyText convertToCamelCase startWithUppercase name =
       replacePlus ('+' : rest) = "Plus" <> replacePlus rest
       replacePlus (x : xs) = x : replacePlus xs
       replacePlus a = a
-   in replaceReservedWord $
-        caseFirstCharCorrectly $
-          generateNameForEmptyIdentifier name $
-            removeIllegalLeadingCharacters $
-              (if convertToCamelCase then toCamelCase else id) $
-                nameWithoutSpecialChars $
-                  replacePlus $
-                    T.unpack name
+   in T.pack $
+        replaceReservedWord $
+          caseFirstCharCorrectly $
+            generateNameForEmptyIdentifier name $
+              removeIllegalLeadingCharacters $
+                (if convertToCamelCase then toCamelCase else id) $
+                  nameWithoutSpecialChars $
+                    replacePlus $
+                      T.unpack name
 
 -- | The same as 'haskellifyText' but transform the result to a 'Name'
 haskellifyName :: Bool -> Bool -> Text -> Name
-haskellifyName convertToCamelCase startWithUppercase name = mkName $ haskellifyText convertToCamelCase startWithUppercase name
+haskellifyName convertToCamelCase startWithUppercase name = mkName . T.unpack $ haskellifyText convertToCamelCase startWithUppercase name
 
 -- | 'OAM.Generator' version of 'haskellifyName'
 haskellifyNameM :: Bool -> Text -> OAM.Generator Name

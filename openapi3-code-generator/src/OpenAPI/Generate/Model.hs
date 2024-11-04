@@ -1,4 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -371,19 +372,24 @@ defineOneOfSchema :: Text -> Text -> [OAS.Schema] -> OAM.Generator TypeWithDecla
 defineOneOfSchema schemaName description schemas = do
   when (null schemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
   settings <- OAM.getSettings
-  let name = haskellifyName (OAO.settingConvertToCamelCase settings) True $ schemaName <> "Variants"
+  let haskellifyConstructor = haskellifyName (OAO.settingConvertToCamelCase settings) True
+      name = haskellifyConstructor $ schemaName <> "Variants"
       fixedValueStrategy = OAO.settingFixedValueStrategy settings
-      (schemas', schemasWithFixedValues) = extractSchemasWithFixedValues fixedValueStrategy schemas
-      indexedSchemas = zip schemas' ([1 ..] :: [Integer])
+      useSingleFieldNames = OAO.settingUseSingleFieldNames settings
+      (schemas', fixedValueSchemas) = extractSchemasWithFixedValues fixedValueStrategy schemas
+      (schemas'', singleFieldedSchemas) = if useSingleFieldNames then extractSchemasWithSingleField schemas' else (schemas', [])
+      defineSingleFielded field = defineModelForSchemaNamed (schemaName <> haskellifyText (OAO.settingConvertToCamelCase settings) True field)
+      indexedSchemas = zip schemas'' ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
   OAM.logInfo $ "Define as oneOf named '" <> T.pack (nameBase name) <> "'"
-  variants <- mapM (uncurry defineIndexed) indexedSchemas
+  singleFieldedVariants <- mapM (uncurry defineSingleFielded) singleFieldedSchemas
+  indexedVariants <- mapM (uncurry defineIndexed) indexedSchemas
   path <- getCurrentPathEscaped
-  let variantDefinitions = vcat <$> mapM (fst . snd) variants
+  let variants = indexedVariants <> singleFieldedVariants
+      variantDefinitions = vcat <$> mapM (fst . snd) variants
       dependencies = Set.unions $ fmap (snd . snd) variants
       types = fmap fst variants
       indexedTypes = zip types ([1 ..] :: [Integer])
-      haskellifyConstructor = haskellifyName (OAO.settingConvertToCamelCase settings) True
       getConstructorName (typ, n) = do
         t <- typ
         let suffix = if OAO.settingUseNumberedVariantConstructors settings then "Variant" <> T.pack (show n) else typeToSuffix t
@@ -401,7 +407,7 @@ defineOneOfSchema schemaName description schemas = do
       createConstructorForSchemaWithFixedValue =
         (`normalC` [])
           . createConstructorNameForSchemaWithFixedValue
-      fixedValueComments = fmap (("Represents the JSON value @" <>) . (<> "@") . showAesonValue) schemasWithFixedValues
+      fixedValueComments = fmap (("Represents the JSON value @" <>) . (<> "@") . showAesonValue) fixedValueSchemas
       emptyCtx = pure []
       patternName = mkName "a"
       p = varP patternName
@@ -423,7 +429,7 @@ defineOneOfSchema schemaName description schemas = do
                         Aeson.Success $p -> pure $e
                         Aeson.Error $p -> fail $e
                       |]
-              case schemasWithFixedValues of
+              case fixedValueSchemas of
                 [] -> parserExpr
                 _ ->
                   multiIfE $
@@ -432,7 +438,7 @@ defineOneOfSchema schemaName description schemas = do
                           let constructorName = createConstructorNameForSchemaWithFixedValue value
                            in normalGE [|$(varE paramName) == $(liftAesonValue value)|] [|pure $(varE constructorName)|]
                       )
-                      schemasWithFixedValues
+                      fixedValueSchemas
                       <> [normalGE [|otherwise|] parserExpr]
          in funD
               (mkName "parseJSON")
@@ -461,7 +467,7 @@ defineOneOfSchema schemaName description schemas = do
               ]
       toJsonFns =
         fmap toJsonFnConstructor constructorNames
-          <> fmap toJsonFnFixedValues schemasWithFixedValues
+          <> fmap toJsonFnFixedValues fixedValueSchemas
       dataDefinition =
         ( Doc.generateHaddockComment
             [ "Defines the oneOf schema located at @" <> path <> "@ in the specification.",
@@ -478,7 +484,7 @@ defineOneOfSchema schemaName description schemas = do
             name
             []
             Nothing
-            (fmap createConstructorForSchemaWithFixedValue schemasWithFixedValues <> fmap createTypeConstruct indexedTypes)
+            (fmap createConstructorForSchemaWithFixedValue fixedValueSchemas <> fmap createTypeConstruct indexedTypes)
             [ derivClause
                 Nothing
                 [ conT ''Show,
@@ -587,6 +593,22 @@ defineArrayModelForSchema strategy schemaName schema = do
       )
     )
 
+data Field = Field
+  { fieldName :: Text,
+    fieldSchema :: OAS.Schema,
+    fieldRequired :: Bool,
+    fieldHaskellName :: Name
+  }
+
+toField :: Bool -> Text -> Text -> OAS.Schema -> Set.Set Text -> Field
+toField convertToCamelCase propName fieldName fieldSchema required =
+  Field
+    { fieldName,
+      fieldSchema,
+      fieldRequired = propName `Set.member` required,
+      fieldHaskellName = haskellifyName convertToCamelCase False fieldName
+    }
+
 -- | Defines a record
 defineObjectModelForSchema :: TypeAliasStrategy -> Text -> OAS.SchemaObject -> OAM.Generator TypeWithDeclaration
 defineObjectModelForSchema strategy schemaName schema =
@@ -599,12 +621,16 @@ defineObjectModelForSchema strategy schemaName schema =
           name = haskellifyName convertToCamelCase True schemaName
           required = OAS.schemaObjectRequired schema
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
+          useSingleFieldNames = OAO.settingUseSingleFieldNames settings
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
-          propsWithNames = zip (fmap fst props) $ fmap (haskellifyName convertToCamelCase False . (schemaName <>) . uppercaseFirstText . fst) props
+          propFields = case props of
+            [(propName, subschema)] | useSingleFieldNames -> [(propName, toField convertToCamelCase propName schemaName subschema required)]
+            _ -> flip fmap props $ \(propName, subschema) ->
+              (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName) subschema required)
           emptyCtx = pure []
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
-      (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes schemaName props required
-      propertyDescriptions <- getDescriptionOfProperties props
+      (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes propFields
+      propertyDescriptions <- getDescriptionOfProperties propFields
       let dataDefinition = do
             bangs <- bangTypes
             let record = recC name (pure <$> bangs)
@@ -615,9 +641,9 @@ defineObjectModelForSchema strategy schemaName schema =
               . Doc.reformatRecord
               . ppr
               <$> dataD emptyCtx name [] Nothing [record] objectDeriveClause
-          toJsonInstance = createToJSONImplementation name propsWithNames propsWithFixedValues required
-          fromJsonInstance = createFromJSONImplementation name propsWithNames required
-          mkFunction = createMkFunction name propsWithNames required bangTypes
+          toJsonInstance = createToJSONImplementation name propFields propsWithFixedValues
+          fromJsonInstance = createFromJSONImplementation name propFields
+          mkFunction = createMkFunction name propFields bangTypes
       pure
         ( varT name,
           ( pure
@@ -657,21 +683,31 @@ extractSchemaWithFixedValue FixedValueStrategyExclude schema@(OAT.Concrete OAS.S
   _ -> Left schema
 extractSchemaWithFixedValue _ schema = Left schema
 
-createMkFunction :: Name -> [(Text, Name)] -> Set.Set Text -> Q [VarBangType] -> Q Doc
-createMkFunction name propsWithNames required bangTypes = do
+extractSchemasWithSingleField :: [OAS.Schema] -> ([OAS.Schema], [(Text, OAS.Schema)])
+extractSchemasWithSingleField = E.partitionEithers . fmap extractSchemaWithSingleField
+
+extractSchemaWithSingleField :: OAS.Schema -> Either OAS.Schema (Text, OAS.Schema)
+extractSchemaWithSingleField schema@(OAT.Concrete OAS.SchemaObject {..}) = case Map.toList schemaObjectProperties of
+  [(field, _)] -> Right (field, schema)
+  _ -> Left schema
+extractSchemaWithSingleField schema = Left schema
+
+createMkFunction :: Name -> [(Text, Field)] -> Q [VarBangType] -> Q Doc
+createMkFunction name propFields bangTypes = do
   bangs <- bangTypes
   let fnName = mkName $ "mk" <> nameBase name
-      propsWithTypes =
-        ( \((originalName, propertyName), (_, _, propertyType)) ->
-            (propertyName, propertyType, originalName `Set.member` required)
+      fieldsWithBangs =
+        ( \((_, record), (_, _, propType)) ->
+            (record, propType)
         )
-          <$> zip propsWithNames bangs
-      requiredPropsWithTypes = filter (\(_, _, isRequired) -> isRequired) propsWithTypes
-      parameterPatterns = (\(propertyName, _, _) -> varP propertyName) <$> requiredPropsWithTypes
-      parameterDescriptions = (\(propertyName, _, _) -> "'" <> T.pack (nameBase propertyName) <> "'") <$> requiredPropsWithTypes
-      recordExpr = (\(propertyName, _, isRequired) -> fieldExp propertyName (if isRequired then varE propertyName else [|Nothing|])) <$> propsWithTypes
+          <$> zip propFields bangs
+      requiredFieldsWithBangs = filter (\(Field {..}, _) -> fieldRequired) fieldsWithBangs
+      parameterPatterns = (\(Field {..}, _) -> varP fieldHaskellName) <$> requiredFieldsWithBangs
+      parameterDescriptions = (\(Field {..}, _) -> "'" <> T.pack (nameBase fieldHaskellName) <> "'") <$> requiredFieldsWithBangs
+      recordExpr = (\(Field {..}, _) -> fieldExp fieldHaskellName (if fieldRequired then varE fieldHaskellName else [|Nothing|])) <$> fieldsWithBangs
       expr = recConE name recordExpr
-      fnType = foldr (\(_, propertyType, _) t -> [t|$(pure propertyType) -> $t|]) (conT name) requiredPropsWithTypes
+      fnType = foldr (\(_, propertyType) t -> [t|$(pure propertyType) -> $t|]) (conT name) requiredFieldsWithBangs
+
   pure
     ( Doc.generateHaddockComment
         [ "Create a new '" <> T.pack (nameBase name) <> "' with all required fields."
@@ -688,17 +724,17 @@ createMkFunction name propsWithNames required bangTypes = do
     `appendDoc` fmap ppr (funD fnName [clause parameterPatterns (normalB expr) []])
 
 -- | create toJSON implementation for an object
-createToJSONImplementation :: Name -> [(Text, Name)] -> [(Text, Aeson.Value)] -> Set.Set Text -> Q Doc
-createToJSONImplementation objectName recordNames propsWithFixedValues required =
+createToJSONImplementation :: Name -> [(Text, Field)] -> [(Text, Aeson.Value)] -> Q Doc
+createToJSONImplementation objectName fieldProps propsWithFixedValues =
   let emptyDefs = pure []
       fnArgName = mkName "obj"
-      toAssertion (jsonName, hsName) =
-        if jsonName `Set.member` required
-          then [|[$(stringE $ T.unpack jsonName) Aeson..= $(varE hsName) $(varE fnArgName)]|]
-          else [|(maybe mempty (pure . ($(stringE $ T.unpack jsonName) Aeson..=)) ($(varE hsName) $(varE fnArgName)))|]
-      toFixedAssertion (jsonName, value) =
-        [|[$(stringE $ T.unpack jsonName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)]|]
-      assertions = fmap toAssertion recordNames <> fmap toFixedAssertion propsWithFixedValues
+      toAssertion (propName, Field {..}) =
+        if fieldRequired
+          then [|[$(stringE $ T.unpack propName) Aeson..= $(varE fieldHaskellName) $(varE fnArgName)]|]
+          else [|(maybe mempty (pure . ($(stringE $ T.unpack propName) Aeson..=)) ($(varE fieldHaskellName) $(varE fnArgName)))|]
+      toFixedAssertion (propName, value) =
+        [|[$(stringE $ T.unpack propName) Aeson..= $(liftAesonValueWithOverloadedStrings False value)]|]
+      assertions = fmap toAssertion fieldProps <> fmap toFixedAssertion propsWithFixedValues
       assertionsList = [|(List.concat $(toExprList assertions))|]
       toExprList = foldr (\x expr -> uInfixE x (varE $ mkName ":") expr) [|mempty|]
       defaultJsonImplementation =
@@ -724,22 +760,22 @@ createToJSONImplementation objectName recordNames propsWithFixedValues required 
    in ppr <$> instanceD emptyDefs [t|Aeson.ToJSON $(varT objectName)|] defaultJsonImplementation
 
 -- | create FromJSON implementation for an object
-createFromJSONImplementation :: Name -> [(Text, Name)] -> Set.Set Text -> Q Doc
-createFromJSONImplementation objectName recordNames required =
+createFromJSONImplementation :: Name -> [(Text, Field)] -> Q Doc
+createFromJSONImplementation objectName fieldProps =
   let fnArgName = mkName "obj"
       withObjectLamda =
         foldl
-          ( \prev (propName, _) ->
-              let propName' = stringE $ T.unpack propName
+          ( \prev (_, Field {..}) ->
+              let fieldName' = stringE $ T.unpack fieldName
                   arg = varE fnArgName
                   readPropE =
-                    if propName `Set.member` required
-                      then [|$arg Aeson..: $propName'|]
-                      else [|$arg Aeson..:! $propName'|]
+                    if fieldRequired
+                      then [|$arg Aeson..: $fieldName'|]
+                      else [|$arg Aeson..:! $fieldName'|]
                in [|$prev <*> $readPropE|]
           )
           [|pure $(varE objectName)|]
-          recordNames
+          fieldProps
    in ppr
         <$> instanceD
           (cxt [])
@@ -756,47 +792,45 @@ createFromJSONImplementation objectName recordNames required =
           ]
 
 -- | create "bangs" record fields for properties
-propertiesToBangTypes :: Text -> [(Text, OAS.Schema)] -> Set.Set Text -> OAM.Generator BangTypesSelfDefined
-propertiesToBangTypes _ [] _ = pure (pure [], emptyDoc, Set.empty)
-propertiesToBangTypes schemaName props required = OAM.nested "properties" $ do
-  propertySuffix <- OAM.getSetting OAO.settingPropertyTypeSuffix
+propertiesToBangTypes :: [(Text, Field)] -> OAM.Generator BangTypesSelfDefined
+propertiesToBangTypes [] = pure (pure [], emptyDoc, Set.empty)
+propertiesToBangTypes fieldProps = OAM.nested "properties" $ do
   convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
-  let createBang :: Text -> Text -> Q Type -> Q VarBangType
-      createBang recordName propName myType = do
+  let createBang :: Field -> Q Type -> Q VarBangType
+      createBang Field {..} myType = do
         bang' <- bang noSourceUnpackedness noSourceStrictness
         type' <-
-          if recordName `Set.member` required
+          if fieldRequired
             then myType
             else appT (varT ''Maybe) myType
-        pure (haskellifyName convertToCamelCase False propName, bang', type')
-      propToBangType :: (Text, OAS.Schema) -> OAM.Generator (Q VarBangType, Q Doc, Dep.Models)
-      propToBangType (recordName, schema) = do
-        let propName = schemaName <> uppercaseFirstText recordName
-        (myType, (content, depenencies)) <- OAM.nested recordName $ defineModelForSchemaNamed (propName <> propertySuffix) schema
-        let myBang = createBang recordName propName myType
-        pure (myBang, content, depenencies)
-      foldFn :: OAM.Generator BangTypesSelfDefined -> (Text, OAS.Schema) -> OAM.Generator BangTypesSelfDefined
+        pure (haskellifyName convertToCamelCase False fieldName, bang', type')
+      propToBangType :: Field -> OAM.Generator (Q VarBangType, Q Doc, Dep.Models)
+      propToBangType field@Field {..} = do
+        (myType, (content, dependencies)) <- OAM.nested fieldName $ defineModelForSchemaNamed fieldName fieldSchema
+        let myBang = createBang field myType
+        pure (myBang, content, dependencies)
+      foldFn :: OAM.Generator BangTypesSelfDefined -> (Text, Field) -> OAM.Generator BangTypesSelfDefined
       foldFn accHolder next = do
         (varBang, content, dependencies) <- accHolder
-        (nextVarBang, nextContent, nextDependencies) <- propToBangType next
+        (nextVarBang, nextContent, nextDependencies) <- propToBangType $ snd next
         pure
           ( varBang `liftedAppend` fmap pure nextVarBang,
             content `appendDoc` nextContent,
             Set.union dependencies nextDependencies
           )
-  foldl foldFn (pure (pure [], emptyDoc, Set.empty)) props
+  foldl foldFn (pure (pure [], emptyDoc, Set.empty)) fieldProps
 
 getDescriptionOfSchema :: OAS.SchemaObject -> Text
 getDescriptionOfSchema schema = Doc.escapeText $ Maybe.fromMaybe "" $ OAS.schemaObjectDescription schema
 
-getDescriptionOfProperties :: [(Text, OAS.Schema)] -> OAM.Generator [Text]
+getDescriptionOfProperties :: [(Text, Field)] -> OAM.Generator [Text]
 getDescriptionOfProperties =
   mapM
-    ( \(name, schema) -> do
-        schema' <- resolveSchemaReferenceWithoutWarning schema
+    ( \(propName, Field {..}) -> do
+        schema' <- resolveSchemaReferenceWithoutWarning fieldSchema
         let description = maybe "" (": " <>) $ schema' >>= OAS.schemaObjectDescription
             constraints = T.unlines $ ("* " <>) <$> getConstraintDescriptionsOfSchema schema'
-        pure $ Doc.escapeText $ name <> description <> (if T.null constraints then "" else "\n\nConstraints:\n\n" <> constraints)
+        pure $ Doc.escapeText $ propName <> description <> (if T.null constraints then "" else "\n\nConstraints:\n\n" <> constraints)
     )
 
 -- | Extracts the constraints of a 'OAS.SchemaObject' as human readable text
