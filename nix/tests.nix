@@ -25,7 +25,7 @@ let
     (generateCode { fileName = "selenium.yaml"; extraFlags = [ "--response-type-suffix=\"Response'\"" ]; })
     (generateCode { fileName = "spot_api.yml"; extraFlags = [ "--opaque-schema=\"aggTrade\"" ]; })
     (generateCode { fileName = "uber.json"; })
-    (generateCode { fileName = "z_complex_self_made_example.yml"; })
+    (generateCode { fileName = "z_complex_self_made_example.yml"; extraFlags = [ "--use-single-field-names" ]; })
     (generateCode { fileName = "petstore.yaml"; extraFlags = [ "--module-name=\"Petstore.API\"" ]; })
   ];
   codeForSpecsLevelTwo = [
