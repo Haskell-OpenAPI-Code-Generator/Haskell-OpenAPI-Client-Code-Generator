@@ -7,6 +7,7 @@
 module OpenAPI.Generate.OptParse
   ( Settings (..),
     getSettings,
+    module OAT,
   )
 where
 
@@ -19,7 +20,7 @@ import qualified Data.Text as T
 import qualified OpenAPI.Generate.Log as OAL
 import OpenAPI.Generate.OptParse.Configuration
 import OpenAPI.Generate.OptParse.Flags
-import OpenAPI.Generate.OptParse.Types
+import OpenAPI.Generate.OptParse.Types as OAT
 import Options.Applicative
 import Path
 import Path.IO
@@ -41,7 +42,7 @@ data Settings = Settings
     -- | Name of the stack project
     settingPackageName :: !Text,
     -- | Name of the module
-    settingModuleName :: !Text,
+    settingModuleName :: !ModuleName,
     -- | The minimum log level to output
     settingLogLevel :: !OAL.LogSeverity,
     -- | Overwrite output directory without question
@@ -126,7 +127,7 @@ combineToSettings Flags {..} mConf configurationFilePath = do
   let settingOpenApiSpecification = fromMaybe "openapi-specification.yml" $ flagOpenApiSpecification <|> mConfigOpenApiSpecification
       settingOutputDir = fromMaybe "out" $ flagOutputDir <|> mConfigOutputDir
       settingPackageName = fromMaybe "openapi" $ flagPackageName <|> mc configPackageName
-      settingModuleName = fromMaybe "OpenAPI" $ flagModuleName <|> mc configModuleName
+      settingModuleName = mkModuleName . T.unpack $ fromMaybe "OpenAPI" (flagModuleName <|> mc configModuleName)
       settingLogLevel = fromMaybe OAL.InfoSeverity $ flagLogLevel <|> mc configLogLevel
       settingForce = fromMaybe False $ flagForce <|> mc configForce
       settingIncremental = fromMaybe False $ flagIncremental <|> mc configIncremental

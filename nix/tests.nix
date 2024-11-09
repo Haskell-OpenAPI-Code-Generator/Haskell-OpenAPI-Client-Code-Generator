@@ -26,6 +26,7 @@ let
     (generateCode { fileName = "spot_api.yml"; extraFlags = [ "--opaque-schema=\"aggTrade\"" ]; })
     (generateCode { fileName = "uber.json"; })
     (generateCode { fileName = "z_complex_self_made_example.yml"; })
+    (generateCode { fileName = "petstore.yaml"; extraFlags = [ "--module-name=\"Petstore.API\"" ]; })
   ];
   codeForSpecsLevelTwo = [
     (generateCode { fileName = "official-petstore.yaml"; })

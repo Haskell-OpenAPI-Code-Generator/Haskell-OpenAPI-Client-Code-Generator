@@ -152,16 +152,18 @@ permitProceed settings = do
 getHsBootFiles :: OAO.Settings -> [([String], String)] -> FilesWithContent
 getHsBootFiles settings modelModules =
   let outputDirectory = T.unpack $ OAO.settingOutputDir settings
-      moduleName = T.unpack $ OAO.settingModuleName settings
+      moduleName = OAO.settingModuleName settings
+      moduleNameStr = OAO.getModuleName moduleName
+      modulePathInfo = OAO.mkModulePathInfo moduleName
    in BF.bimap
-        ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs-boot") . foldr1 (</>))
+        ((\suffix -> outputDirectory </> srcDirectory </> OAO.getModuleInfoPath modulePathInfo (Just suffix) ".hs-boot") . foldr1 (</>))
         ( T.unpack
             . T.unlines
             . ( \xs -> case xs of
                   x : xs' ->
                     x
                       : "import qualified Data.Aeson"
-                      : "import qualified " <> T.pack moduleName <> ".Common"
+                      : "import qualified " <> T.pack moduleNameStr <> ".Common"
                       : xs'
                   _ -> xs
               )
@@ -202,19 +204,21 @@ data OutputFiles = OutputFiles
 generateFilesToCreate :: OAT.OpenApiSpecification -> OAO.Settings -> IO OutputFiles
 generateFilesToCreate spec settings = do
   let outputDirectory = T.unpack $ OAO.settingOutputDir settings
-      moduleName = T.unpack $ OAO.settingModuleName settings
+      moduleName = OAO.settingModuleName settings
+      modulePathInfo = OAO.mkModulePathInfo moduleName
+      moduleNameStr = OAO.getModuleName moduleName
       packageName = T.unpack $ OAO.settingPackageName settings
       env = OAM.createEnvironment settings $ Ref.buildReferenceMap spec
       logMessages = mapM_ (putStrLn . T.unpack) . OAL.filterAndTransformLogs (OAO.settingLogLevel settings)
-      showAndReplace = replaceOpenAPI moduleName . show
-      ((operationsQ, operationDependencies), logs) = OAM.runGenerator env $ defineOperations moduleName spec
+      showAndReplace = replaceOpenAPI moduleNameStr . show
+      ((operationsQ, operationDependencies), logs) = OAM.runGenerator env $ defineOperations moduleNameStr spec
   logMessages logs
   operationModules <- runQ operationsQ
-  configurationInfo <- runQ $ defineConfigurationInformation moduleName spec
-  let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleName spec operationDependencies
+  configurationInfo <- runQ $ defineConfigurationInformation moduleNameStr spec
+  let (modelsQ, logsModels) = OAM.runGenerator env $ defineModels moduleNameStr spec operationDependencies
   logMessages logsModels
   modelModules <- fmap (BF.second showAndReplace) <$> runQ modelsQ
-  let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleName spec
+  let (securitySchemesQ, logs') = OAM.runGenerator env $ defineSecuritySchemes moduleNameStr spec
   logMessages logs'
   securitySchemes' <- runQ securitySchemesQ
   let modules =
@@ -222,34 +226,35 @@ generateFilesToCreate spec settings = do
           <> modelModules
           <> [ (["Configuration"], showAndReplace configurationInfo),
                (["SecuritySchemes"], showAndReplace securitySchemes'),
-               (["Common"], replaceOpenAPI moduleName $ replaceVersionNumber $(embedFile "src/OpenAPI/Common.hs"))
+               (["Common"], replaceOpenAPI moduleNameStr $ replaceVersionNumber $(embedFile "src/OpenAPI/Common.hs"))
              ]
       modulesToExport =
         fmap
-          ( (moduleName <>)
+          ( (moduleNameStr <>)
               . ("." <>)
               . joinWithPoint
               . fst
           )
           modules
-      mainFile = outputDirectory </> srcDirectory </> (moduleName ++ ".hs")
-      mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleName modulesToExport "The main module which exports all functionality."
+      mainFile = outputDirectory </> srcDirectory </> OAO.getModuleInfoPath modulePathInfo Nothing ".hs"
+      mainModuleContent = show $ Doc.createModuleHeaderWithReexports moduleNameStr modulesToExport "The main module which exports all functionality."
       hsBootFiles = getHsBootFiles settings modelModules
   pure $
     OutputFiles
       ( BF.second (unlines . lines)
           <$> (mainFile, mainModuleContent)
-            : (BF.first ((outputDirectory </>) . (srcDirectory </>) . (moduleName </>) . (<> ".hs") . foldr1 (</>)) <$> modules)
+            : (BF.first ((\suffix -> outputDirectory </> srcDirectory </> OAO.getModuleInfoPath modulePathInfo (Just suffix) ".hs") . foldr1 (</>)) <$> modules)
               <> hsBootFiles
       )
-      (BF.first (outputDirectory </>) <$> cabalProjectFiles packageName moduleName modulesToExport)
+      (BF.first (outputDirectory </>) <$> cabalProjectFiles packageName moduleNameStr modulesToExport)
       (BF.first (outputDirectory </>) <$> stackProjectFiles)
       (BF.first (outputDirectory </>) <$> nixProjectFiles packageName)
 
 writeFiles :: OAO.Settings -> OutputFiles -> IO ()
 writeFiles settings OutputFiles {..} = do
   let outputDirectory = T.unpack $ OAO.settingOutputDir settings
-      moduleName = T.unpack $ OAO.settingModuleName settings
+      modulePathInfo = OAO.mkModulePathInfo $ OAO.settingModuleName settings
+      moduleDir = OAO.getModuleInfoDir modulePathInfo
       incremental = OAO.settingIncremental settings
       write = mapM_ $ if incremental then writeFileIncremental else writeFileWithLog
   putStrLn "Remove old output directory"
@@ -257,8 +262,8 @@ writeFiles settings OutputFiles {..} = do
     void $
       tryIOError (removeDirectoryRecursive outputDirectory)
   putStrLn "Output directory removed, create missing directories"
-  createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Operations")
-  createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleName </> "Types")
+  createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleDir </> "Operations")
+  createDirectoryIfMissing True (outputDirectory </> srcDirectory </> moduleDir </> "Types")
   putStrLn "Directories created"
   write outputFilesModuleFiles
   write outputFilesCabalFiles
