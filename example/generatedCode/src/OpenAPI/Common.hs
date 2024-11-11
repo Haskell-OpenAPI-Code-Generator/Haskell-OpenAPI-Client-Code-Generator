@@ -255,7 +255,7 @@ createBaseRequest config method path queryParams =
         else basePath
     -- filters all maybe
     query = BF.second pure <$> serializeQueryParams queryParams
-    userAgent = configApplicationName config <> " openapi3-code-generator/0.1.0.7 (https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator)"
+    userAgent = configApplicationName config <> " openapi3-code-generator/0.2.0.0 (https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator)"
     addUserAgent =
       if configIncludeUserAgent config
         then HS.addRequestHeader HT.hUserAgent $ textToByte userAgent
