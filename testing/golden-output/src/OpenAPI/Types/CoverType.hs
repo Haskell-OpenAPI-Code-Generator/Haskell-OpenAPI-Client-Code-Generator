@@ -45,50 +45,50 @@ import {-# SOURCE #-} OpenAPI.Types.Value
 -- 
 data CoverType = CoverType {
   -- | cover
-  coverTypeCover :: (GHC.Maybe.Maybe CoverTypeCoverVariants)
+  coverType :: (GHC.Maybe.Maybe CoverTypeVariants)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CoverType
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("cover" Data.Aeson.Types.ToJSON..=)) (coverTypeCover obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("cover" Data.Aeson.Types.ToJSON..=)) (coverTypeCover obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("cover" Data.Aeson.Types.ToJSON..=)) (coverType obj) : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("cover" Data.Aeson.Types.ToJSON..=)) (coverType obj) : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON CoverType
     where {parseJSON = Data.Aeson.Types.FromJSON.withObject "CoverType" (\obj -> GHC.Base.pure CoverType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "cover"))}
 -- | Create a new 'CoverType' with all required fields.
 mkCoverType :: CoverType
-mkCoverType = CoverType{coverTypeCover = GHC.Maybe.Nothing}
+mkCoverType = CoverType{coverType = GHC.Maybe.Nothing}
 -- | Defines the oneOf schema located at @components.schemas.CoverType.properties.cover.oneOf@ in the specification.
 -- 
 -- 
-data CoverTypeCoverVariants =
-   CoverTypeCoverPetByAge PetByAge
-  | CoverTypeCoverMischling Mischling
-  | CoverTypeCoverTest Test
-  | CoverTypeCoverTest2 Test2
-  | CoverTypeCoverTest3 Test3
-  | CoverTypeCoverTest4 Test4
-  | CoverTypeCoverTest5 Test5
-  | CoverTypeCoverTest6 Test6
-  | CoverTypeCoverTest7 Test7
-  | CoverTypeCoverTest8 Test8
-  | CoverTypeCoverTest9 Test9
-  | CoverTypeCoverTest10 Test10
-  | CoverTypeCoverValue Value
+data CoverTypeVariants =
+   CoverTypePetByAge PetByAge
+  | CoverTypeMischling Mischling
+  | CoverTypeTest Test
+  | CoverTypeTest2 Test2
+  | CoverTypeTest3 Test3
+  | CoverTypeTest4 Test4
+  | CoverTypeTest5 Test5
+  | CoverTypeTest6 Test6
+  | CoverTypeTest7 Test7
+  | CoverTypeTest8 Test8
+  | CoverTypeTest9 Test9
+  | CoverTypeTest10 Test10
+  | CoverTypeValue Value
   deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.Types.ToJSON.ToJSON CoverTypeCoverVariants
-    where {toJSON (CoverTypeCoverPetByAge a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverMischling a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest2 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest3 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest4 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest5 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest6 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest7 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest8 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest9 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverTest10 a) = Data.Aeson.Types.ToJSON.toJSON a;
-           toJSON (CoverTypeCoverValue a) = Data.Aeson.Types.ToJSON.toJSON a}
-instance Data.Aeson.Types.FromJSON.FromJSON CoverTypeCoverVariants
-    where {parseJSON val = case (CoverTypeCoverPetByAge Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverMischling Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest2 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest3 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest5 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest6 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest7 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest8 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest9 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverTest10 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeCoverValue Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))))))))))) of
+instance Data.Aeson.Types.ToJSON.ToJSON CoverTypeVariants
+    where {toJSON (CoverTypePetByAge a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeMischling a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest2 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest3 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest4 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest5 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest6 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest7 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest8 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest9 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeTest10 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (CoverTypeValue a) = Data.Aeson.Types.ToJSON.toJSON a}
+instance Data.Aeson.Types.FromJSON.FromJSON CoverTypeVariants
+    where {parseJSON val = case (CoverTypePetByAge Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeMischling Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest2 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest3 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest4 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest5 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest6 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest7 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest8 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest9 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeTest10 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CoverTypeValue Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))))))))))) of
                            {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
                             Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}

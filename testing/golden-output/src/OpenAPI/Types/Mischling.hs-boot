@@ -11,6 +11,11 @@ instance Show MischlingAnother_relativeOneOf5
 instance Eq MischlingAnother_relativeOneOf5
 instance Data.Aeson.FromJSON MischlingAnother_relativeOneOf5
 instance Data.Aeson.ToJSON MischlingAnother_relativeOneOf5
+data MischlingAnother_relativeAnother_cat
+instance Show MischlingAnother_relativeAnother_cat
+instance Eq MischlingAnother_relativeAnother_cat
+instance Data.Aeson.FromJSON MischlingAnother_relativeAnother_cat
+instance Data.Aeson.ToJSON MischlingAnother_relativeAnother_cat
 data MischlingAnother_relativeVariants
 instance Show MischlingAnother_relativeVariants
 instance Eq MischlingAnother_relativeVariants
