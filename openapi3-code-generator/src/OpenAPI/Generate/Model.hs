@@ -369,17 +369,18 @@ defineAnyOfSchema strategy schemaName description schemas = do
 -- creates types for all the subschemas and then creates an adt with constructors for the different
 -- subschemas. Constructors are numbered
 defineOneOfSchema :: Text -> Text -> [OAS.Schema] -> OAM.Generator TypeWithDeclaration
-defineOneOfSchema schemaName description schemas = do
-  when (null schemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
+defineOneOfSchema schemaName description allSchemas = do
+  when (null allSchemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
   settings <- OAM.getSettings
   let haskellifyConstructor = haskellifyName (OAO.settingConvertToCamelCase settings) True
       name = haskellifyConstructor $ schemaName <> "Variants"
       fixedValueStrategy = OAO.settingFixedValueStrategy settings
-      useSingleFieldNames = OAO.settingUseSingleFieldNames settings
-      (schemas', fixedValueSchemas) = extractSchemasWithFixedValues fixedValueStrategy schemas
-      (schemas'', singleFieldedSchemas) = if useSingleFieldNames then extractSchemasWithSingleField schemas' else (schemas', [])
+      (otherSchemas, fixedValueSchemas, singleFieldedSchemas) =
+        let (s', fixedValue) = extractSchemasWithFixedValues fixedValueStrategy allSchemas
+            (s'', singleFielded) = extractSchemasWithSingleField s'
+         in (s'', fixedValue, singleFielded)
       defineSingleFielded field = defineModelForSchemaNamed (schemaName <> haskellifyText (OAO.settingConvertToCamelCase settings) True field)
-      indexedSchemas = zip schemas'' ([1 ..] :: [Integer])
+      indexedSchemas = zip otherSchemas ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
   OAM.logInfo $ "Define as oneOf named '" <> T.pack (nameBase name) <> "'"
   singleFieldedVariants <- mapM (uncurry defineSingleFielded) singleFieldedSchemas
@@ -624,10 +625,9 @@ defineObjectModelForSchema strategy schemaName schema =
           name = haskellifyName convertToCamelCase True schemaName
           required = OAS.schemaObjectRequired schema
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
-          useSingleFieldNames = OAO.settingUseSingleFieldNames settings
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
           propFields = case props of
-            [(propName, subschema)] | useSingleFieldNames -> [(propName, toField convertToCamelCase propName schemaName subschema required)]
+            [(propName, subschema)] -> [(propName, toField convertToCamelCase propName schemaName subschema required)]
             _ -> flip fmap props $ \(propName, subschema) ->
               (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName) subschema required)
           emptyCtx = pure []

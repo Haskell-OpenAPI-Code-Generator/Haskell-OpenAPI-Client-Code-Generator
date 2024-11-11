@@ -46,8 +46,7 @@ data Flags = Flags
     flagOpaqueSchemas :: !(Maybe [Text]),
     flagWhiteListedSchemas :: !(Maybe [Text]),
     flagOutputAllSchemas :: !(Maybe Bool),
-    flagFixedValueStrategy :: !(Maybe FixedValueStrategy),
-    flagUseSingleFieldNames :: !(Maybe Bool)
+    flagFixedValueStrategy :: !(Maybe FixedValueStrategy)
   }
   deriving (Show, Eq)
 
@@ -88,7 +87,6 @@ parseFlags =
     <*> parseFlagWhiteListedSchemas
     <*> parseFlagOutputAllSchemas
     <*> parseFlagFixedValueStrategy
-    <*> parseFlagUseSingleFieldNames
 
 parseFlagConfiguration :: Parser (Maybe Text)
 parseFlagConfiguration =
@@ -384,7 +382,3 @@ parseFlagFixedValueStrategy =
           help "In OpenAPI 3, fixed values can be defined as an enum with only one allowed value. If such a constant value is encountered as a required property of an object, the generator excludes this property by default ('exclude' strategy) and adds the value in the 'ToJSON' instance and expects the value to be there in the 'FromJSON' instance. This setting allows to change this behavior by including all fixed value fields instead ('include' strategy), i.e. just not trying to do anything smart (default: 'exclude').",
           long "fixed-value-strategy"
         ]
-
-parseFlagUseSingleFieldNames :: Parser (Maybe Bool)
-parseFlagUseSingleFieldNames =
-  booleanFlag "Instead of numbering oneof branches as OneOfN, name oneof branches after a single field where possible" "use-single-field-names" Nothing
