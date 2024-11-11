@@ -594,16 +594,19 @@ defineArrayModelForSchema strategy schemaName schema = do
     )
 
 data Field = Field
-  { fieldName :: Text,
+  { fieldProp :: Text,
+    fieldName :: Text,
     fieldSchema :: OAS.Schema,
     fieldRequired :: Bool,
     fieldHaskellName :: Name
   }
 
+-- FIXME add property type suffix
 toField :: Bool -> Text -> Text -> OAS.Schema -> Set.Set Text -> Field
 toField convertToCamelCase propName fieldName fieldSchema required =
   Field
-    { fieldName,
+    { fieldProp = propName,
+      fieldName,
       fieldSchema,
       fieldRequired = propName `Set.member` required,
       fieldHaskellName = haskellifyName convertToCamelCase False fieldName
@@ -766,12 +769,12 @@ createFromJSONImplementation objectName fieldProps =
       withObjectLamda =
         foldl
           ( \prev (_, Field {..}) ->
-              let fieldName' = stringE $ T.unpack fieldName
+              let fieldProp' = stringE $ T.unpack fieldProp
                   arg = varE fnArgName
                   readPropE =
                     if fieldRequired
-                      then [|$arg Aeson..: $fieldName'|]
-                      else [|$arg Aeson..:! $fieldName'|]
+                      then [|$arg Aeson..: $fieldProp'|]
+                      else [|$arg Aeson..:! $fieldProp'|]
                in [|$prev <*> $readPropE|]
           )
           [|pure $(varE objectName)|]
@@ -806,7 +809,7 @@ propertiesToBangTypes fieldProps = OAM.nested "properties" $ do
         pure (haskellifyName convertToCamelCase False fieldName, bang', type')
       propToBangType :: Field -> OAM.Generator (Q VarBangType, Q Doc, Dep.Models)
       propToBangType field@Field {..} = do
-        (myType, (content, dependencies)) <- OAM.nested fieldName $ defineModelForSchemaNamed fieldName fieldSchema
+        (myType, (content, dependencies)) <- OAM.nested fieldProp $ defineModelForSchemaNamed fieldName fieldSchema
         let myBang = createBang field myType
         pure (myBang, content, dependencies)
       foldFn :: OAM.Generator BangTypesSelfDefined -> (Text, Field) -> OAM.Generator BangTypesSelfDefined
