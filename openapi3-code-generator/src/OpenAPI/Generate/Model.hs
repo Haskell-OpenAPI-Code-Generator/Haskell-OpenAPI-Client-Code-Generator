@@ -602,7 +602,6 @@ data Field = Field
     fieldHaskellName :: Name
   }
 
--- FIXME add property type suffix
 toField :: Bool -> Text -> Text -> OAS.Schema -> Set.Set Text -> Field
 toField convertToCamelCase propName fieldName fieldSchema required =
   Field
@@ -626,10 +625,11 @@ defineObjectModelForSchema strategy schemaName schema =
           required = OAS.schemaObjectRequired schema
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
+          propSuffix = OAO.settingPropertyTypeSuffix settings
           propFields = case props of
-            [(propName, subschema)] -> [(propName, toField convertToCamelCase propName schemaName subschema required)]
+            [(propName, subschema)] -> [(propName, toField convertToCamelCase propName (schemaName <> propSuffix) subschema required)]
             _ -> flip fmap props $ \(propName, subschema) ->
-              (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName) subschema required)
+              (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName <> propSuffix) subschema required)
           emptyCtx = pure []
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
       (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes propFields
