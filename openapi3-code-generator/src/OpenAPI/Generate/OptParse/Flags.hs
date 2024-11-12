@@ -46,7 +46,8 @@ data Flags = Flags
     flagOpaqueSchemas :: !(Maybe [Text]),
     flagWhiteListedSchemas :: !(Maybe [Text]),
     flagOutputAllSchemas :: !(Maybe Bool),
-    flagFixedValueStrategy :: !(Maybe FixedValueStrategy)
+    flagFixedValueStrategy :: !(Maybe FixedValueStrategy),
+    flagShortenSingleFieldObjects :: !(Maybe Bool)
   }
   deriving (Show, Eq)
 
@@ -87,6 +88,7 @@ parseFlags =
     <*> parseFlagWhiteListedSchemas
     <*> parseFlagOutputAllSchemas
     <*> parseFlagFixedValueStrategy
+    <*> parseFlagShortenSingleFieldObjects
 
 parseFlagConfiguration :: Parser (Maybe Text)
 parseFlagConfiguration =
@@ -382,3 +384,7 @@ parseFlagFixedValueStrategy =
           help "In OpenAPI 3, fixed values can be defined as an enum with only one allowed value. If such a constant value is encountered as a required property of an object, the generator excludes this property by default ('exclude' strategy) and adds the value in the 'ToJSON' instance and expects the value to be there in the 'FromJSON' instance. This setting allows to change this behavior by including all fixed value fields instead ('include' strategy), i.e. just not trying to do anything smart (default: 'exclude').",
           long "fixed-value-strategy"
         ]
+
+parseFlagShortenSingleFieldObjects :: Parser (Maybe Bool)
+parseFlagShortenSingleFieldObjects =
+  booleanFlag "When encountering an object with a single field, shorten the field of that object to be the schema name. Respects property type suffix." "shorten-single-field-objects" Nothing

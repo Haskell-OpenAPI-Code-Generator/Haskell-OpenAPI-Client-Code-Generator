@@ -160,18 +160,18 @@ mkMischlingAnother_relativeOneOf5 = MischlingAnother_relativeOneOf5{mischlingAno
 -- 
 data MischlingAnother_relativeAnother_cat = MischlingAnother_relativeAnother_cat {
   -- | another_cat
-  mischlingAnother_relativeAnother_cat :: Cat
+  mischlingAnother_relativeAnother_catAnother_cat :: Cat
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeAnother_cat
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_cat obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_cat obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeAnother_cat
     where {parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingAnother_relativeAnother_cat" (\obj -> GHC.Base.pure MischlingAnother_relativeAnother_cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "another_cat"))}
 -- | Create a new 'MischlingAnother_relativeAnother_cat' with all required fields.
-mkMischlingAnother_relativeAnother_cat :: Cat -- ^ 'mischlingAnother_relativeAnother_cat'
+mkMischlingAnother_relativeAnother_cat :: Cat -- ^ 'mischlingAnother_relativeAnother_catAnother_cat'
   -> MischlingAnother_relativeAnother_cat
-mkMischlingAnother_relativeAnother_cat mischlingAnother_relativeAnother_cat = MischlingAnother_relativeAnother_cat{mischlingAnother_relativeAnother_cat = mischlingAnother_relativeAnother_cat}
+mkMischlingAnother_relativeAnother_cat mischlingAnother_relativeAnother_catAnother_cat = MischlingAnother_relativeAnother_cat{mischlingAnother_relativeAnother_catAnother_cat = mischlingAnother_relativeAnother_catAnother_cat}
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 

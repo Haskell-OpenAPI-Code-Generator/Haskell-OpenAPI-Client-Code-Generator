@@ -624,10 +624,13 @@ defineObjectModelForSchema strategy schemaName schema =
           name = haskellifyName convertToCamelCase True schemaName
           required = OAS.schemaObjectRequired schema
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
+          shortenSingleFieldObjects = OAO.settingShortenSingleFieldObjects settings
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
           propSuffix = OAO.settingPropertyTypeSuffix settings
           propFields = case props of
-            [(propName, subschema)] -> [(propName, toField convertToCamelCase propName (schemaName <> propSuffix) subschema required)]
+            [(propName, subschema)]
+              | shortenSingleFieldObjects ->
+                  [(propName, toField convertToCamelCase propName (schemaName <> propSuffix) subschema required)]
             _ -> flip fmap props $ \(propName, subschema) ->
               (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName <> propSuffix) subschema required)
           emptyCtx = pure []

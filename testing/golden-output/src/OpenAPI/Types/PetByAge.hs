@@ -88,18 +88,18 @@ mkPetByAgeAnother_relativeOneOf5 = PetByAgeAnother_relativeOneOf5{petByAgeAnothe
 -- 
 data PetByAgeAnother_relativeAnother_cat = PetByAgeAnother_relativeAnother_cat {
   -- | another_cat
-  petByAgeAnother_relativeAnother_cat :: Cat
+  petByAgeAnother_relativeAnother_catAnother_cat :: Cat
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByAgeAnother_relativeAnother_cat
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeAnother_cat obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeAnother_cat obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= petByAgeAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON PetByAgeAnother_relativeAnother_cat
     where {parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByAgeAnother_relativeAnother_cat" (\obj -> GHC.Base.pure PetByAgeAnother_relativeAnother_cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "another_cat"))}
 -- | Create a new 'PetByAgeAnother_relativeAnother_cat' with all required fields.
-mkPetByAgeAnother_relativeAnother_cat :: Cat -- ^ 'petByAgeAnother_relativeAnother_cat'
+mkPetByAgeAnother_relativeAnother_cat :: Cat -- ^ 'petByAgeAnother_relativeAnother_catAnother_cat'
   -> PetByAgeAnother_relativeAnother_cat
-mkPetByAgeAnother_relativeAnother_cat petByAgeAnother_relativeAnother_cat = PetByAgeAnother_relativeAnother_cat{petByAgeAnother_relativeAnother_cat = petByAgeAnother_relativeAnother_cat}
+mkPetByAgeAnother_relativeAnother_cat petByAgeAnother_relativeAnother_catAnother_cat = PetByAgeAnother_relativeAnother_cat{petByAgeAnother_relativeAnother_catAnother_cat = petByAgeAnother_relativeAnother_catAnother_cat}
 -- | Defines the oneOf schema located at @components.schemas.PetByAge.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
