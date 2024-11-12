@@ -626,13 +626,12 @@ defineObjectModelForSchema strategy schemaName schema =
           fixedValueStrategy = OAO.settingFixedValueStrategy settings
           shortenSingleFieldObjects = OAO.settingShortenSingleFieldObjects settings
           (props, propsWithFixedValues) = extractPropertiesWithFixedValues fixedValueStrategy required $ Map.toList $ OAS.schemaObjectProperties schema
-          propSuffix = OAO.settingPropertyTypeSuffix settings
           propFields = case props of
             [(propName, subschema)]
               | shortenSingleFieldObjects ->
-                  [(propName, toField convertToCamelCase propName (schemaName <> propSuffix) subschema required)]
+                  [(propName, toField convertToCamelCase propName schemaName subschema required)]
             _ -> flip fmap props $ \(propName, subschema) ->
-              (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName <> propSuffix) subschema required)
+              (propName, toField convertToCamelCase propName (schemaName <> uppercaseFirstText propName) subschema required)
           emptyCtx = pure []
       OAM.logInfo $ "Define as record named '" <> T.pack (nameBase name) <> "'"
       (bangTypes, propertyContent, propertyDependencies) <- propertiesToBangTypes propFields
@@ -802,6 +801,7 @@ propertiesToBangTypes :: [(Text, Field)] -> OAM.Generator BangTypesSelfDefined
 propertiesToBangTypes [] = pure (pure [], emptyDoc, Set.empty)
 propertiesToBangTypes fieldProps = OAM.nested "properties" $ do
   convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
+  propTypeSuffix <- OAM.getSetting OAO.settingPropertyTypeSuffix
   let createBang :: Field -> Q Type -> Q VarBangType
       createBang Field {..} myType = do
         bang' <- bang noSourceUnpackedness noSourceStrictness
@@ -812,7 +812,7 @@ propertiesToBangTypes fieldProps = OAM.nested "properties" $ do
         pure (haskellifyName convertToCamelCase False fieldName, bang', type')
       propToBangType :: Field -> OAM.Generator (Q VarBangType, Q Doc, Dep.Models)
       propToBangType field@Field {..} = do
-        (myType, (content, dependencies)) <- OAM.nested fieldProp $ defineModelForSchemaNamed fieldName fieldSchema
+        (myType, (content, dependencies)) <- OAM.nested fieldProp $ defineModelForSchemaNamed (fieldName <> propTypeSuffix) fieldSchema
         let myBang = createBang field myType
         pure (myBang, content, dependencies)
       foldFn :: OAM.Generator BangTypesSelfDefined -> (Text, Field) -> OAM.Generator BangTypesSelfDefined
