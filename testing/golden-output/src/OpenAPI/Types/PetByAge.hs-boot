@@ -11,6 +11,11 @@ instance Show PetByAgeAnother_relativeOneOf5
 instance Eq PetByAgeAnother_relativeOneOf5
 instance Data.Aeson.FromJSON PetByAgeAnother_relativeOneOf5
 instance Data.Aeson.ToJSON PetByAgeAnother_relativeOneOf5
+data PetByAgeAnother_relativeAnother_cat
+instance Show PetByAgeAnother_relativeAnother_cat
+instance Eq PetByAgeAnother_relativeAnother_cat
+instance Data.Aeson.FromJSON PetByAgeAnother_relativeAnother_cat
+instance Data.Aeson.ToJSON PetByAgeAnother_relativeAnother_cat
 data PetByAgeAnother_relativeVariants
 instance Show PetByAgeAnother_relativeVariants
 instance Eq PetByAgeAnother_relativeVariants

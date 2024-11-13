@@ -155,6 +155,23 @@ instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeOneOf5
 mkMischlingAnother_relativeOneOf5 :: MischlingAnother_relativeOneOf5
 mkMischlingAnother_relativeOneOf5 = MischlingAnother_relativeOneOf5{mischlingAnother_relativeOneOf5Hunts = GHC.Maybe.Nothing,
                                                                     mischlingAnother_relativeOneOf5Pet_type = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
+-- 
+-- 
+data MischlingAnother_relativeAnother_cat = MischlingAnother_relativeAnother_cat {
+  -- | another_cat
+  mischlingAnother_relativeAnother_catAnother_cat :: Cat
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeAnother_cat
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["another_cat" Data.Aeson.Types.ToJSON..= mischlingAnother_relativeAnother_catAnother_cat obj] : GHC.Base.mempty)))}
+instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeAnother_cat
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "MischlingAnother_relativeAnother_cat" (\obj -> GHC.Base.pure MischlingAnother_relativeAnother_cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "another_cat"))}
+-- | Create a new 'MischlingAnother_relativeAnother_cat' with all required fields.
+mkMischlingAnother_relativeAnother_cat :: Cat -- ^ 'mischlingAnother_relativeAnother_catAnother_cat'
+  -> MischlingAnother_relativeAnother_cat
+mkMischlingAnother_relativeAnother_cat mischlingAnother_relativeAnother_catAnother_cat = MischlingAnother_relativeAnother_cat{mischlingAnother_relativeAnother_catAnother_cat = mischlingAnother_relativeAnother_catAnother_cat}
 -- | Defines the oneOf schema located at @components.schemas.Mischling.allOf.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
@@ -166,6 +183,7 @@ data MischlingAnother_relativeVariants =
   | MischlingAnother_relativeText Data.Text.Internal.Text
   | MischlingAnother_relativeListTText [Data.Text.Internal.Text]
   | MischlingAnother_relativeMischlingAnother_relativeOneOf5 MischlingAnother_relativeOneOf5
+  | MischlingAnother_relativeMischlingAnother_relativeAnother_cat MischlingAnother_relativeAnother_cat
   deriving (GHC.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeVariants
     where {toJSON (MischlingAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a;
@@ -173,12 +191,13 @@ instance Data.Aeson.Types.ToJSON.ToJSON MischlingAnother_relativeVariants
            toJSON (MischlingAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (MischlingAnother_relativeListTText a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (MischlingAnother_relativeMischlingAnother_relativeOneOf5 a) = Data.Aeson.Types.ToJSON.toJSON a;
+           toJSON (MischlingAnother_relativeMischlingAnother_relativeAnother_cat a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (MischlingAnother_relativeEmptyString) = "";
            toJSON (MischlingAnother_relativeTest) = "test"}
 instance Data.Aeson.Types.FromJSON.FromJSON MischlingAnother_relativeVariants
     where {parseJSON val = if | val GHC.Classes.== "" -> GHC.Base.pure MischlingAnother_relativeEmptyString
                               | val GHC.Classes.== "test" -> GHC.Base.pure MischlingAnother_relativeTest
-                              | GHC.Base.otherwise -> case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf5 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")))) of
+                              | GHC.Base.otherwise -> case (MischlingAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeListTText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeOneOf5 Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((MischlingAnother_relativeMischlingAnother_relativeAnother_cat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched"))))) of
                                                       {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
                                                        Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}
 -- | Defines the enum schema located at @components.schemas.Mischling.allOf.properties.breed@ in the specification.

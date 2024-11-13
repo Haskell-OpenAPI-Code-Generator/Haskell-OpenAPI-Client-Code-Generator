@@ -87,7 +87,7 @@ defineModuleForOperation mainModuleName requestPath method operation = OAM.neste
   convertToCamelCase <- OAM.getSetting OAO.settingConvertToCamelCase
   let operationIdAsText = T.pack $ show operationIdName
       appendToOperationName = ((T.pack $ nameBase operationIdName) <>)
-      moduleName = haskellifyText convertToCamelCase True operationIdAsText
+      moduleName = T.unpack $ haskellifyText convertToCamelCase True operationIdAsText
   OAM.logInfo $ "Generating operation with name '" <> operationIdAsText <> "'"
   (bodySchema, bodyPath) <- getBodySchemaFromOperation operation
   (responseTypeName, responseTransformerExp, responseBodyDefinitions, responseBodyDependencies) <- OAR.getResponseDefinitions operation appendToOperationName

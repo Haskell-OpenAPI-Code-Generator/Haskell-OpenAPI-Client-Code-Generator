@@ -110,7 +110,10 @@ data Settings = Settings
     -- in the 'FromJSON' instance.
     -- This setting allows to change this behavior by including all fixed value
     -- fields instead ("include" strategy), i.e. just not trying to do anything smart.
-    settingFixedValueStrategy :: !FixedValueStrategy
+    settingFixedValueStrategy :: !FixedValueStrategy,
+    -- | When encountering an object with a single field, shorten the field of that object to be the
+    -- schema name. Respects property type suffix.
+    settingShortenSingleFieldObjects :: !Bool
   }
   deriving (Show, Eq)
 
@@ -157,6 +160,7 @@ combineToSettings Flags {..} mConf configurationFilePath = do
       settingWhiteListedSchemas = fromMaybe [] $ flagWhiteListedSchemas <|> mc configWhiteListedSchemas
       settingOutputAllSchemas = fromMaybe False $ flagOutputAllSchemas <|> mc configOutputAllSchemas
       settingFixedValueStrategy = fromMaybe FixedValueStrategyExclude $ flagFixedValueStrategy <|> mc configFixedValueStrategy
+      settingShortenSingleFieldObjects = fromMaybe False $ flagShortenSingleFieldObjects <|> mc configShortenSingleFieldObjects
 
   pure Settings {..}
   where
