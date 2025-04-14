@@ -9,6 +9,8 @@
     autodocodec.flake = false;
     safe-coloured-text.url = "github:NorfairKing/safe-coloured-text";
     safe-coloured-text.flake = false;
+    fast-myers-diff.url = "github:NorfairKing/fast-myers-diff";
+    fast-myers-diff.flake = false;
     sydtest.url = "github:NorfairKing/sydtest";
     sydtest.flake = false;
     flake-utils.url = "github:numtide/flake-utils";
@@ -20,6 +22,7 @@
     , pre-commit-hooks
     , validity
     , safe-coloured-text
+    , fast-myers-diff
     , sydtest
     , autodocodec
     , flake-utils
@@ -32,6 +35,7 @@
           self.overlays.${system}
           (import (autodocodec + "/nix/overlay.nix"))
           (import (safe-coloured-text + "/nix/overlay.nix"))
+          (import (fast-myers-diff + "/nix/overlay.nix"))
           (import (sydtest + "/nix/overlay.nix"))
           (import (validity + "/nix/overlay.nix"))
         ];
