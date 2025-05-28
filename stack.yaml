@@ -1,4 +1,4 @@
-resolver: lts-21.22
+resolver: lts-23.19
 packages:
 - openapi3-code-generator
 

@@ -12,11 +12,12 @@ import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Decoding
 import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
-import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.ByteString
 import qualified Data.ByteString as Data.ByteString.Internal
 import qualified Data.ByteString as Data.ByteString.Internal.Type
@@ -50,8 +51,8 @@ import OpenAPI.Types
 -- Multiple status values can be provided with comma separated strings
 findPetsByStatus :: forall m . OpenAPI.Common.MonadHTTP m => [FindPetsByStatusParametersStatus] -- ^ status: Status values that need to be considered for filter
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response FindPetsByStatusResponse) -- ^ Monadic computation which returns the result of the operation
-findPetsByStatus status = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either FindPetsByStatusResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByStatusResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                     [Pet])
+findPetsByStatus status = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either FindPetsByStatusResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByStatusResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                              [Pet])
                                                                                                                                                                      | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right FindPetsByStatusResponse400
                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/pet/findByStatus" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.Internal.pack "form") GHC.Types.True])
 -- | Defines the enum schema located at @paths.\/pet\/findByStatus.GET.parameters.[0].schema.items@ in the specification.
@@ -90,8 +91,8 @@ findPetsByStatusWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => Op
   -> [FindPetsByStatusParametersStatus] -- ^ status: Status values that need to be considered for filter
   -> m (Network.HTTP.Client.Types.Response FindPetsByStatusResponse) -- ^ Monadic computation which returns the result of the operation
 findPetsByStatusWithConfiguration config
-                                  status = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either FindPetsByStatusResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByStatusResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                      [Pet])
+                                  status = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either FindPetsByStatusResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByStatusResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                               [Pet])
                                                                                                                                                                                       | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right FindPetsByStatusResponse400
                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/pet/findByStatus" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "status") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON status) (Data.Text.Internal.pack "form") GHC.Types.True])
 -- | > GET /pet/findByStatus

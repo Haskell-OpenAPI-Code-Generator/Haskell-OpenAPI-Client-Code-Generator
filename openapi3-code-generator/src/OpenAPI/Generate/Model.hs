@@ -4,6 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
 
 -- | Defines functionality for the generation of models from OpenAPI schemas
 module OpenAPI.Generate.Model
@@ -551,7 +552,7 @@ defineNewSchemaForAllOf schemaName description schemas = do
       OAM.logWarning "allOf does not contain any schemas with properties."
       pure Nothing
     else do
-      let schemaPrototype = head concreteSchemas
+      let schemaPrototype = List.head concreteSchemas
           newSchema = schemaPrototype {OAS.schemaObjectProperties = propertiesCombined, OAS.schemaObjectRequired = requiredCombined, OAS.schemaObjectDescription = Just description}
       OAM.logTrace $ "Define allOf as record named '" <> schemaName <> "'"
       pure $ Just (newSchema, newDependencies)

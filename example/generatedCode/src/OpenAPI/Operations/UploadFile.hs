@@ -12,11 +12,12 @@ import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Decoding
 import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
-import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.ByteString
 import qualified Data.ByteString as Data.ByteString.Internal
 import qualified Data.ByteString as Data.ByteString.Internal.Type
@@ -50,8 +51,8 @@ import OpenAPI.Types
 -- 
 uploadFile :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Int.Int64 -- ^ petId: ID of pet to update
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response UploadFileResponse) -- ^ Monadic computation which returns the result of the operation
-uploadFile petId = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either UploadFileResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> UploadFileResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                  ApiResponse)
+uploadFile petId = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either UploadFileResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> UploadFileResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                           ApiResponse)
                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "/uploadImage")) GHC.Base.mempty)
 -- | Represents a response of the operation 'uploadFile'.
 -- 
@@ -67,8 +68,8 @@ uploadFileWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.
   -> GHC.Int.Int64 -- ^ petId: ID of pet to update
   -> m (Network.HTTP.Client.Types.Response UploadFileResponse) -- ^ Monadic computation which returns the result of the operation
 uploadFileWithConfiguration config
-                            petId = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either UploadFileResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> UploadFileResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                   ApiResponse)
+                            petId = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either UploadFileResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> UploadFileResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                            ApiResponse)
                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "/uploadImage")) GHC.Base.mempty)
 -- | > POST /pet/{petId}/uploadImage
 -- 

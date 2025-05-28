@@ -12,11 +12,12 @@ import qualified Prelude as GHC.Maybe
 import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Decoding
 import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
-import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.Aeson as Data.Aeson.Types.Internal
+import qualified Data.Aeson as Data.Aeson.Types.ToJSON
 import qualified Data.ByteString
 import qualified Data.ByteString as Data.ByteString.Internal
 import qualified Data.ByteString as Data.ByteString.Internal.Type
@@ -50,8 +51,8 @@ import OpenAPI.Types
 -- Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
 findPetsByTags :: forall m . OpenAPI.Common.MonadHTTP m => [Data.Text.Internal.Text] -- ^ tags: Tags to filter by
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response FindPetsByTagsResponse) -- ^ Monadic computation which returns the result of the operation
-findPetsByTags tags = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either FindPetsByTagsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByTagsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                             [Pet])
+findPetsByTags tags = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either FindPetsByTagsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByTagsResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                      [Pet])
                                                                                                                                                                | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right FindPetsByTagsResponse400
                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/pet/findByTags" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "tags") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON tags) (Data.Text.Internal.pack "form") GHC.Types.True])
 -- | Represents a response of the operation 'findPetsByTags'.
@@ -69,8 +70,8 @@ findPetsByTagsWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => Open
   -> [Data.Text.Internal.Text] -- ^ tags: Tags to filter by
   -> m (Network.HTTP.Client.Types.Response FindPetsByTagsResponse) -- ^ Monadic computation which returns the result of the operation
 findPetsByTagsWithConfiguration config
-                                tags = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either FindPetsByTagsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByTagsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                              [Pet])
+                                tags = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either FindPetsByTagsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> FindPetsByTagsResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                       [Pet])
                                                                                                                                                                                 | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right FindPetsByTagsResponse400
                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/pet/findByTags" [OpenAPI.Common.QueryParameter (Data.Text.Internal.pack "tags") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON tags) (Data.Text.Internal.pack "form") GHC.Types.True])
 -- | > GET /pet/findByTags
