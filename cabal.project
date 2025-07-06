@@ -1,2 +1,4 @@
-packages: */*.cabal
+packages:
+  */*.cabal
+  example/generatedCode/openapi.cabal
 test-show-details: direct
