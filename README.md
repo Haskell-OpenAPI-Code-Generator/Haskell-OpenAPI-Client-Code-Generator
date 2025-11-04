@@ -1,6 +1,11 @@
 # openapi3-code-generator
 [![Build nix derivations](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml/badge.svg)](https://github.com/Haskell-OpenAPI-Code-Generator/Haskell-OpenAPI-Client-Code-Generator/actions/workflows/build.yml)
 
+> [!NOTE]  
+> This converter has been built for the OpenAPI specification 3.0.
+> Since there are a lot of similarities between 3.0 and 3.1, some specification may still work but most will not.
+> If you are interested in helping making it compatible with 3.1 as well, a PR would be appreciated!
+
 ## How to use?
 1. install [cabal](https://www.haskell.org/cabal/)
 1. `cabal update`
