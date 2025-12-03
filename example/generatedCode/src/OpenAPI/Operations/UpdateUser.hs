@@ -62,17 +62,17 @@ updateUser :: forall m . OpenAPI.Common.MonadHTTP m => Data.Text.Internal.Text -
   -> User -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response UpdateUserResponse) -- ^ Monadic computation which returns the result of the operation
 updateUser username
-           body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either UpdateUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right UpdateUserResponse400
-                                                                                                                                                       | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right UpdateUserResponse404
-                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Base.<> "")) GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+           body = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either UpdateUserResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right UpdateUserResponse400
+                                                                                                                                                                                                        | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right UpdateUserResponse404
+                                                                                                                                                                                                        | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | Represents a response of the operation 'updateUser'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'UpdateUserResponseError' is used.
 data UpdateUserResponse =
-   UpdateUserResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   UpdateUserResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | UpdateUserResponse400 -- ^ Invalid user supplied
   | UpdateUserResponse404 -- ^ User not found
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > PUT /user/{username}
 -- 
 -- The same as 'updateUser' but accepts an explicit configuration.
@@ -82,9 +82,9 @@ updateUserWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.
   -> m (Network.HTTP.Client.Types.Response UpdateUserResponse) -- ^ Monadic computation which returns the result of the operation
 updateUserWithConfiguration config
                             username
-                            body = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either UpdateUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right UpdateUserResponse400
-                                                                                                                                                                        | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right UpdateUserResponse404
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Base.<> "")) GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                            body = GHC.Internal.Base.fmap (\response_3 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either UpdateUserResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right UpdateUserResponse400
+                                                                                                                                                                                                                         | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right UpdateUserResponse404
+                                                                                                                                                                                                                         | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PUT /user/{username}
 -- 
 -- The same as 'updateUser' but returns the raw 'Data.ByteString.ByteString'.
@@ -92,7 +92,7 @@ updateUserRaw :: forall m . OpenAPI.Common.MonadHTTP m => Data.Text.Internal.Tex
   -> User -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 updateUserRaw username
-              body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Base.<> "")) GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+              body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > PUT /user/{username}
 -- 
 -- The same as 'updateUser' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
@@ -102,4 +102,4 @@ updateUserWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenA
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 updateUserWithConfigurationRaw config
                                username
-                               body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Base.<> "")) GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                               body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "PUT") ("/user/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel username)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)

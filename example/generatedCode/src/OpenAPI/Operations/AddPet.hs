@@ -60,17 +60,17 @@ import OpenAPI.Types
 -- 
 addPet :: forall m . OpenAPI.Common.MonadHTTP m => Pet -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response AddPetResponse) -- ^ Monadic computation which returns the result of the operation
-addPet body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either AddPetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right AddPetResponse200
-                                                                                                                                               | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 405) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right AddPetResponse405
-                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+addPet body = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either AddPetResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right AddPetResponse200
+                                                                                                                                                                                                | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 405) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right AddPetResponse405
+                                                                                                                                                                                                | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | Represents a response of the operation 'addPet'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'AddPetResponseError' is used.
 data AddPetResponse =
-   AddPetResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   AddPetResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | AddPetResponse200 -- ^ Success
   | AddPetResponse405 -- ^ Invalid input
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > POST /pet
 -- 
 -- The same as 'addPet' but accepts an explicit configuration.
@@ -78,15 +78,15 @@ addPetWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Comm
   -> Pet -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response AddPetResponse) -- ^ Monadic computation which returns the result of the operation
 addPetWithConfiguration config
-                        body = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either AddPetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right AddPetResponse200
-                                                                                                                                                                | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 405) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right AddPetResponse405
-                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                        body = GHC.Internal.Base.fmap (\response_3 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either AddPetResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right AddPetResponse200
+                                                                                                                                                                                                                 | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 405) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right AddPetResponse405
+                                                                                                                                                                                                                 | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /pet
 -- 
 -- The same as 'addPet' but returns the raw 'Data.ByteString.ByteString'.
 addPetRaw :: forall m . OpenAPI.Common.MonadHTTP m => Pet -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-addPetRaw body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+addPetRaw body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /pet
 -- 
 -- The same as 'addPet' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
@@ -94,4 +94,4 @@ addPetWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.C
   -> Pet -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 addPetWithConfigurationRaw config
-                           body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                           body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/pet" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)

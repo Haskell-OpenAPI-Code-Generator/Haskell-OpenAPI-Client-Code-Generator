@@ -46,35 +46,35 @@ import OpenAPI.TypeAlias
 -- 
 data User = User {
   -- | email
-  userEmail :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  userEmail :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | firstName
-  , userFirstName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , userFirstName :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | id
-  , userId :: (GHC.Maybe.Maybe GHC.Int.Int64)
+  , userId :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int64)
   -- | lastName
-  , userLastName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , userLastName :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | password
-  , userPassword :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , userPassword :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | phone
-  , userPhone :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , userPhone :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | userStatus: User Status
-  , userUserStatus :: (GHC.Maybe.Maybe GHC.Int.Int32)
+  , userUserStatus :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int32)
   -- | username
-  , userUsername :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
-  } deriving (GHC.Show.Show
+  , userUsername :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON User
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("email" Data.Aeson.Types.ToJSON..=)) (userEmail obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("firstName" Data.Aeson.Types.ToJSON..=)) (userFirstName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (userId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("lastName" Data.Aeson.Types.ToJSON..=)) (userLastName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("password" Data.Aeson.Types.ToJSON..=)) (userPassword obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("phone" Data.Aeson.Types.ToJSON..=)) (userPhone obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("userStatus" Data.Aeson.Types.ToJSON..=)) (userUserStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("username" Data.Aeson.Types.ToJSON..=)) (userUsername obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("email" Data.Aeson.Types.ToJSON..=)) (userEmail obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("firstName" Data.Aeson.Types.ToJSON..=)) (userFirstName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (userId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("lastName" Data.Aeson.Types.ToJSON..=)) (userLastName obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("password" Data.Aeson.Types.ToJSON..=)) (userPassword obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("phone" Data.Aeson.Types.ToJSON..=)) (userPhone obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("userStatus" Data.Aeson.Types.ToJSON..=)) (userUserStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("username" Data.Aeson.Types.ToJSON..=)) (userUsername obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("email" Data.Aeson.Types.ToJSON..=)) (userEmail obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("firstName" Data.Aeson.Types.ToJSON..=)) (userFirstName obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (userId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("lastName" Data.Aeson.Types.ToJSON..=)) (userLastName obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("password" Data.Aeson.Types.ToJSON..=)) (userPassword obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("phone" Data.Aeson.Types.ToJSON..=)) (userPhone obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("userStatus" Data.Aeson.Types.ToJSON..=)) (userUserStatus obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("username" Data.Aeson.Types.ToJSON..=)) (userUsername obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("email" Data.Aeson.Types.ToJSON..=)) (userEmail obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("firstName" Data.Aeson.Types.ToJSON..=)) (userFirstName obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (userId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("lastName" Data.Aeson.Types.ToJSON..=)) (userLastName obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("password" Data.Aeson.Types.ToJSON..=)) (userPassword obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("phone" Data.Aeson.Types.ToJSON..=)) (userPhone obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("userStatus" Data.Aeson.Types.ToJSON..=)) (userUserStatus obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("username" Data.Aeson.Types.ToJSON..=)) (userUsername obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON User
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "User" (\obj -> (((((((GHC.Base.pure User GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "email")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "firstName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "lastName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "password")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "phone")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "userStatus")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "username"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "User" (\obj -> (((((((GHC.Internal.Base.pure User GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "email")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "firstName")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "lastName")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "password")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "phone")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "userStatus")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "username"))}
 -- | Create a new 'User' with all required fields.
 mkUser :: User
-mkUser = User{userEmail = GHC.Maybe.Nothing,
-              userFirstName = GHC.Maybe.Nothing,
-              userId = GHC.Maybe.Nothing,
-              userLastName = GHC.Maybe.Nothing,
-              userPassword = GHC.Maybe.Nothing,
-              userPhone = GHC.Maybe.Nothing,
-              userUserStatus = GHC.Maybe.Nothing,
-              userUsername = GHC.Maybe.Nothing}
+mkUser = User{userEmail = GHC.Internal.Maybe.Nothing,
+              userFirstName = GHC.Internal.Maybe.Nothing,
+              userId = GHC.Internal.Maybe.Nothing,
+              userLastName = GHC.Internal.Maybe.Nothing,
+              userPassword = GHC.Internal.Maybe.Nothing,
+              userPhone = GHC.Internal.Maybe.Nothing,
+              userUserStatus = GHC.Internal.Maybe.Nothing,
+              userUsername = GHC.Internal.Maybe.Nothing}

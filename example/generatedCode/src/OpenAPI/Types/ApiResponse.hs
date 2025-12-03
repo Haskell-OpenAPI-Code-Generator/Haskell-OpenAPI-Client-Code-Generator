@@ -46,20 +46,20 @@ import OpenAPI.TypeAlias
 -- 
 data ApiResponse = ApiResponse {
   -- | code
-  apiResponseCode :: (GHC.Maybe.Maybe GHC.Int.Int32)
+  apiResponseCode :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int32)
   -- | message
-  , apiResponseMessage :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , apiResponseMessage :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | type
-  , apiResponseType :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
-  } deriving (GHC.Show.Show
+  , apiResponseType :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON ApiResponse
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("code" Data.Aeson.Types.ToJSON..=)) (apiResponseCode obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("message" Data.Aeson.Types.ToJSON..=)) (apiResponseMessage obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("type" Data.Aeson.Types.ToJSON..=)) (apiResponseType obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("code" Data.Aeson.Types.ToJSON..=)) (apiResponseCode obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("message" Data.Aeson.Types.ToJSON..=)) (apiResponseMessage obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("type" Data.Aeson.Types.ToJSON..=)) (apiResponseType obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("code" Data.Aeson.Types.ToJSON..=)) (apiResponseCode obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("message" Data.Aeson.Types.ToJSON..=)) (apiResponseMessage obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("type" Data.Aeson.Types.ToJSON..=)) (apiResponseType obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("code" Data.Aeson.Types.ToJSON..=)) (apiResponseCode obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("message" Data.Aeson.Types.ToJSON..=)) (apiResponseMessage obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("type" Data.Aeson.Types.ToJSON..=)) (apiResponseType obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON ApiResponse
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "ApiResponse" (\obj -> ((GHC.Base.pure ApiResponse GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "message")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "type"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "ApiResponse" (\obj -> ((GHC.Internal.Base.pure ApiResponse GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "code")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "message")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "type"))}
 -- | Create a new 'ApiResponse' with all required fields.
 mkApiResponse :: ApiResponse
-mkApiResponse = ApiResponse{apiResponseCode = GHC.Maybe.Nothing,
-                            apiResponseMessage = GHC.Maybe.Nothing,
-                            apiResponseType = GHC.Maybe.Nothing}
+mkApiResponse = ApiResponse{apiResponseCode = GHC.Internal.Maybe.Nothing,
+                            apiResponseMessage = GHC.Internal.Maybe.Nothing,
+                            apiResponseType = GHC.Internal.Maybe.Nothing}

@@ -46,32 +46,32 @@ import OpenAPI.TypeAlias
 -- 
 data Order = Order {
   -- | complete
-  orderComplete :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  orderComplete :: (GHC.Internal.Maybe.Maybe GHC.Types.Bool)
   -- | id
-  , orderId :: (GHC.Maybe.Maybe GHC.Int.Int64)
+  , orderId :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int64)
   -- | petId
-  , orderPetId :: (GHC.Maybe.Maybe GHC.Int.Int64)
+  , orderPetId :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int64)
   -- | quantity
-  , orderQuantity :: (GHC.Maybe.Maybe GHC.Int.Int32)
+  , orderQuantity :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int32)
   -- | shipDate
-  , orderShipDate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , orderShipDate :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | status: Order Status
-  , orderStatus :: (GHC.Maybe.Maybe OrderStatus)
-  } deriving (GHC.Show.Show
+  , orderStatus :: (GHC.Internal.Maybe.Maybe OrderStatus)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Order
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("complete" Data.Aeson.Types.ToJSON..=)) (orderComplete obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (orderId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("petId" Data.Aeson.Types.ToJSON..=)) (orderPetId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("quantity" Data.Aeson.Types.ToJSON..=)) (orderQuantity obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("shipDate" Data.Aeson.Types.ToJSON..=)) (orderShipDate obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (orderStatus obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("complete" Data.Aeson.Types.ToJSON..=)) (orderComplete obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (orderId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("petId" Data.Aeson.Types.ToJSON..=)) (orderPetId obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("quantity" Data.Aeson.Types.ToJSON..=)) (orderQuantity obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("shipDate" Data.Aeson.Types.ToJSON..=)) (orderShipDate obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (orderStatus obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("complete" Data.Aeson.Types.ToJSON..=)) (orderComplete obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (orderId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("petId" Data.Aeson.Types.ToJSON..=)) (orderPetId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("quantity" Data.Aeson.Types.ToJSON..=)) (orderQuantity obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("shipDate" Data.Aeson.Types.ToJSON..=)) (orderShipDate obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (orderStatus obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("complete" Data.Aeson.Types.ToJSON..=)) (orderComplete obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (orderId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("petId" Data.Aeson.Types.ToJSON..=)) (orderPetId obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("quantity" Data.Aeson.Types.ToJSON..=)) (orderQuantity obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("shipDate" Data.Aeson.Types.ToJSON..=)) (orderShipDate obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (orderStatus obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Order
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Order" (\obj -> (((((GHC.Base.pure Order GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "complete")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "petId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "quantity")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "shipDate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Order" (\obj -> (((((GHC.Internal.Base.pure Order GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "complete")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "petId")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "quantity")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "shipDate")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status"))}
 -- | Create a new 'Order' with all required fields.
 mkOrder :: Order
-mkOrder = Order{orderComplete = GHC.Maybe.Nothing,
-                orderId = GHC.Maybe.Nothing,
-                orderPetId = GHC.Maybe.Nothing,
-                orderQuantity = GHC.Maybe.Nothing,
-                orderShipDate = GHC.Maybe.Nothing,
-                orderStatus = GHC.Maybe.Nothing}
+mkOrder = Order{orderComplete = GHC.Internal.Maybe.Nothing,
+                orderId = GHC.Internal.Maybe.Nothing,
+                orderPetId = GHC.Internal.Maybe.Nothing,
+                orderQuantity = GHC.Internal.Maybe.Nothing,
+                orderShipDate = GHC.Internal.Maybe.Nothing,
+                orderStatus = GHC.Internal.Maybe.Nothing}
 -- | Defines the enum schema located at @components.schemas.Order.properties.status@ in the specification.
 -- 
 -- Order Status
@@ -81,7 +81,7 @@ data OrderStatus =
   | OrderStatusEnumPlaced -- ^ Represents the JSON value @"placed"@
   | OrderStatusEnumApproved -- ^ Represents the JSON value @"approved"@
   | OrderStatusEnumDelivered -- ^ Represents the JSON value @"delivered"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON OrderStatus
     where {toJSON (OrderStatusOther val) = val;
            toJSON (OrderStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
@@ -89,7 +89,7 @@ instance Data.Aeson.Types.ToJSON.ToJSON OrderStatus
            toJSON (OrderStatusEnumApproved) = "approved";
            toJSON (OrderStatusEnumDelivered) = "delivered"}
 instance Data.Aeson.Types.FromJSON.FromJSON OrderStatus
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "placed" -> OrderStatusEnumPlaced
-                                             | val GHC.Classes.== "approved" -> OrderStatusEnumApproved
-                                             | val GHC.Classes.== "delivered" -> OrderStatusEnumDelivered
-                                             | GHC.Base.otherwise -> OrderStatusOther val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "placed" -> OrderStatusEnumPlaced
+                                                      | val GHC.Classes.== "approved" -> OrderStatusEnumApproved
+                                                      | val GHC.Classes.== "delivered" -> OrderStatusEnumDelivered
+                                                      | GHC.Internal.Base.otherwise -> OrderStatusOther val)}

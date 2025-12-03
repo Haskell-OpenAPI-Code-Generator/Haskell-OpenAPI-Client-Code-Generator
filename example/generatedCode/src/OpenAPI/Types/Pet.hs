@@ -48,34 +48,34 @@ import {-# SOURCE #-} OpenAPI.Types.Tag
 -- 
 data Pet = Pet {
   -- | category
-  petCategory :: (GHC.Maybe.Maybe Category)
+  petCategory :: (GHC.Internal.Maybe.Maybe Category)
   -- | id
-  , petId :: (GHC.Maybe.Maybe GHC.Int.Int64)
+  , petId :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int64)
   -- | name
   , petName :: Data.Text.Internal.Text
   -- | photoUrls
   , petPhotoUrls :: [Data.Text.Internal.Text]
   -- | status: pet status in the store
-  , petStatus :: (GHC.Maybe.Maybe PetStatus)
+  , petStatus :: (GHC.Internal.Maybe.Maybe PetStatus)
   -- | tags
-  , petTags :: (GHC.Maybe.Maybe [Tag])
-  } deriving (GHC.Show.Show
+  , petTags :: (GHC.Internal.Maybe.Maybe [Tag])
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Pet
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("category" Data.Aeson.Types.ToJSON..=)) (petCategory obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("id" Data.Aeson.Types.ToJSON..=)) (petId obj) : ["name" Data.Aeson.Types.ToJSON..= petName obj] : ["photoUrls" Data.Aeson.Types.ToJSON..= petPhotoUrls obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("status" Data.Aeson.Types.ToJSON..=)) (petStatus obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (petTags obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Pet
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Pet" (\obj -> (((((GHC.Base.pure Pet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "category")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "photoUrls")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "tags"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Pet" (\obj -> (((((GHC.Internal.Base.pure Pet GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "category")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "id")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "photoUrls")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "status")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "tags"))}
 -- | Create a new 'Pet' with all required fields.
 mkPet :: Data.Text.Internal.Text -- ^ 'petName'
   -> [Data.Text.Internal.Text] -- ^ 'petPhotoUrls'
   -> Pet
-mkPet petName petPhotoUrls = Pet{petCategory = GHC.Maybe.Nothing,
-                                 petId = GHC.Maybe.Nothing,
+mkPet petName petPhotoUrls = Pet{petCategory = GHC.Internal.Maybe.Nothing,
+                                 petId = GHC.Internal.Maybe.Nothing,
                                  petName = petName,
                                  petPhotoUrls = petPhotoUrls,
-                                 petStatus = GHC.Maybe.Nothing,
-                                 petTags = GHC.Maybe.Nothing}
+                                 petStatus = GHC.Internal.Maybe.Nothing,
+                                 petTags = GHC.Internal.Maybe.Nothing}
 -- | Defines the enum schema located at @components.schemas.Pet.properties.status@ in the specification.
 -- 
 -- pet status in the store
@@ -85,7 +85,7 @@ data PetStatus =
   | PetStatusEnumAvailable -- ^ Represents the JSON value @"available"@
   | PetStatusEnumPending -- ^ Represents the JSON value @"pending"@
   | PetStatusEnumSold -- ^ Represents the JSON value @"sold"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetStatus
     where {toJSON (PetStatusOther val) = val;
            toJSON (PetStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
@@ -93,7 +93,7 @@ instance Data.Aeson.Types.ToJSON.ToJSON PetStatus
            toJSON (PetStatusEnumPending) = "pending";
            toJSON (PetStatusEnumSold) = "sold"}
 instance Data.Aeson.Types.FromJSON.FromJSON PetStatus
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> PetStatusEnumAvailable
-                                             | val GHC.Classes.== "pending" -> PetStatusEnumPending
-                                             | val GHC.Classes.== "sold" -> PetStatusEnumSold
-                                             | GHC.Base.otherwise -> PetStatusOther val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "available" -> PetStatusEnumAvailable
+                                                      | val GHC.Classes.== "pending" -> PetStatusEnumPending
+                                                      | val GHC.Classes.== "sold" -> PetStatusEnumSold
+                                                      | GHC.Internal.Base.otherwise -> PetStatusOther val)}

@@ -58,40 +58,40 @@ import OpenAPI.Types
 -- | > DELETE /store/order/{orderId}
 -- 
 -- For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
-deleteOrder :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
+deleteOrder :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Internal.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response DeleteOrderResponse) -- ^ Monadic computation which returns the result of the operation
-deleteOrder orderId = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either DeleteOrderResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteOrderResponse400
-                                                                                                                                                            | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteOrderResponse404
-                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Base.<> "")) GHC.Base.mempty)
+deleteOrder orderId = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either DeleteOrderResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeleteOrderResponse400
+                                                                                                                                                                                                             | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeleteOrderResponse404
+                                                                                                                                                                                                             | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | Represents a response of the operation 'deleteOrder'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'DeleteOrderResponseError' is used.
 data DeleteOrderResponse =
-   DeleteOrderResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   DeleteOrderResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | DeleteOrderResponse400 -- ^ Invalid ID supplied
   | DeleteOrderResponse404 -- ^ Order not found
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > DELETE /store/order/{orderId}
 -- 
 -- The same as 'deleteOrder' but accepts an explicit configuration.
 deleteOrderWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
-  -> GHC.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
+  -> GHC.Internal.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
   -> m (Network.HTTP.Client.Types.Response DeleteOrderResponse) -- ^ Monadic computation which returns the result of the operation
 deleteOrderWithConfiguration config
-                             orderId = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either DeleteOrderResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteOrderResponse400
-                                                                                                                                                                             | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteOrderResponse404
-                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Base.<> "")) GHC.Base.mempty)
+                             orderId = GHC.Internal.Base.fmap (\response_3 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either DeleteOrderResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeleteOrderResponse400
+                                                                                                                                                                                                                              | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeleteOrderResponse404
+                                                                                                                                                                                                                              | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | > DELETE /store/order/{orderId}
 -- 
 -- The same as 'deleteOrder' but returns the raw 'Data.ByteString.ByteString'.
-deleteOrderRaw :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
+deleteOrderRaw :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Internal.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-deleteOrderRaw orderId = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Base.<> "")) GHC.Base.mempty)
+deleteOrderRaw orderId = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | > DELETE /store/order/{orderId}
 -- 
 -- The same as 'deleteOrder' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
 deleteOrderWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
-  -> GHC.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
+  -> GHC.Internal.Int.Int64 -- ^ orderId: ID of the order that needs to be deleted | Constraints: Minimum  of 1.0
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 deleteOrderWithConfigurationRaw config
-                                orderId = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Base.<> "")) GHC.Base.mempty)
+                                orderId = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/store/order/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel orderId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
