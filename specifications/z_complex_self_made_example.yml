@@ -105,6 +105,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dog"
+  /pet/multiparam2/{status}:
+    parameters:
+    - name: status
+      in: path
+      description: Status in path (from path params)
+      required: true
+      schema:
+        type: integer
+        enum:
+        - 1
+        - 3
+        - 5
+    get:
+      description: Operation with multiple parameters (some from path params)
+      operationId: multiParamPathParam
+      parameters:
+      - name: status
+        in: query
+        description: Status in query
+        required: true
+        schema:
+          type: string
+          enum:
+          - available
+          - pending
+          - sold
+      - name: filter
+        in: query
+        description: Filter the entries?
+        schema:
+          type: boolean
+      - name: referenceParameter
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Cat'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dog"
+
   /pet/multiparam/{status}:
     parameters:
     - name: status

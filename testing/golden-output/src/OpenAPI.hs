@@ -3,6 +3,7 @@
 -- | The main module which exports all functionality.
 module OpenAPI (
   module OpenAPI.Operations.MultiParam,
+  module OpenAPI.Operations.MultiParamPathParam,
   module OpenAPI.Operations.MultiParamWithFixedEnum,
   module OpenAPI.Operations.NoParam,
   module OpenAPI.Operations.SingleParam,
@@ -28,6 +29,7 @@ module OpenAPI (
   ) where
 
 import OpenAPI.Operations.MultiParam
+import OpenAPI.Operations.MultiParamPathParam
 import OpenAPI.Operations.MultiParamWithFixedEnum
 import OpenAPI.Operations.NoParam
 import OpenAPI.Operations.SingleParam
