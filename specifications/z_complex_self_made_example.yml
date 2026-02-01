@@ -106,6 +106,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Dog"
   /pet/multiparam/{status}:
+    parameters:
+    - name: status
+      in: path
+      description: Status in path from path params, will be overridden below.
+      required: true
+      schema:
+        type: string
     get:
       description: Operation with multiple parameters
       operationId: multiParam
