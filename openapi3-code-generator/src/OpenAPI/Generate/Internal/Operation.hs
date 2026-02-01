@@ -156,13 +156,17 @@ getParameterLocationPrefix =
 overrideParameters :: [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])]
 overrideParameters pathParams operationParams =
   -- According to OpenAPI specification, the unique parameter is identified by a combination of name and location.
-  -- So, we are using (name, in') as key in these maps.
-  let mkParamsMap parameters = Map.fromList [((OAT.parameterObjectName (fst p), OAT.parameterObjectIn (fst p)), p) | p <- parameters]
-      pathParamsMap = mkParamsMap pathParams
-      operationParamsMap = mkParamsMap operationParams
-      -- prefer operation parameters
-      allParamsMap = Map.union operationParamsMap pathParamsMap
-   in Map.elems allParamsMap
+  -- So, we are using (name, in') as key.
+  -- We emit all the path parameters that were not overridden, and then all the
+  -- operation parameters. (Note, we use lists to keep the original parameter
+  -- order for generating code).
+  let getKey :: (OAT.ParameterObject, [Text]) -> (Text, OAT.ParameterObjectLocation)
+      getKey p =
+        let po = fst p
+         in (OAT.parameterObjectName po, OAT.parameterObjectIn po)
+      opKeys = Set.fromList (map getKey operationParams)
+      pathParamsWithoutOverride = filter (\p -> Set.notMember (getKey p) opKeys) pathParams
+   in pathParamsWithoutOverride <> operationParams
 
 getConcreteParameters :: [OAT.Referencable OAT.ParameterObject] -> OAM.Generator [(OAT.ParameterObject, [Text])]
 getConcreteParameters =
