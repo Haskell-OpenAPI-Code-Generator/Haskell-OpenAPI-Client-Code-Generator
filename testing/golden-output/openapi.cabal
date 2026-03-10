@@ -12,6 +12,8 @@ library
       OpenAPI.Operations.NoParam
       OpenAPI.Operations.SingleParam
       OpenAPI.Operations.SingleParamWithFixedEnum
+      OpenAPI.Operations.WithDiscriminator
+      OpenAPI.Operations.WithDiscriminatorWithoutMapping
       OpenAPI.Operations.Patch_pets
       OpenAPI.Operations.ShowPetById
       OpenAPI.Types
@@ -19,9 +21,16 @@ library
       OpenAPI.Types.Cat
       OpenAPI.Types.CoverType
       OpenAPI.Types.Dog
+      OpenAPI.Types.Fish
+      OpenAPI.Types.Gecko
+      OpenAPI.Types.GilaMonster
+      OpenAPI.Types.Guppie
+      OpenAPI.Types.Lizard
+      OpenAPI.Types.Minnow
       OpenAPI.Types.Mischling
       OpenAPI.Types.PetByAge
       OpenAPI.Types.PetByType
+      OpenAPI.Types.Shark
       OpenAPI.Types.Test6
       OpenAPI.Types.Test7
       OpenAPI.Types.Test8
