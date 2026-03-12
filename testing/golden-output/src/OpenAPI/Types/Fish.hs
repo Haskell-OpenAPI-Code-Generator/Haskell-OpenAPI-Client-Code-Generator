@@ -57,9 +57,14 @@ instance Data.Aeson.Types.ToJSON.ToJSON FishVariants
            toJSON (FishMinnow a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (FishShark a) = Data.Aeson.Types.ToJSON.toJSON a}
 instance Data.Aeson.Types.FromJSON.FromJSON FishVariants
-    where {parseJSON val = case (FishGuppie Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((FishMinnow Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((FishShark Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
-                           {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
-                            Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}
+    where {parseJSON val = Data.Aeson.Types.FromJSON.withObject "Fish" (\obj -> do {result_0 <- obj Data.Aeson.Types.FromJSON..:? "fishType";
+                                                                                    case result_0 of
+                                                                                    {GHC.Maybe.Nothing -> Control.Monad.Fail.fail "Object lacks discriminator property";
+                                                                                     GHC.Maybe.Just propertyName -> case propertyName :: Data.Text.Internal.Text of
+                                                                                                                    {"guppie" -> FishGuppie Data.Functor.<$> Data.Aeson.Types.FromJSON.parseJSON val;
+                                                                                                                     "minnow" -> FishMinnow Data.Functor.<$> Data.Aeson.Types.FromJSON.parseJSON val;
+                                                                                                                     "shark" -> FishShark Data.Functor.<$> Data.Aeson.Types.FromJSON.parseJSON val;
+                                                                                                                     _unmatched -> Control.Monad.Fail.fail "No match for discriminator property"}}}) val}
 -- | Defines an alias for the schema located at @components.schemas.Fish.oneOf@ in the specification.
 -- 
 -- 

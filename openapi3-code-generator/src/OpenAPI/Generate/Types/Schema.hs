@@ -175,7 +175,7 @@ instance FromJSON SchemaType where
 
 data DiscriminatorObject = DiscriminatorObject
   { discriminatorObjectPropertyName :: Text,
-    discriminatorObjectMapping :: Map.Map Text Text
+    discriminatorObjectMapping :: Maybe (Map.Map Text Text)
   }
   deriving (Show, Eq, Ord, Generic)
 
@@ -183,7 +183,7 @@ instance FromJSON DiscriminatorObject where
   parseJSON = withObject "DiscriminatorObject" $ \o ->
     DiscriminatorObject
       <$> o .: "propertyName"
-      <*> o .:? "mapping" .!= Map.empty
+      <*> o .:? "mapping" .!= Nothing
 
 data ConcreteValue
   = StringDefaultValue Text

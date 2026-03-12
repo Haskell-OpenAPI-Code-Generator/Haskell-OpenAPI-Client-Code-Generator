@@ -41,7 +41,7 @@ import qualified GHC.Types
 import qualified OpenAPI.Common
 import OpenAPI.TypeAlias
 
--- | Defines the object schema located at @components.schemas.Gecko@ in the specification.
+-- | Defines the object schema located at @components.schemas.gecko@ in the specification.
 -- 
 -- 
 data Gecko = Gecko {

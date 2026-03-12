@@ -22,8 +22,6 @@ library
       OpenAPI.Types.CoverType
       OpenAPI.Types.Dog
       OpenAPI.Types.Fish
-      OpenAPI.Types.Gecko
-      OpenAPI.Types.GilaMonster
       OpenAPI.Types.Guppie
       OpenAPI.Types.Lizard
       OpenAPI.Types.Minnow
@@ -36,6 +34,8 @@ library
       OpenAPI.Types.Test8
       OpenAPI.Types.Test9
       OpenAPI.Types.Value
+      OpenAPI.Types.Gecko
+      OpenAPI.Types.GilaMonster
       OpenAPI.Configuration
       OpenAPI.SecuritySchemes
       OpenAPI.Common
