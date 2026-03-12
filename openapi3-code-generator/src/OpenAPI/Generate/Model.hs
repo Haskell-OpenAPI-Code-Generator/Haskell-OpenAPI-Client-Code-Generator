@@ -244,7 +244,7 @@ defineModelForSchemaConcreteIgnoreEnum strategy schemaName schema = do
           anyOfNull = null $ OAS.schemaObjectAnyOf schema
        in case (allOfNull, oneOfNull, anyOfNull) of
             (False, _, _) -> OAM.nested "allOf" $ defineAllOfSchema schemaName schemaDescription $ OAS.schemaObjectAllOf schema
-            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription $ OAS.schemaObjectOneOf schema
+            (_, False, _) -> OAM.nested "oneOf" $ typeAliasing $ defineOneOfSchema schemaName schemaDescription (OAS.schemaObjectOneOf schema) $ OAS.schemaObjectDiscriminator schema
             (_, _, False) -> OAM.nested "anyOf" $ defineAnyOfSchema strategy schemaName schemaDescription $ OAS.schemaObjectAnyOf schema
             _ -> defineObjectModelForSchema strategy schemaName schema
     _ ->
@@ -350,7 +350,7 @@ defineAnyOfSchema strategy schemaName description schemas = do
       addDependencies newDependencies $ defineAllOfSchema schemaName description (fmap OAT.Concrete schemasWithoutRequired)
     else do
       OAM.logTrace "anyOf does contain at least one schema which is not of type object and will therefore be defined as oneOf"
-      createAlias schemaName description strategy $ defineOneOfSchema schemaName description schemas
+      createAlias schemaName description strategy $ defineOneOfSchema schemaName description schemas Nothing
 
 --    this would be the correct implementation
 --    but it generates endless loop because some implementations use anyOf as a oneOf
@@ -369,18 +369,19 @@ defineAnyOfSchema strategy schemaName description schemas = do
 --
 -- creates types for all the subschemas and then creates an adt with constructors for the different
 -- subschemas. Constructors are numbered
-defineOneOfSchema :: Text -> Text -> [OAS.Schema] -> OAM.Generator TypeWithDeclaration
-defineOneOfSchema schemaName description allSchemas = do
+defineOneOfSchema :: Text -> Text -> [OAS.Schema] -> Maybe OAS.DiscriminatorObject -> OAM.Generator TypeWithDeclaration
+defineOneOfSchema schemaName description allSchemas discriminator = do
   when (null allSchemas) $ OAM.logWarning "oneOf does not contain any sub-schemas and will therefore be defined as a void type"
   settings <- OAM.getSettings
   let haskellifyConstructor = haskellifyName (OAO.settingConvertToCamelCase settings) True
+      haskellifyPartialConstructor = haskellifyText (OAO.settingConvertToCamelCase settings) True
       name = haskellifyConstructor $ schemaName <> "Variants"
       fixedValueStrategy = OAO.settingFixedValueStrategy settings
       (otherSchemas, fixedValueSchemas, singleFieldedSchemas) =
         let (s', fixedValue) = extractSchemasWithFixedValues fixedValueStrategy allSchemas
             (s'', singleFielded) = extractSchemasWithSingleField s'
          in (s'', fixedValue, singleFielded)
-      defineSingleFielded field = defineModelForSchemaNamed (schemaName <> haskellifyText (OAO.settingConvertToCamelCase settings) True field)
+      defineSingleFielded field = defineModelForSchemaNamed $ schemaName <> haskellifyPartialConstructor field
       indexedSchemas = zip otherSchemas ([1 ..] :: [Integer])
       defineIndexed schema index = defineModelForSchemaNamed (schemaName <> "OneOf" <> T.pack (show index)) schema
   OAM.logInfo $ "Define as oneOf named '" <> T.pack (nameBase name) <> "'"
@@ -416,32 +417,73 @@ defineOneOfSchema schemaName description allSchemas = do
       e = varE patternName
       fromJsonFn =
         let paramName = mkName "val"
-            body = do
-              constructorNames' <- sequence constructorNames
-              let resultExpr =
-                    foldr
-                      ( \constructorName expr ->
-                          [|($(varE constructorName) <$> Aeson.fromJSON $(varE paramName)) <|> $expr|]
-                      )
-                      [|Aeson.Error "No variant matched"|]
-                      constructorNames'
-                  parserExpr =
-                    [|
-                      case $resultExpr of
-                        Aeson.Success $p -> pure $e
-                        Aeson.Error $p -> fail $e
-                      |]
-              case fixedValueSchemas of
-                [] -> parserExpr
-                _ ->
-                  multiIfE $
-                    fmap
-                      ( \value ->
-                          let constructorName = createConstructorNameForSchemaWithFixedValue value
-                           in normalGE [|$(varE paramName) == $(liftAesonValue value)|] [|pure $(varE constructorName)|]
-                      )
-                      fixedValueSchemas
-                      <> [normalGE [|otherwise|] parserExpr]
+            body =
+              case discriminator of
+                Just disc -> do
+                  let
+                    fnArgName = mkName "obj"
+                    discriminatorPropertyName = mkName "propertyName"
+                    nonFixedSchemas = zip ([1 .. ] :: [Integer]) $ do
+                      schema <- allSchemas
+                      guard $ E.isLeft $ extractSchemaWithFixedValue FixedValueStrategyExclude schema
+                      pure schema
+                    schemaLookupFromRef = Map.fromList $ do
+                      (n, schema) <- nonFixedSchemas
+                      case schema of
+                        OAT.Reference ref -> [(ref, (n, getSchemaNameFromReference ref))]
+                        OAT.Concrete _ -> []
+                    oneOfSchemaRefs = do
+                      (ref, (_, name')) <- Map.toList schemaLookupFromRef
+                      pure (name', ref)
+                    propertyNamesWithReferences = maybe oneOfSchemaRefs Map.toList $ OAS.discriminatorObjectMapping disc
+                  let
+                    mkMatchedCase (propName, fullRef) =
+                      case Map.lookup fullRef schemaLookupFromRef of
+                        Nothing -> []
+                        Just (n, caseName) -> do
+                          let
+                            suffix = if OAO.settingUseNumberedVariantConstructors settings then "Variant" <> T.pack (show n) else ""
+                            parseConstructor constructorName = [|($(varE constructorName) <$> Aeson.parseJSON $(varE paramName))|]
+                          [match (litP $ stringL $ T.unpack propName) (normalB [|$(parseConstructor $ haskellifyConstructor $ schemaName <> haskellifyPartialConstructor caseName <> suffix)|]) []]
+                    matchedCases = propertyNamesWithReferences >>= mkMatchedCase
+                    unmatchedCase = match (varP $ mkName "_unmatched") (normalB [|fail "No match for discriminator property"|]) []
+                    propertyCases = matchedCases <> [unmatchedCase]
+                    getDiscProp = [|$(varE fnArgName) Aeson..:? $(stringE $ T.unpack $ OAS.discriminatorObjectPropertyName disc)|]
+                    annotatedDiscriminatorPropertyName = [|$(varE discriminatorPropertyName) :: Text|]
+                    withObjectLamda = [|
+                                       do
+                                         result <- $getDiscProp
+                                         case result of
+                                           Nothing -> fail "Object lacks discriminator property"
+                                           Just $(varP discriminatorPropertyName) ->
+                                             $(caseE annotatedDiscriminatorPropertyName propertyCases)
+                                            |]
+                  [|Aeson.withObject $(stringE $ T.unpack schemaName) $(lam1E (varP fnArgName) withObjectLamda) $(varE paramName)|]
+                Nothing -> do
+                  constructorNames' <- sequence constructorNames
+                  let resultExpr =
+                        foldr
+                          ( \constructorName expr -> [|($(varE constructorName) <$> Aeson.fromJSON $(varE paramName)) <|> $expr|]
+                          )
+                          [|Aeson.Error "No variant matched"|]
+                          constructorNames'
+                      parserExpr =
+                        [|
+                          case $resultExpr of
+                            Aeson.Success $p -> pure $e
+                            Aeson.Error $p -> fail $e
+                          |]
+                  case fixedValueSchemas of
+                    [] -> parserExpr
+                    _ ->
+                      multiIfE $
+                        fmap
+                          ( \value ->
+                              let constructorName = createConstructorNameForSchemaWithFixedValue value
+                               in normalGE [|$(varE paramName) == $(liftAesonValue value)|] [|pure $(varE constructorName)|]
+                          )
+                          fixedValueSchemas
+                          <> [normalGE [|otherwise|] parserExpr]
          in funD
               (mkName "parseJSON")
               [ clause

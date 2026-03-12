@@ -17,8 +17,6 @@ module OpenAPI (
   module OpenAPI.Types.CoverType,
   module OpenAPI.Types.Dog,
   module OpenAPI.Types.Fish,
-  module OpenAPI.Types.Gecko,
-  module OpenAPI.Types.GilaMonster,
   module OpenAPI.Types.Guppie,
   module OpenAPI.Types.Lizard,
   module OpenAPI.Types.Minnow,
@@ -31,6 +29,8 @@ module OpenAPI (
   module OpenAPI.Types.Test8,
   module OpenAPI.Types.Test9,
   module OpenAPI.Types.Value,
+  module OpenAPI.Types.Gecko,
+  module OpenAPI.Types.GilaMonster,
   module OpenAPI.Configuration,
   module OpenAPI.SecuritySchemes,
   module OpenAPI.Common,
@@ -51,8 +51,6 @@ import OpenAPI.Types.Cat
 import OpenAPI.Types.CoverType
 import OpenAPI.Types.Dog
 import OpenAPI.Types.Fish
-import OpenAPI.Types.Gecko
-import OpenAPI.Types.GilaMonster
 import OpenAPI.Types.Guppie
 import OpenAPI.Types.Lizard
 import OpenAPI.Types.Minnow
@@ -65,6 +63,8 @@ import OpenAPI.Types.Test7
 import OpenAPI.Types.Test8
 import OpenAPI.Types.Test9
 import OpenAPI.Types.Value
+import OpenAPI.Types.Gecko
+import OpenAPI.Types.GilaMonster
 import OpenAPI.Configuration
 import OpenAPI.SecuritySchemes
 import OpenAPI.Common

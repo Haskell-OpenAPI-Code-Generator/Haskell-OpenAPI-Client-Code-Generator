@@ -54,9 +54,13 @@ instance Data.Aeson.Types.ToJSON.ToJSON LizardVariants
     where {toJSON (LizardGecko a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (LizardGilaMonster a) = Data.Aeson.Types.ToJSON.toJSON a}
 instance Data.Aeson.Types.FromJSON.FromJSON LizardVariants
-    where {parseJSON val = case (LizardGecko Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((LizardGilaMonster Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched") of
-                           {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
-                            Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}
+    where {parseJSON val = Data.Aeson.Types.FromJSON.withObject "Lizard" (\obj -> do {result_0 <- obj Data.Aeson.Types.FromJSON..:? "lizardType";
+                                                                                      case result_0 of
+                                                                                      {GHC.Maybe.Nothing -> Control.Monad.Fail.fail "Object lacks discriminator property";
+                                                                                       GHC.Maybe.Just propertyName -> case propertyName :: Data.Text.Internal.Text of
+                                                                                                                      {"gecko" -> LizardGecko Data.Functor.<$> Data.Aeson.Types.FromJSON.parseJSON val;
+                                                                                                                       "gilaMonster" -> LizardGilaMonster Data.Functor.<$> Data.Aeson.Types.FromJSON.parseJSON val;
+                                                                                                                       _unmatched -> Control.Monad.Fail.fail "No match for discriminator property"}}}) val}
 -- | Defines an alias for the schema located at @components.schemas.Lizard.oneOf@ in the specification.
 -- 
 -- 

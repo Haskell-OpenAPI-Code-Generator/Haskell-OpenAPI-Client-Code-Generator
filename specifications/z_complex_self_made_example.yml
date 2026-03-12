@@ -373,11 +373,11 @@ components:
     Lizard:
       type: object
       oneOf:
-        - $ref: '#/components/schemas/Gecko'
-        - $ref: '#/components/schemas/GilaMonster'
+        - $ref: '#/components/schemas/gecko'
+        - $ref: '#/components/schemas/gilaMonster'
       discriminator:
         propertyName: lizardType
-    Gecko:
+    gecko:
       type: object
       properties:
         hasTail:
@@ -386,7 +386,7 @@ components:
           type: string
       required:
         - lizardType
-    GilaMonster:
+    gilaMonster:
       type: object
       properties:
         hasTail:
