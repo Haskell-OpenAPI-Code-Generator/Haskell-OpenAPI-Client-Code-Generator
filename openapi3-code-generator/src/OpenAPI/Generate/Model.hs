@@ -420,44 +420,42 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
             body =
               case discriminator of
                 Just disc -> do
-                  let
-                    fnArgName = mkName "obj"
-                    discriminatorPropertyName = mkName "propertyName"
-                    nonFixedSchemas = zip ([1 .. ] :: [Integer]) $ do
-                      schema <- allSchemas
-                      guard $ E.isLeft $ extractSchemaWithFixedValue FixedValueStrategyExclude schema
-                      pure schema
-                    schemaLookupFromRef = Map.fromList $ do
-                      (n, schema) <- nonFixedSchemas
-                      case schema of
-                        OAT.Reference ref -> [(ref, (n, getSchemaNameFromReference ref))]
-                        OAT.Concrete _ -> []
-                    oneOfSchemaRefs = do
-                      (ref, (_, name')) <- Map.toList schemaLookupFromRef
-                      pure (name', ref)
-                    propertyNamesWithReferences = maybe oneOfSchemaRefs Map.toList $ OAS.discriminatorObjectMapping disc
-                  let
-                    mkMatchedCase (propName, fullRef) =
-                      case Map.lookup fullRef schemaLookupFromRef of
-                        Nothing -> []
-                        Just (n, caseName) -> do
-                          let
-                            suffix = if OAO.settingUseNumberedVariantConstructors settings then "Variant" <> T.pack (show n) else ""
-                            parseConstructor constructorName = [|($(varE constructorName) <$> Aeson.parseJSON $(varE paramName))|]
-                          [match (litP $ stringL $ T.unpack propName) (normalB [|$(parseConstructor $ haskellifyConstructor $ schemaName <> haskellifyPartialConstructor caseName <> suffix)|]) []]
-                    matchedCases = propertyNamesWithReferences >>= mkMatchedCase
-                    unmatchedCase = match (varP $ mkName "_unmatched") (normalB [|fail "No match for discriminator property"|]) []
-                    propertyCases = matchedCases <> [unmatchedCase]
-                    getDiscProp = [|$(varE fnArgName) Aeson..:? $(stringE $ T.unpack $ OAS.discriminatorObjectPropertyName disc)|]
-                    annotatedDiscriminatorPropertyName = [|$(varE discriminatorPropertyName) :: Text|]
-                    withObjectLamda = [|
-                                       do
-                                         result <- $getDiscProp
-                                         case result of
-                                           Nothing -> fail "Object lacks discriminator property"
-                                           Just $(varP discriminatorPropertyName) ->
-                                             $(caseE annotatedDiscriminatorPropertyName propertyCases)
-                                            |]
+                  let fnArgName = mkName "obj"
+                      discriminatorPropertyName = mkName "propertyName"
+                      nonFixedSchemas = zip ([1 ..] :: [Integer]) $ do
+                        schema <- allSchemas
+                        guard $ E.isLeft $ extractSchemaWithFixedValue FixedValueStrategyExclude schema
+                        pure schema
+                      schemaLookupFromRef = Map.fromList $ do
+                        (n, schema) <- nonFixedSchemas
+                        case schema of
+                          OAT.Reference ref -> [(ref, (n, getSchemaNameFromReference ref))]
+                          OAT.Concrete _ -> []
+                      oneOfSchemaRefs = do
+                        (ref, (_, name')) <- Map.toList schemaLookupFromRef
+                        pure (name', ref)
+                      propertyNamesWithReferences = maybe oneOfSchemaRefs Map.toList $ OAS.discriminatorObjectMapping disc
+                  let mkMatchedCase (propName, fullRef) =
+                        case Map.lookup fullRef schemaLookupFromRef of
+                          Nothing -> []
+                          Just (n, caseName) -> do
+                            let suffix = if OAO.settingUseNumberedVariantConstructors settings then "Variant" <> T.pack (show n) else ""
+                                parseConstructor constructorName = [|($(varE constructorName) <$> Aeson.parseJSON $(varE paramName))|]
+                            [match (litP $ stringL $ T.unpack propName) (normalB [|$(parseConstructor $ haskellifyConstructor $ schemaName <> haskellifyPartialConstructor caseName <> suffix)|]) []]
+                      matchedCases = propertyNamesWithReferences >>= mkMatchedCase
+                      unmatchedCase = match (varP $ mkName "_unmatched") (normalB [|fail "No match for discriminator property"|]) []
+                      propertyCases = matchedCases <> [unmatchedCase]
+                      getDiscProp = [|$(varE fnArgName) Aeson..:? $(stringE $ T.unpack $ OAS.discriminatorObjectPropertyName disc)|]
+                      annotatedDiscriminatorPropertyName = [|$(varE discriminatorPropertyName) :: Text|]
+                      withObjectLamda =
+                        [|
+                          do
+                            result <- $getDiscProp
+                            case result of
+                              Nothing -> fail "Object lacks discriminator property"
+                              Just $(varP discriminatorPropertyName) ->
+                                $(caseE annotatedDiscriminatorPropertyName propertyCases)
+                          |]
                   [|Aeson.withObject $(stringE $ T.unpack schemaName) $(lam1E (varP fnArgName) withObjectLamda) $(varE paramName)|]
                 Nothing -> do
                   constructorNames' <- sequence constructorNames
