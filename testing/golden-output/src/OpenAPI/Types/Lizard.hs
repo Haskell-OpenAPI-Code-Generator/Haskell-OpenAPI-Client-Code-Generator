@@ -54,7 +54,7 @@ instance Data.Aeson.Types.ToJSON.ToJSON LizardVariants
     where {toJSON (LizardGecko a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (LizardGilaMonster a) = Data.Aeson.Types.ToJSON.toJSON a}
 instance Data.Aeson.Types.FromJSON.FromJSON LizardVariants
-    where {parseJSON val = Data.Aeson.Types.FromJSON.withObject "Lizard" (\obj -> do {result_0 <- obj Data.Aeson.Types.FromJSON..:? "lizardType";
+    where {parseJSON val = Data.Aeson.Types.FromJSON.withObject "Lizard" (\obj -> do {result_0 <- obj Data.Aeson.Types.FromJSON..:? "discriminatorTag";
                                                                                       case result_0 of
                                                                                       {GHC.Maybe.Nothing -> Control.Monad.Fail.fail "Object lacks discriminator property";
                                                                                        GHC.Maybe.Just propertyName -> case propertyName :: Data.Text.Internal.Text of

@@ -376,25 +376,25 @@ components:
         - $ref: '#/components/schemas/gecko'
         - $ref: '#/components/schemas/gilaMonster'
       discriminator:
-        propertyName: lizardType
+        propertyName: discriminatorTag
     gecko:
       type: object
       properties:
         hasTail:
           type: boolean
-        lizardType:
+        discriminatorTag:
           type: string
       required:
-        - lizardType
+        - discriminatorTag
     gilaMonster:
       type: object
       properties:
         hasTail:
           type: boolean
-        lizardType:
+        discriminatorTag:
           type: string
       required:
-        - lizardType
+        - discriminatorTag
     Mischling:
       allOf: # Combines the main `Pet` schema with `Cat`-specific properties
         - $ref: '#/components/schemas/Dog'

@@ -45,19 +45,19 @@ import OpenAPI.TypeAlias
 -- 
 -- 
 data Gecko = Gecko {
+  -- | discriminatorTag
+  geckoDiscriminatorTag :: Data.Text.Internal.Text
   -- | hasTail
-  geckoHasTail :: (GHC.Maybe.Maybe GHC.Types.Bool)
-  -- | lizardType
-  , geckoLizardType :: Data.Text.Internal.Text
+  , geckoHasTail :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Gecko
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (geckoHasTail obj) : ["lizardType" Data.Aeson.Types.ToJSON..= geckoLizardType obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (geckoHasTail obj) : ["lizardType" Data.Aeson.Types.ToJSON..= geckoLizardType obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= geckoDiscriminatorTag obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (geckoHasTail obj) : GHC.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= geckoDiscriminatorTag obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (geckoHasTail obj) : GHC.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Gecko
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Gecko" (\obj -> (GHC.Base.pure Gecko GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hasTail")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "lizardType"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Gecko" (\obj -> (GHC.Base.pure Gecko GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "discriminatorTag")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hasTail"))}
 -- | Create a new 'Gecko' with all required fields.
-mkGecko :: Data.Text.Internal.Text -- ^ 'geckoLizardType'
+mkGecko :: Data.Text.Internal.Text -- ^ 'geckoDiscriminatorTag'
   -> Gecko
-mkGecko geckoLizardType = Gecko{geckoHasTail = GHC.Maybe.Nothing,
-                                geckoLizardType = geckoLizardType}
+mkGecko geckoDiscriminatorTag = Gecko{geckoDiscriminatorTag = geckoDiscriminatorTag,
+                                      geckoHasTail = GHC.Maybe.Nothing}
