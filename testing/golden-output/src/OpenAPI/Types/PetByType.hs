@@ -46,20 +46,20 @@ import OpenAPI.TypeAlias
 -- 
 data PetByType = PetByType {
   -- | hunts
-  petByTypeHunts :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  petByTypeHunts :: (GHC.Internal.Maybe.Maybe GHC.Types.Bool)
   -- | pet_type
   , petByTypePet_type :: PetByTypePet_type
-  } deriving (GHC.Show.Show
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByType
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (petByTypeHunts obj) : ["pet_type" Data.Aeson.Types.ToJSON..= petByTypePet_type obj] : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON PetByType
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Base.pure PetByType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "PetByType" (\obj -> (GHC.Internal.Base.pure PetByType GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pet_type"))}
 -- | Create a new 'PetByType' with all required fields.
 mkPetByType :: PetByTypePet_type -- ^ 'petByTypePet_type'
   -> PetByType
-mkPetByType petByTypePet_type = PetByType{petByTypeHunts = GHC.Maybe.Nothing,
+mkPetByType petByTypePet_type = PetByType{petByTypeHunts = GHC.Internal.Maybe.Nothing,
                                           petByTypePet_type = petByTypePet_type}
 -- | Defines the enum schema located at @components.schemas.PetByType.properties.pet_type@ in the specification.
 -- 
@@ -69,13 +69,13 @@ data PetByTypePet_type =
   | PetByTypePet_typeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
   | PetByTypePet_typeEnumCat -- ^ Represents the JSON value @"Cat"@
   | PetByTypePet_typeEnumDog -- ^ Represents the JSON value @"Dog"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON PetByTypePet_type
     where {toJSON (PetByTypePet_typeOther val) = val;
            toJSON (PetByTypePet_typeTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
            toJSON (PetByTypePet_typeEnumCat) = "Cat";
            toJSON (PetByTypePet_typeEnumDog) = "Dog"}
 instance Data.Aeson.Types.FromJSON.FromJSON PetByTypePet_type
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumCat
-                                             | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumDog
-                                             | GHC.Base.otherwise -> PetByTypePet_typeOther val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "Cat" -> PetByTypePet_typeEnumCat
+                                                      | val GHC.Classes.== "Dog" -> PetByTypePet_typeEnumDog
+                                                      | GHC.Internal.Base.otherwise -> PetByTypePet_typeOther val)}

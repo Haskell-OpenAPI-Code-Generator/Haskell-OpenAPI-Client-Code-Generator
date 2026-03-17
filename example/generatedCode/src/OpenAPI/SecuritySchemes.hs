@@ -26,13 +26,13 @@ import qualified OpenAPI.Common
 -- @
 apiKeyInHeaderAuthenticationSecurityScheme :: Data.Text.Internal.Text ->
                                               OpenAPI.Common.SecurityScheme
-apiKeyInHeaderAuthenticationSecurityScheme = Network.HTTP.Simple.addRequestHeader "api_key" GHC.Base.. OpenAPI.Common.textToByte
+apiKeyInHeaderAuthenticationSecurityScheme = Network.HTTP.Simple.addRequestHeader "api_key" GHC.Internal.Base.. OpenAPI.Common.textToByte
 
 -- | Used to pass the authentication information for BasicAuthentication to 'basicAuthenticationSecurityScheme'.
 data BasicAuthenticationData
     = BasicAuthenticationData {basicAuthenticationDataUsername :: Data.Text.Internal.Text,
                                basicAuthenticationDataPassword :: Data.Text.Internal.Text}
-    deriving (GHC.Show.Show, GHC.Classes.Ord, GHC.Classes.Eq)
+    deriving (GHC.Internal.Show.Show, GHC.Classes.Ord, GHC.Classes.Eq)
 
 -- | Use this security scheme to use basic authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.
 -- 
@@ -49,7 +49,7 @@ data BasicAuthenticationData
 -- @
 basicAuthenticationSecurityScheme :: BasicAuthenticationData ->
                                      OpenAPI.Common.SecurityScheme
-basicAuthenticationSecurityScheme = \basicAuth_0 -> Network.HTTP.Client.Request.applyBasicAuth (OpenAPI.Common.textToByte GHC.Base.$ basicAuthenticationDataUsername basicAuth_0) (OpenAPI.Common.textToByte GHC.Base.$ basicAuthenticationDataPassword basicAuth_0)
+basicAuthenticationSecurityScheme = \basicAuth_0 -> Network.HTTP.Client.Request.applyBasicAuth (OpenAPI.Common.textToByte GHC.Internal.Base.$ basicAuthenticationDataUsername basicAuth_0) (OpenAPI.Common.textToByte GHC.Internal.Base.$ basicAuthenticationDataPassword basicAuth_0)
 
 -- | Use this security scheme to use bearer authentication for a request. Should be used in a 'OpenAPI.Common.Configuration'.
 -- 
@@ -62,4 +62,4 @@ basicAuthenticationSecurityScheme = \basicAuth_0 -> Network.HTTP.Client.Request.
 -- @
 bearerAuthenticationSecurityScheme :: Data.Text.Internal.Text ->
                                       OpenAPI.Common.SecurityScheme
-bearerAuthenticationSecurityScheme = \token_1 -> Network.HTTP.Simple.addRequestHeader "Authorization" GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ ("Bearer " GHC.Base.<> token_1))
+bearerAuthenticationSecurityScheme = \token_1 -> Network.HTTP.Simple.addRequestHeader "Authorization" GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ ("Bearer " GHC.Internal.Base.<> token_1))

@@ -59,30 +59,30 @@ import OpenAPI.Types
 -- 
 -- 
 logoutUser :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response LogoutUserResponse) -- ^ Monadic computation which returns the result of the operation
-logoutUser = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either LogoutUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right LogoutUserResponseDefault
-                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Base.mempty)
+logoutUser = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either LogoutUserResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | GHC.Internal.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right LogoutUserResponseDefault
+                                                                                                                                                                                                   | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Internal.Base.mempty)
 -- | Represents a response of the operation 'logoutUser'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'LogoutUserResponseError' is used.
 data LogoutUserResponse =
-   LogoutUserResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   LogoutUserResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | LogoutUserResponseDefault -- ^ successful operation
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > GET /user/logout
 -- 
 -- The same as 'logoutUser' but accepts an explicit configuration.
 logoutUserWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> m (Network.HTTP.Client.Types.Response LogoutUserResponse) -- ^ Monadic computation which returns the result of the operation
-logoutUserWithConfiguration config = GHC.Base.fmap (\response_1 -> GHC.Base.fmap (Data.Either.either LogoutUserResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right LogoutUserResponseDefault
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_1) response_1) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Base.mempty)
+logoutUserWithConfiguration config = GHC.Internal.Base.fmap (\response_1 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either LogoutUserResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | GHC.Internal.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right LogoutUserResponseDefault
+                                                                                                                                                                                                                           | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_1) response_1) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Internal.Base.mempty)
 -- | > GET /user/logout
 -- 
 -- The same as 'logoutUser' but returns the raw 'Data.ByteString.ByteString'.
 logoutUserRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-logoutUserRaw = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Base.mempty)
+logoutUserRaw = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Internal.Base.mempty)
 -- | > GET /user/logout
 -- 
 -- The same as 'logoutUser' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
 logoutUserWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-logoutUserWithConfigurationRaw config = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Base.mempty)
+logoutUserWithConfigurationRaw config = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/user/logout" GHC.Internal.Base.mempty)

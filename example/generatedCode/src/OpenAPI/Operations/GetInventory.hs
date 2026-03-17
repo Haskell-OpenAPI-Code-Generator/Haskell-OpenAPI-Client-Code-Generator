@@ -59,32 +59,32 @@ import OpenAPI.Types
 -- 
 -- Returns a map of status codes to quantities
 getInventory :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response GetInventoryResponse) -- ^ Monadic computation which returns the result of the operation
-getInventory = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetInventoryResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetInventoryResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                           Data.Aeson.Types.Internal.Object)
-                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Base.mempty)
+getInventory = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either GetInventoryResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetInventoryResponse200 GHC.Internal.Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: GHC.Internal.Data.Either.Either GHC.Internal.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Data.Aeson.Types.Internal.Object)
+                                                                                                                                                                                                       | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Internal.Base.mempty)
 -- | Represents a response of the operation 'getInventory'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetInventoryResponseError' is used.
 data GetInventoryResponse =
-   GetInventoryResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   GetInventoryResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | GetInventoryResponse200 Data.Aeson.Types.Internal.Object -- ^ successful operation
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > GET /store/inventory
 -- 
 -- The same as 'getInventory' but accepts an explicit configuration.
 getInventoryWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> m (Network.HTTP.Client.Types.Response GetInventoryResponse) -- ^ Monadic computation which returns the result of the operation
-getInventoryWithConfiguration config = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetInventoryResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetInventoryResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                   Data.Aeson.Types.Internal.Object)
-                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Base.mempty)
+getInventoryWithConfiguration config = GHC.Internal.Base.fmap (\response_2 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either GetInventoryResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetInventoryResponse200 GHC.Internal.Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: GHC.Internal.Data.Either.Either GHC.Internal.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Data.Aeson.Types.Internal.Object)
+                                                                                                                                                                                                                               | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_2) response_2) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Internal.Base.mempty)
 -- | > GET /store/inventory
 -- 
 -- The same as 'getInventory' but returns the raw 'Data.ByteString.ByteString'.
 getInventoryRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-getInventoryRaw = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Base.mempty)
+getInventoryRaw = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Internal.Base.mempty)
 -- | > GET /store/inventory
 -- 
 -- The same as 'getInventory' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
 getInventoryWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-getInventoryWithConfigurationRaw config = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Base.mempty)
+getInventoryWithConfigurationRaw config = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "GET") "/store/inventory" GHC.Internal.Base.mempty)

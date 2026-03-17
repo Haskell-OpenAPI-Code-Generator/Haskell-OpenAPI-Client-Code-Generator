@@ -60,18 +60,18 @@ import OpenAPI.Types
 -- 
 placeOrder :: forall m . OpenAPI.Common.MonadHTTP m => Order -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response PlaceOrderResponse) -- ^ Monadic computation which returns the result of the operation
-placeOrder body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PlaceOrderResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PlaceOrderResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                          Order)
-                                                                                                                                                       | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right PlaceOrderResponse400
-                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+placeOrder body = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either PlaceOrderResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PlaceOrderResponse200 GHC.Internal.Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: GHC.Internal.Data.Either.Either GHC.Internal.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Order)
+                                                                                                                                                                                                        | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right PlaceOrderResponse400
+                                                                                                                                                                                                        | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | Represents a response of the operation 'placeOrder'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PlaceOrderResponseError' is used.
 data PlaceOrderResponse =
-   PlaceOrderResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   PlaceOrderResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | PlaceOrderResponse200 Order -- ^ successful operation
   | PlaceOrderResponse400 -- ^ Invalid Order
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > POST /store/order
 -- 
 -- The same as 'placeOrder' but accepts an explicit configuration.
@@ -79,16 +79,16 @@ placeOrderWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.
   -> Order -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response PlaceOrderResponse) -- ^ Monadic computation which returns the result of the operation
 placeOrderWithConfiguration config
-                            body = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either PlaceOrderResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PlaceOrderResponse200 Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                           Order)
-                                                                                                                                                                        | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right PlaceOrderResponse400
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                            body = GHC.Internal.Base.fmap (\response_3 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either PlaceOrderResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PlaceOrderResponse200 GHC.Internal.Data.Functor.<$> (Data.Aeson.Decoding.eitherDecodeStrict body :: GHC.Internal.Data.Either.Either GHC.Internal.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Order)
+                                                                                                                                                                                                                         | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right PlaceOrderResponse400
+                                                                                                                                                                                                                         | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /store/order
 -- 
 -- The same as 'placeOrder' but returns the raw 'Data.ByteString.ByteString'.
 placeOrderRaw :: forall m . OpenAPI.Common.MonadHTTP m => Order -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-placeOrderRaw body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+placeOrderRaw body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /store/order
 -- 
 -- The same as 'placeOrder' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
@@ -96,4 +96,4 @@ placeOrderWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenA
   -> Order -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 placeOrderWithConfigurationRaw config
-                               body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                               body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/store/order" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)

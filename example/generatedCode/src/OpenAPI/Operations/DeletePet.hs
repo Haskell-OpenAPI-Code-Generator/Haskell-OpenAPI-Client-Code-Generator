@@ -58,40 +58,40 @@ import OpenAPI.Types
 -- | > DELETE /pet/{petId}
 -- 
 -- 
-deletePet :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Int.Int64 -- ^ petId: Pet id to delete
+deletePet :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Internal.Int.Int64 -- ^ petId: Pet id to delete
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response DeletePetResponse) -- ^ Monadic computation which returns the result of the operation
-deletePet petId = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either DeletePetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeletePetResponse400
-                                                                                                                                                      | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeletePetResponse404
-                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "")) GHC.Base.mempty)
+deletePet petId = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either DeletePetResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeletePetResponse400
+                                                                                                                                                                                                       | (\status_2 -> Network.HTTP.Types.Status.statusCode status_2 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeletePetResponse404
+                                                                                                                                                                                                       | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | Represents a response of the operation 'deletePet'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'DeletePetResponseError' is used.
 data DeletePetResponse =
-   DeletePetResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   DeletePetResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | DeletePetResponse400 -- ^ Invalid ID supplied
   | DeletePetResponse404 -- ^ Pet not found
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > DELETE /pet/{petId}
 -- 
 -- The same as 'deletePet' but accepts an explicit configuration.
 deletePetWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
-  -> GHC.Int.Int64 -- ^ petId: Pet id to delete
+  -> GHC.Internal.Int.Int64 -- ^ petId: Pet id to delete
   -> m (Network.HTTP.Client.Types.Response DeletePetResponse) -- ^ Monadic computation which returns the result of the operation
 deletePetWithConfiguration config
-                           petId = GHC.Base.fmap (\response_3 -> GHC.Base.fmap (Data.Either.either DeletePetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeletePetResponse400
-                                                                                                                                                                       | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeletePetResponse404
-                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "")) GHC.Base.mempty)
+                           petId = GHC.Internal.Base.fmap (\response_3 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either DeletePetResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | (\status_4 -> Network.HTTP.Types.Status.statusCode status_4 GHC.Classes.== 400) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeletePetResponse400
+                                                                                                                                                                                                                        | (\status_5 -> Network.HTTP.Types.Status.statusCode status_5 GHC.Classes.== 404) (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right DeletePetResponse404
+                                                                                                                                                                                                                        | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_3) response_3) (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | > DELETE /pet/{petId}
 -- 
 -- The same as 'deletePet' but returns the raw 'Data.ByteString.ByteString'.
-deletePetRaw :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Int.Int64 -- ^ petId: Pet id to delete
+deletePetRaw :: forall m . OpenAPI.Common.MonadHTTP m => GHC.Internal.Int.Int64 -- ^ petId: Pet id to delete
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-deletePetRaw petId = GHC.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "")) GHC.Base.mempty)
+deletePetRaw petId = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)
 -- | > DELETE /pet/{petId}
 -- 
 -- The same as 'deletePet' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
 deletePetWithConfigurationRaw :: forall m . OpenAPI.Common.MonadHTTP m => OpenAPI.Common.Configuration -- ^ The configuration to use in the request
-  -> GHC.Int.Int64 -- ^ petId: Pet id to delete
+  -> GHC.Internal.Int.Int64 -- ^ petId: Pet id to delete
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 deletePetWithConfigurationRaw config
-                              petId = GHC.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (OpenAPI.Common.textToByte GHC.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Base.<> "")) GHC.Base.mempty)
+                              petId = GHC.Internal.Base.id (OpenAPI.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "DELETE") ("/pet/" GHC.Internal.Base.<> (OpenAPI.Common.byteToText (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Internal.Base.$ (OpenAPI.Common.textToByte GHC.Internal.Base.$ OpenAPI.Common.stringifyModel petId)) GHC.Internal.Base.<> "")) GHC.Internal.Base.mempty)

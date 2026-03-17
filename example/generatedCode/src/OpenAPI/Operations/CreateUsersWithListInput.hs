@@ -60,15 +60,15 @@ import OpenAPI.Types
 -- 
 createUsersWithListInput :: forall m . OpenAPI.Common.MonadHTTP m => [User] -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response CreateUsersWithListInputResponse) -- ^ Monadic computation which returns the result of the operation
-createUsersWithListInput body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either CreateUsersWithListInputResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right CreateUsersWithListInputResponseDefault
-                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+createUsersWithListInput body = GHC.Internal.Base.fmap (\response_0 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either CreateUsersWithListInputResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | GHC.Internal.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right CreateUsersWithListInputResponseDefault
+                                                                                                                                                                                                                                    | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_0) response_0) (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | Represents a response of the operation 'createUsersWithListInput'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'CreateUsersWithListInputResponseError' is used.
 data CreateUsersWithListInputResponse =
-   CreateUsersWithListInputResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+   CreateUsersWithListInputResponseError GHC.Internal.Base.String -- ^ Means either no matching case available or a parse error
   | CreateUsersWithListInputResponseDefault -- ^ successful operation
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 -- | > POST /user/createWithList
 -- 
 -- The same as 'createUsersWithListInput' but accepts an explicit configuration.
@@ -76,14 +76,14 @@ createUsersWithListInputWithConfiguration :: forall m . OpenAPI.Common.MonadHTTP
   -> [User] -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response CreateUsersWithListInputResponse) -- ^ Monadic computation which returns the result of the operation
 createUsersWithListInputWithConfiguration config
-                                          body = GHC.Base.fmap (\response_1 -> GHC.Base.fmap (Data.Either.either CreateUsersWithListInputResponseError GHC.Base.id GHC.Base.. (\response body -> if | GHC.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right CreateUsersWithListInputResponseDefault
-                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_1) response_1) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                                          body = GHC.Internal.Base.fmap (\response_1 -> GHC.Internal.Base.fmap (GHC.Internal.Data.Either.either CreateUsersWithListInputResponseError GHC.Internal.Base.id GHC.Internal.Base.. (\response body -> if | GHC.Internal.Base.const GHC.Types.True (Network.HTTP.Client.Types.responseStatus response) -> GHC.Internal.Data.Either.Right CreateUsersWithListInputResponseDefault
+                                                                                                                                                                                                                                                     | GHC.Internal.Base.otherwise -> GHC.Internal.Data.Either.Left "Missing default response type") response_1) response_1) (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /user/createWithList
 -- 
 -- The same as 'createUsersWithListInput' but returns the raw 'Data.ByteString.ByteString'.
 createUsersWithListInputRaw :: forall m . OpenAPI.Common.MonadHTTP m => [User] -- ^ The request body to send
   -> OpenAPI.Common.ClientT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
-createUsersWithListInputRaw body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+createUsersWithListInputRaw body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
 -- | > POST /user/createWithList
 -- 
 -- The same as 'createUsersWithListInput' but accepts an explicit configuration and returns the raw 'Data.ByteString.ByteString'.
@@ -91,4 +91,4 @@ createUsersWithListInputWithConfigurationRaw :: forall m . OpenAPI.Common.MonadH
   -> [User] -- ^ The request body to send
   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.Type.ByteString) -- ^ Monadic computation which returns the result of the operation
 createUsersWithListInputWithConfigurationRaw config
-                                             body = GHC.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Base.mempty (GHC.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)
+                                             body = GHC.Internal.Base.id (OpenAPI.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Internal.Base.$ Data.Text.Internal.pack "POST") "/user/createWithList" GHC.Internal.Base.mempty (GHC.Internal.Maybe.Just body) OpenAPI.Common.RequestBodyEncodingJSON)

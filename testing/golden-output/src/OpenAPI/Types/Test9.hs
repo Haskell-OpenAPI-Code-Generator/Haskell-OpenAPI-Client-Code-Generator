@@ -48,11 +48,11 @@ data Test9 =
    Test9Other Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
   | Test9Typed Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
   | Test9EnumXxx -- ^ Represents the JSON value @"xxx"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test9
     where {toJSON (Test9Other val) = val;
            toJSON (Test9Typed val) = Data.Aeson.Types.ToJSON.toJSON val;
            toJSON (Test9EnumXxx) = "xxx"}
 instance Data.Aeson.Types.FromJSON.FromJSON Test9
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "xxx" -> Test9EnumXxx
-                                             | GHC.Base.otherwise -> Test9Other val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "xxx" -> Test9EnumXxx
+                                                      | GHC.Internal.Base.otherwise -> Test9Other val)}
