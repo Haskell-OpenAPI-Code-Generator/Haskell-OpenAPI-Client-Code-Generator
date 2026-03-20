@@ -15,31 +15,39 @@ runAddPet =
       (mkPet [])
         { petId = Just 21,
           petName = Just "Harro",
-          petStatus = Just PetStatusEnumAvailable
+          petStatus = Just PetStatus'EnumAvailable
         }
 
 runGetInventory :: (MonadHTTP m) => m (Response GetInventoryResponse)
-runGetInventory = getInventoryWithConfiguration defaultConfiguration
+runGetInventory = runWithConfiguration defaultConfiguration getInventory
 
 runFindPetsByStatus :: (MonadHTTP m) => FindPetsByStatusParametersStatus -> m (Response FindPetsByStatusResponse)
-runFindPetsByStatus status = findPetsByStatusWithConfiguration defaultConfiguration [status]
+runFindPetsByStatus status = runWithConfiguration defaultConfiguration $ findPetsByStatus [status]
 
 runEchoUserAgent :: (MonadHTTP m) => m (Response EchoUserAgentResponse)
 runEchoUserAgent =
-  echoUserAgentWithConfiguration $
+  runWithConfiguration
     defaultConfiguration
       { configApplicationName = "XYZ"
       }
+    echoUserAgent
 
 runEchoUserAgentWithoutUserAgent :: (MonadHTTP m) => m (Response EchoUserAgentResponse)
 runEchoUserAgentWithoutUserAgent =
-  echoUserAgentWithConfiguration $
+  runWithConfiguration
     defaultConfiguration
       { configIncludeUserAgent = False
       }
+    echoUserAgent
 
 runEchoPath :: (MonadHTTP m) => EchoPathParametersPath -> m (Response EchoPathResponse)
-runEchoPath = echoPathWithConfiguration defaultConfiguration
+runEchoPath path = runWithConfiguration defaultConfiguration $ echoPath path
 
 runSendAndReceiveNullableAndOptional :: (MonadHTTP m) => Text -> NullableAndOptionalTest -> m (Response SendAndReceiveNullableAndOptionalResponse)
-runSendAndReceiveNullableAndOptional = sendAndReceiveNullableAndOptionalWithConfiguration defaultConfiguration
+runSendAndReceiveNullableAndOptional mode body = runWithConfiguration defaultConfiguration $ sendAndReceiveNullableAndOptional mode body
+
+runGetFishByType :: (MonadHTTP m) => Text -> m (Response GetFishByTypeResponse)
+runGetFishByType fishType = runWithConfiguration defaultConfiguration $ getFishByType fishType
+
+runGetLizardByType :: (MonadHTTP m) => Text -> m (Response GetLizardByTypeResponse)
+runGetLizardByType lizardType = runWithConfiguration defaultConfiguration $ getLizardByType lizardType

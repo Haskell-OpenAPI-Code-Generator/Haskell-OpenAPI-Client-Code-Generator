@@ -11,10 +11,9 @@ where
 
 import Control.Monad (when)
 import Data.Aeson
-import qualified Data.Aeson.Key as Key
-import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Aeson.TH
 import Data.Char
+import qualified Data.HashMap.Strict as KeyMap
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
@@ -36,6 +35,8 @@ type API =
     :<|> "echo" :> Header "User-Agent" String :> Get '[JSON] String
     :<|> "echo" :> Capture "path" String :> Get '[JSON] String
     :<|> "nullable-optional" :> Capture "mode" String :> ReqBody '[JSON] Value :> Post '[JSON] Value
+    :<|> "discriminator" :> "fish" :> Capture "fishType" String :> Get '[JSON] Value
+    :<|> "discriminator" :> "lizard" :> Capture "lizardType" String :> Get '[JSON] Value
 
 startApp :: IO ()
 startApp = run 8887 app
@@ -47,7 +48,7 @@ api :: Proxy API
 api = Proxy
 
 server :: Server API
-server = pure getInventory :<|> findByStatus :<|> addPet :<|> userAgentEcho :<|> pathEcho :<|> checkNullableAndOptional
+server = pure getInventory :<|> findByStatus :<|> addPet :<|> userAgentEcho :<|> pathEcho :<|> checkNullableAndOptional :<|> getFish :<|> getLizard
 
 getInventory :: Value
 getInventory = object ["pet1" .= Number 23, "pet2" .= Number 2]
@@ -77,110 +78,146 @@ pathEcho = pure
 
 checkNullableAndOptional :: String -> Value -> Handler Value
 checkNullableAndOptional "filled" (Object map) = do
-  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("requiredNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("optionalNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("optionalNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNullable") map /= Just "x") $ throwError err400
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", "x"),
-          (Key.fromText "requiredNullable", "x"),
-          (Key.fromText "optionalNonNullable", "x"),
-          (Key.fromText "optionalNullable", "x"),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", "x"),
-          (Key.fromText "referencedOptionalNonNullable", "x"),
-          (Key.fromText "referencedOptionalNullable", "x")
+        [ ("requiredNonNullable", "x"),
+          ("requiredNullable", "x"),
+          ("optionalNonNullable", "x"),
+          ("optionalNullable", "x"),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", "x"),
+          ("referencedOptionalNonNullable", "x"),
+          ("referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "emptyNull" (Object map) = do
-  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just Null) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Nothing) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Just Null) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just Null) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Nothing) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("requiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("optionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("optionalNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNullable") map /= Just Null) $ throwError err400
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", "x"),
-          (Key.fromText "requiredNullable", Null),
-          (Key.fromText "optionalNullable", Null),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", Null),
-          (Key.fromText "referencedOptionalNullable", Null)
+        [ ("requiredNonNullable", "x"),
+          ("requiredNullable", Null),
+          ("optionalNullable", Null),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", Null),
+          ("referencedOptionalNullable", Null)
         ]
 checkNullableAndOptional "emptyAbsent" (Object map) = do
-  when (KeyMap.lookup (Key.fromText "requiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "requiredNullable") map /= Just Null) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNonNullable") map /= Nothing) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "optionalNullable") map /= Nothing) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNonNullable") map /= Just "x") $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedRequiredNullable") map /= Just Null) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNonNullable") map /= Nothing) $ throwError err400
-  when (KeyMap.lookup (Key.fromText "referencedOptionalNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("requiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("requiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("optionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("optionalNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNonNullable") map /= Just "x") $ throwError err400
+  when (KeyMap.lookup ("referencedRequiredNullable") map /= Just Null) $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNonNullable") map /= Nothing) $ throwError err400
+  when (KeyMap.lookup ("referencedOptionalNullable") map /= Nothing) $ throwError err400
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", "x"),
-          (Key.fromText "requiredNullable", Null),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", Null)
+        [ ("requiredNonNullable", "x"),
+          ("requiredNullable", Null),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", Null)
         ]
 checkNullableAndOptional "errorRequiredNonNullableWithNull" (Object map) =
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", Null),
-          (Key.fromText "requiredNullable", "x"),
-          (Key.fromText "optionalNonNullable", "x"),
-          (Key.fromText "optionalNullable", "x"),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", "x"),
-          (Key.fromText "referencedOptionalNonNullable", "x"),
-          (Key.fromText "referencedOptionalNullable", "x")
+        [ ("requiredNonNullable", Null),
+          ("requiredNullable", "x"),
+          ("optionalNonNullable", "x"),
+          ("optionalNullable", "x"),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", "x"),
+          ("referencedOptionalNonNullable", "x"),
+          ("referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorRequiredNonNullableWithAbsence" (Object map) =
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNullable", "x"),
-          (Key.fromText "optionalNonNullable", "x"),
-          (Key.fromText "optionalNullable", "x"),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", "x"),
-          (Key.fromText "referencedOptionalNonNullable", "x"),
-          (Key.fromText "referencedOptionalNullable", "x")
+        [ ("requiredNullable", "x"),
+          ("optionalNonNullable", "x"),
+          ("optionalNullable", "x"),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", "x"),
+          ("referencedOptionalNonNullable", "x"),
+          ("referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorRequiredNullable" (Object map) =
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", "x"),
-          (Key.fromText "optionalNonNullable", "x"),
-          (Key.fromText "optionalNullable", "x"),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", "x"),
-          (Key.fromText "referencedOptionalNonNullable", "x"),
-          (Key.fromText "referencedOptionalNullable", "x")
+        [ ("requiredNonNullable", "x"),
+          ("optionalNonNullable", "x"),
+          ("optionalNullable", "x"),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", "x"),
+          ("referencedOptionalNonNullable", "x"),
+          ("referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional "errorOptionalNonNullable" (Object map) =
   pure $
     Object $
       KeyMap.fromList
-        [ (Key.fromText "requiredNonNullable", "x"),
-          (Key.fromText "requiredNullable", "x"),
-          (Key.fromText "optionalNonNullable", Null),
-          (Key.fromText "optionalNullable", "x"),
-          (Key.fromText "referencedRequiredNonNullable", "x"),
-          (Key.fromText "referencedRequiredNullable", "x"),
-          (Key.fromText "referencedOptionalNonNullable", "x"),
-          (Key.fromText "referencedOptionalNullable", "x")
+        [ ("requiredNonNullable", "x"),
+          ("requiredNullable", "x"),
+          ("optionalNonNullable", Null),
+          ("optionalNullable", "x"),
+          ("referencedRequiredNonNullable", "x"),
+          ("referencedRequiredNullable", "x"),
+          ("referencedOptionalNonNullable", "x"),
+          ("referencedOptionalNullable", "x")
         ]
 checkNullableAndOptional _ _ = throwError err500
+
+getFish :: String -> Handler Value
+getFish "guppie" =
+  pure $
+    object
+      [ "fishType" .= String "guppie",
+        "color" .= String "orange"
+      ]
+getFish "minnow" =
+  pure $
+    object
+      [ "fishType" .= String "minnow",
+        "color" .= String "silver"
+      ]
+getFish "shark" =
+  pure $
+    object
+      [ "fishType" .= String "shark",
+        "teethRemaining" .= Number 42
+      ]
+getFish _ = throwError err400
+
+getLizard :: String -> Handler Value
+getLizard "gecko" =
+  pure $
+    object
+      [ "discriminatorTag" .= String "Gecko",
+        "hasTail" .= Bool True
+      ]
+getLizard "gilaMonster" =
+  pure $
+    object
+      [ "discriminatorTag" .= String "GilaMonster",
+        "hasTail" .= Bool False
+      ]
+getLizard _ = throwError err400
