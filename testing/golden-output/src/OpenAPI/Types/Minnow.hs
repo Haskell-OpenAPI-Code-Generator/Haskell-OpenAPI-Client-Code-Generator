@@ -46,18 +46,18 @@ import OpenAPI.TypeAlias
 -- 
 data Minnow = Minnow {
   -- | color
-  minnowColor :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  minnowColor :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | fishType
   , minnowFishType :: Data.Text.Internal.Text
-  } deriving (GHC.Show.Show
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Minnow
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (minnowColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= minnowFishType obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (minnowColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= minnowFishType obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (minnowColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= minnowFishType obj] : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (minnowColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= minnowFishType obj] : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Minnow
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Minnow" (\obj -> (GHC.Base.pure Minnow GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "color")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Minnow" (\obj -> (GHC.Internal.Base.pure Minnow GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "color")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType"))}
 -- | Create a new 'Minnow' with all required fields.
 mkMinnow :: Data.Text.Internal.Text -- ^ 'minnowFishType'
   -> Minnow
-mkMinnow minnowFishType = Minnow{minnowColor = GHC.Maybe.Nothing,
+mkMinnow minnowFishType = Minnow{minnowColor = GHC.Internal.Maybe.Nothing,
                                  minnowFishType = minnowFishType}

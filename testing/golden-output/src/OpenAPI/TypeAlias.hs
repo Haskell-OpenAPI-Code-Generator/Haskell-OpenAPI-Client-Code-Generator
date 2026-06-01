@@ -66,7 +66,7 @@ type Test2 = [Data.Text.Internal.Text]
 -- | Defines an alias for the schema located at @components.schemas.Test10@ in the specification.
 -- 
 -- 
-type Test10 = GHC.Base.NonEmpty Data.Text.Internal.Text
+type Test10 = GHC.Internal.Base.NonEmpty Data.Text.Internal.Text
 
 -- | Defines an alias for the schema located at @components.schemas.Test@ in the specification.
 -- 

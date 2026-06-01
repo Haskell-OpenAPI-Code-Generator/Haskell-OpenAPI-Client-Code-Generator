@@ -47,26 +47,26 @@ import {-# SOURCE #-} OpenAPI.Types.PetByType
 -- 
 data Cat = Cat {
   -- | age
-  catAge :: (GHC.Maybe.Maybe GHC.Types.Int)
+  catAge :: (GHC.Internal.Maybe.Maybe GHC.Types.Int)
   -- | another_relative
-  , catAnother_relative :: (GHC.Maybe.Maybe CatAnother_relativeVariants)
+  , catAnother_relative :: (GHC.Internal.Maybe.Maybe CatAnother_relativeVariants)
   -- | hunts
-  , catHunts :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  , catHunts :: (GHC.Internal.Maybe.Maybe GHC.Types.Bool)
   -- | relative
-  , catRelative :: (GHC.Maybe.Maybe CatRelativeVariants)
-  } deriving (GHC.Show.Show
+  , catRelative :: (GHC.Internal.Maybe.Maybe CatRelativeVariants)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Cat
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("age" Data.Aeson.Types.ToJSON..=)) (catAge obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("another_relative" Data.Aeson.Types.ToJSON..=)) (catAnother_relative obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hunts" Data.Aeson.Types.ToJSON..=)) (catHunts obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("relative" Data.Aeson.Types.ToJSON..=)) (catRelative obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Cat
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> (((GHC.Base.pure Cat GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "age")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "another_relative")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "relative"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Cat" (\obj -> (((GHC.Internal.Base.pure Cat GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "age")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "another_relative")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hunts")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "relative"))}
 -- | Create a new 'Cat' with all required fields.
 mkCat :: Cat
-mkCat = Cat{catAge = GHC.Maybe.Nothing,
-            catAnother_relative = GHC.Maybe.Nothing,
-            catHunts = GHC.Maybe.Nothing,
-            catRelative = GHC.Maybe.Nothing}
+mkCat = Cat{catAge = GHC.Internal.Maybe.Nothing,
+            catAnother_relative = GHC.Internal.Maybe.Nothing,
+            catHunts = GHC.Internal.Maybe.Nothing,
+            catRelative = GHC.Internal.Maybe.Nothing}
 -- | Defines the oneOf schema located at @components.schemas.Cat.properties.another_relative.oneOf@ in the specification.
 -- 
 -- 
@@ -74,15 +74,15 @@ data CatAnother_relativeVariants =
    CatAnother_relativeCat Cat
   | CatAnother_relativePetByType PetByType
   | CatAnother_relativeText Data.Text.Internal.Text
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CatAnother_relativeVariants
     where {toJSON (CatAnother_relativeCat a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (CatAnother_relativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (CatAnother_relativeText a) = Data.Aeson.Types.ToJSON.toJSON a}
 instance Data.Aeson.Types.FromJSON.FromJSON CatAnother_relativeVariants
-    where {parseJSON val = case (CatAnother_relativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatAnother_relativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatAnother_relativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
-                           {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
-                            Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}
+    where {parseJSON val = case (CatAnother_relativeCat GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> ((CatAnother_relativePetByType GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> ((CatAnother_relativeText GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                           {Data.Aeson.Types.Internal.Success a -> GHC.Internal.Base.pure a;
+                            Data.Aeson.Types.Internal.Error a -> GHC.Internal.Control.Monad.Fail.fail a}}
 -- | Defines the oneOf schema located at @components.schemas.Cat.properties.relative.anyOf@ in the specification.
 -- 
 -- 
@@ -90,12 +90,12 @@ data CatRelativeVariants =
    CatRelativeCat Cat
   | CatRelativePetByType PetByType
   | CatRelativeText Data.Text.Internal.Text
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON CatRelativeVariants
     where {toJSON (CatRelativeCat a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (CatRelativePetByType a) = Data.Aeson.Types.ToJSON.toJSON a;
            toJSON (CatRelativeText a) = Data.Aeson.Types.ToJSON.toJSON a}
 instance Data.Aeson.Types.FromJSON.FromJSON CatRelativeVariants
-    where {parseJSON val = case (CatRelativeCat Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatRelativePetByType Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> ((CatRelativeText Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
-                           {Data.Aeson.Types.Internal.Success a -> GHC.Base.pure a;
-                            Data.Aeson.Types.Internal.Error a -> Control.Monad.Fail.fail a}}
+    where {parseJSON val = case (CatRelativeCat GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> ((CatRelativePetByType GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> ((CatRelativeText GHC.Internal.Data.Functor.<$> Data.Aeson.Types.FromJSON.fromJSON val) GHC.Internal.Base.<|> Data.Aeson.Types.Internal.Error "No variant matched")) of
+                           {Data.Aeson.Types.Internal.Success a -> GHC.Internal.Base.pure a;
+                            Data.Aeson.Types.Internal.Error a -> GHC.Internal.Control.Monad.Fail.fail a}}

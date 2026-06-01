@@ -48,16 +48,16 @@ data GilaMonster = GilaMonster {
   -- | discriminatorTag
   gilaMonsterDiscriminatorTag :: Data.Text.Internal.Text
   -- | hasTail
-  , gilaMonsterHasTail :: (GHC.Maybe.Maybe GHC.Types.Bool)
-  } deriving (GHC.Show.Show
+  , gilaMonsterHasTail :: (GHC.Internal.Maybe.Maybe GHC.Types.Bool)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON GilaMonster
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= gilaMonsterDiscriminatorTag obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (gilaMonsterHasTail obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= gilaMonsterDiscriminatorTag obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (gilaMonsterHasTail obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= gilaMonsterDiscriminatorTag obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (gilaMonsterHasTail obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (["discriminatorTag" Data.Aeson.Types.ToJSON..= gilaMonsterDiscriminatorTag obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("hasTail" Data.Aeson.Types.ToJSON..=)) (gilaMonsterHasTail obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON GilaMonster
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "GilaMonster" (\obj -> (GHC.Base.pure GilaMonster GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "discriminatorTag")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hasTail"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "GilaMonster" (\obj -> (GHC.Internal.Base.pure GilaMonster GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "discriminatorTag")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "hasTail"))}
 -- | Create a new 'GilaMonster' with all required fields.
 mkGilaMonster :: Data.Text.Internal.Text -- ^ 'gilaMonsterDiscriminatorTag'
   -> GilaMonster
 mkGilaMonster gilaMonsterDiscriminatorTag = GilaMonster{gilaMonsterDiscriminatorTag = gilaMonsterDiscriminatorTag,
-                                                        gilaMonsterHasTail = GHC.Maybe.Nothing}
+                                                        gilaMonsterHasTail = GHC.Internal.Maybe.Nothing}

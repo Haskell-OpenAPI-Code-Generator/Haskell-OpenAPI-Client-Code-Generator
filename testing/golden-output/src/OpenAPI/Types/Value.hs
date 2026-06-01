@@ -48,11 +48,11 @@ data Value =
    ValueOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
   | ValueTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
   | ValueEnumYyy -- ^ Represents the JSON value @"yyy"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Value
     where {toJSON (ValueOther val) = val;
            toJSON (ValueTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
            toJSON (ValueEnumYyy) = "yyy"}
 instance Data.Aeson.Types.FromJSON.FromJSON Value
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "yyy" -> ValueEnumYyy
-                                             | GHC.Base.otherwise -> ValueOther val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "yyy" -> ValueEnumYyy
+                                                      | GHC.Internal.Base.otherwise -> ValueOther val)}

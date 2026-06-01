@@ -46,78 +46,78 @@ import OpenAPI.TypeAlias
 -- 
 data Dog = Dog {
   -- | bark
-  dogBark :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  dogBark :: (GHC.Internal.Maybe.Maybe GHC.Types.Bool)
   -- | binary
-  , dogBinary :: (GHC.Maybe.Maybe OpenAPI.Common.JsonByteString)
+  , dogBinary :: (GHC.Internal.Maybe.Maybe OpenAPI.Common.JsonByteString)
   -- | breed
-  , dogBreed :: (GHC.Maybe.Maybe DogBreed)
+  , dogBreed :: (GHC.Internal.Maybe.Maybe DogBreed)
   -- | byte
-  , dogByte :: (GHC.Maybe.Maybe OpenAPI.Common.JsonByteString)
+  , dogByte :: (GHC.Internal.Maybe.Maybe OpenAPI.Common.JsonByteString)
   -- | double
-  , dogDouble :: (GHC.Maybe.Maybe GHC.Types.Double)
+  , dogDouble :: (GHC.Internal.Maybe.Maybe GHC.Types.Double)
   -- | father
-  , dogFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
+  , dogFather :: (GHC.Internal.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | float
   -- 
   -- Constraints:
   -- 
   -- * Must be a multiple of 1.0e-2
-  , dogFloat :: (GHC.Maybe.Maybe GHC.Types.Float)
+  , dogFloat :: (GHC.Internal.Maybe.Maybe GHC.Types.Float)
   -- | int32
-  , dogInt32 :: (GHC.Maybe.Maybe GHC.Int.Int32)
+  , dogInt32 :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int32)
   -- | int64
   -- 
   -- Constraints:
   -- 
   -- * Must be a multiple of 4.0
-  , dogInt64 :: (GHC.Maybe.Maybe GHC.Int.Int64)
+  , dogInt64 :: (GHC.Internal.Maybe.Maybe GHC.Internal.Int.Int64)
   -- | integer
-  , dogInteger :: (GHC.Maybe.Maybe GHC.Types.Int)
+  , dogInteger :: (GHC.Internal.Maybe.Maybe GHC.Types.Int)
   -- | number
-  , dogNumber :: (GHC.Maybe.Maybe GHC.Types.Double)
+  , dogNumber :: (GHC.Internal.Maybe.Maybe GHC.Types.Double)
   -- | pet_type
-  , dogPet_type :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
+  , dogPet_type :: (GHC.Internal.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | secondFather
-  , dogSecondFather :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
+  , dogSecondFather :: (GHC.Internal.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | str
   -- 
   -- Constraints:
   -- 
   -- * Maximum length of 244
   -- * Minimum length of 100
-  , dogStr :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , dogStr :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDate
-  , dogStrDate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , dogStrDate :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | strDateTime
-  , dogStrDateTime :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  , dogStrDateTime :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | tags
-  , dogTags :: (GHC.Maybe.Maybe [Data.Text.Internal.Text])
-  } deriving (GHC.Show.Show
+  , dogTags :: (GHC.Internal.Maybe.Maybe [Data.Text.Internal.Text])
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Dog
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("bark" Data.Aeson.Types.ToJSON..=)) (dogBark obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("binary" Data.Aeson.Types.ToJSON..=)) (dogBinary obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("breed" Data.Aeson.Types.ToJSON..=)) (dogBreed obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("byte" Data.Aeson.Types.ToJSON..=)) (dogByte obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("double" Data.Aeson.Types.ToJSON..=)) (dogDouble obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("father" Data.Aeson.Types.ToJSON..=)) (dogFather obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("float" Data.Aeson.Types.ToJSON..=)) (dogFloat obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("int32" Data.Aeson.Types.ToJSON..=)) (dogInt32 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("int64" Data.Aeson.Types.ToJSON..=)) (dogInt64 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("integer" Data.Aeson.Types.ToJSON..=)) (dogInteger obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("number" Data.Aeson.Types.ToJSON..=)) (dogNumber obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("pet_type" Data.Aeson.Types.ToJSON..=)) (dogPet_type obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("secondFather" Data.Aeson.Types.ToJSON..=)) (dogSecondFather obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("str" Data.Aeson.Types.ToJSON..=)) (dogStr obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("strDate" Data.Aeson.Types.ToJSON..=)) (dogStrDate obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("strDateTime" Data.Aeson.Types.ToJSON..=)) (dogStrDateTime obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (dogTags obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("bark" Data.Aeson.Types.ToJSON..=)) (dogBark obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("binary" Data.Aeson.Types.ToJSON..=)) (dogBinary obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("breed" Data.Aeson.Types.ToJSON..=)) (dogBreed obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("byte" Data.Aeson.Types.ToJSON..=)) (dogByte obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("double" Data.Aeson.Types.ToJSON..=)) (dogDouble obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("father" Data.Aeson.Types.ToJSON..=)) (dogFather obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("float" Data.Aeson.Types.ToJSON..=)) (dogFloat obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("int32" Data.Aeson.Types.ToJSON..=)) (dogInt32 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("int64" Data.Aeson.Types.ToJSON..=)) (dogInt64 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("integer" Data.Aeson.Types.ToJSON..=)) (dogInteger obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("number" Data.Aeson.Types.ToJSON..=)) (dogNumber obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("pet_type" Data.Aeson.Types.ToJSON..=)) (dogPet_type obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("secondFather" Data.Aeson.Types.ToJSON..=)) (dogSecondFather obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("str" Data.Aeson.Types.ToJSON..=)) (dogStr obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("strDate" Data.Aeson.Types.ToJSON..=)) (dogStrDate obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("strDateTime" Data.Aeson.Types.ToJSON..=)) (dogStrDateTime obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (dogTags obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("bark" Data.Aeson.Types.ToJSON..=)) (dogBark obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("binary" Data.Aeson.Types.ToJSON..=)) (dogBinary obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("breed" Data.Aeson.Types.ToJSON..=)) (dogBreed obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("byte" Data.Aeson.Types.ToJSON..=)) (dogByte obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("double" Data.Aeson.Types.ToJSON..=)) (dogDouble obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("father" Data.Aeson.Types.ToJSON..=)) (dogFather obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("float" Data.Aeson.Types.ToJSON..=)) (dogFloat obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("int32" Data.Aeson.Types.ToJSON..=)) (dogInt32 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("int64" Data.Aeson.Types.ToJSON..=)) (dogInt64 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("integer" Data.Aeson.Types.ToJSON..=)) (dogInteger obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("number" Data.Aeson.Types.ToJSON..=)) (dogNumber obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("pet_type" Data.Aeson.Types.ToJSON..=)) (dogPet_type obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("secondFather" Data.Aeson.Types.ToJSON..=)) (dogSecondFather obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("str" Data.Aeson.Types.ToJSON..=)) (dogStr obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("strDate" Data.Aeson.Types.ToJSON..=)) (dogStrDate obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("strDateTime" Data.Aeson.Types.ToJSON..=)) (dogStrDateTime obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (dogTags obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("bark" Data.Aeson.Types.ToJSON..=)) (dogBark obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("binary" Data.Aeson.Types.ToJSON..=)) (dogBinary obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("breed" Data.Aeson.Types.ToJSON..=)) (dogBreed obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("byte" Data.Aeson.Types.ToJSON..=)) (dogByte obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("double" Data.Aeson.Types.ToJSON..=)) (dogDouble obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("father" Data.Aeson.Types.ToJSON..=)) (dogFather obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("float" Data.Aeson.Types.ToJSON..=)) (dogFloat obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("int32" Data.Aeson.Types.ToJSON..=)) (dogInt32 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("int64" Data.Aeson.Types.ToJSON..=)) (dogInt64 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("integer" Data.Aeson.Types.ToJSON..=)) (dogInteger obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("number" Data.Aeson.Types.ToJSON..=)) (dogNumber obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("pet_type" Data.Aeson.Types.ToJSON..=)) (dogPet_type obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("secondFather" Data.Aeson.Types.ToJSON..=)) (dogSecondFather obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("str" Data.Aeson.Types.ToJSON..=)) (dogStr obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("strDate" Data.Aeson.Types.ToJSON..=)) (dogStrDate obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("strDateTime" Data.Aeson.Types.ToJSON..=)) (dogStrDateTime obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("tags" Data.Aeson.Types.ToJSON..=)) (dogTags obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Dog
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Dog" (\obj -> ((((((((((((((((GHC.Base.pure Dog GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "bark")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "binary")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "breed")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "byte")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "double")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "father")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "float")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "int32")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "int64")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "integer")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "number")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "pet_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "secondFather")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "str")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "strDate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "strDateTime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "tags"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Dog" (\obj -> ((((((((((((((((GHC.Internal.Base.pure Dog GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "bark")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "binary")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "breed")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "byte")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "double")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "father")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "float")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "int32")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "int64")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "integer")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "number")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "pet_type")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "secondFather")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "str")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "strDate")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "strDateTime")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "tags"))}
 -- | Create a new 'Dog' with all required fields.
 mkDog :: Dog
-mkDog = Dog{dogBark = GHC.Maybe.Nothing,
-            dogBinary = GHC.Maybe.Nothing,
-            dogBreed = GHC.Maybe.Nothing,
-            dogByte = GHC.Maybe.Nothing,
-            dogDouble = GHC.Maybe.Nothing,
-            dogFather = GHC.Maybe.Nothing,
-            dogFloat = GHC.Maybe.Nothing,
-            dogInt32 = GHC.Maybe.Nothing,
-            dogInt64 = GHC.Maybe.Nothing,
-            dogInteger = GHC.Maybe.Nothing,
-            dogNumber = GHC.Maybe.Nothing,
-            dogPet_type = GHC.Maybe.Nothing,
-            dogSecondFather = GHC.Maybe.Nothing,
-            dogStr = GHC.Maybe.Nothing,
-            dogStrDate = GHC.Maybe.Nothing,
-            dogStrDateTime = GHC.Maybe.Nothing,
-            dogTags = GHC.Maybe.Nothing}
+mkDog = Dog{dogBark = GHC.Internal.Maybe.Nothing,
+            dogBinary = GHC.Internal.Maybe.Nothing,
+            dogBreed = GHC.Internal.Maybe.Nothing,
+            dogByte = GHC.Internal.Maybe.Nothing,
+            dogDouble = GHC.Internal.Maybe.Nothing,
+            dogFather = GHC.Internal.Maybe.Nothing,
+            dogFloat = GHC.Internal.Maybe.Nothing,
+            dogInt32 = GHC.Internal.Maybe.Nothing,
+            dogInt64 = GHC.Internal.Maybe.Nothing,
+            dogInteger = GHC.Internal.Maybe.Nothing,
+            dogNumber = GHC.Internal.Maybe.Nothing,
+            dogPet_type = GHC.Internal.Maybe.Nothing,
+            dogSecondFather = GHC.Internal.Maybe.Nothing,
+            dogStr = GHC.Internal.Maybe.Nothing,
+            dogStrDate = GHC.Internal.Maybe.Nothing,
+            dogStrDateTime = GHC.Internal.Maybe.Nothing,
+            dogTags = GHC.Internal.Maybe.Nothing}
 -- | Defines the enum schema located at @components.schemas.Dog.properties.breed@ in the specification.
 -- 
 -- 
@@ -128,7 +128,7 @@ data DogBreed =
   | DogBreedEnumHusky -- ^ Represents the JSON value @"Husky"@
   | DogBreedEnumRetriever -- ^ Represents the JSON value @"Retriever"@
   | DogBreedEnumShepherd -- ^ Represents the JSON value @"Shepherd"@
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
+  deriving (GHC.Internal.Show.Show, GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON DogBreed
     where {toJSON (DogBreedOther val) = val;
            toJSON (DogBreedTyped val) = Data.Aeson.Types.ToJSON.toJSON val;
@@ -137,8 +137,8 @@ instance Data.Aeson.Types.ToJSON.ToJSON DogBreed
            toJSON (DogBreedEnumRetriever) = "Retriever";
            toJSON (DogBreedEnumShepherd) = "Shepherd"}
 instance Data.Aeson.Types.FromJSON.FromJSON DogBreed
-    where {parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "Dingo" -> DogBreedEnumDingo
-                                             | val GHC.Classes.== "Husky" -> DogBreedEnumHusky
-                                             | val GHC.Classes.== "Retriever" -> DogBreedEnumRetriever
-                                             | val GHC.Classes.== "Shepherd" -> DogBreedEnumShepherd
-                                             | GHC.Base.otherwise -> DogBreedOther val)}
+    where {parseJSON val = GHC.Internal.Base.pure (if | val GHC.Classes.== "Dingo" -> DogBreedEnumDingo
+                                                      | val GHC.Classes.== "Husky" -> DogBreedEnumHusky
+                                                      | val GHC.Classes.== "Retriever" -> DogBreedEnumRetriever
+                                                      | val GHC.Classes.== "Shepherd" -> DogBreedEnumShepherd
+                                                      | GHC.Internal.Base.otherwise -> DogBreedOther val)}

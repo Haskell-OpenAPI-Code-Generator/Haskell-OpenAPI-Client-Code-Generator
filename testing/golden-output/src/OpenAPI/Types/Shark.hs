@@ -48,16 +48,16 @@ data Shark = Shark {
   -- | fishType
   sharkFishType :: Data.Text.Internal.Text
   -- | teethRemaining
-  , sharkTeethRemaining :: (GHC.Maybe.Maybe GHC.Types.Int)
-  } deriving (GHC.Show.Show
+  , sharkTeethRemaining :: (GHC.Internal.Maybe.Maybe GHC.Types.Int)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Shark
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (["fishType" Data.Aeson.Types.ToJSON..= sharkFishType obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("teethRemaining" Data.Aeson.Types.ToJSON..=)) (sharkTeethRemaining obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (["fishType" Data.Aeson.Types.ToJSON..= sharkFishType obj] : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("teethRemaining" Data.Aeson.Types.ToJSON..=)) (sharkTeethRemaining obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (["fishType" Data.Aeson.Types.ToJSON..= sharkFishType obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("teethRemaining" Data.Aeson.Types.ToJSON..=)) (sharkTeethRemaining obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (["fishType" Data.Aeson.Types.ToJSON..= sharkFishType obj] : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("teethRemaining" Data.Aeson.Types.ToJSON..=)) (sharkTeethRemaining obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Shark
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Shark" (\obj -> (GHC.Base.pure Shark GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "teethRemaining"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Shark" (\obj -> (GHC.Internal.Base.pure Shark GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "teethRemaining"))}
 -- | Create a new 'Shark' with all required fields.
 mkShark :: Data.Text.Internal.Text -- ^ 'sharkFishType'
   -> Shark
 mkShark sharkFishType = Shark{sharkFishType = sharkFishType,
-                              sharkTeethRemaining = GHC.Maybe.Nothing}
+                              sharkTeethRemaining = GHC.Internal.Maybe.Nothing}

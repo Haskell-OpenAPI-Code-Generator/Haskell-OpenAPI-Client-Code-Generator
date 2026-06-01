@@ -46,20 +46,20 @@ import OpenAPI.TypeAlias
 -- 
 data Test7Item = Test7Item {
   -- | prop1
-  test7ItemProp1 :: (GHC.Maybe.Maybe GHC.Types.Int)
+  test7ItemProp1 :: (GHC.Internal.Maybe.Maybe GHC.Types.Int)
   -- | prop2
-  , test7ItemProp2 :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
-  } deriving (GHC.Show.Show
+  , test7ItemProp2 :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Test7Item
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("prop1" Data.Aeson.Types.ToJSON..=)) (test7ItemProp1 obj) : GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("prop2" Data.Aeson.Types.ToJSON..=)) (test7ItemProp2 obj) : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Test7Item
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Test7Item" (\obj -> (GHC.Base.pure Test7Item GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop1")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Test7Item" (\obj -> (GHC.Internal.Base.pure Test7Item GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop1")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "prop2"))}
 -- | Create a new 'Test7Item' with all required fields.
 mkTest7Item :: Test7Item
-mkTest7Item = Test7Item{test7ItemProp1 = GHC.Maybe.Nothing,
-                        test7ItemProp2 = GHC.Maybe.Nothing}
+mkTest7Item = Test7Item{test7ItemProp1 = GHC.Internal.Maybe.Nothing,
+                        test7ItemProp2 = GHC.Internal.Maybe.Nothing}
 -- | Defines an alias for the schema located at @components.schemas.Test7@ in the specification.
 -- 
 -- 

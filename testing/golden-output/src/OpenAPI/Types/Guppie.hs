@@ -46,18 +46,18 @@ import OpenAPI.TypeAlias
 -- 
 data Guppie = Guppie {
   -- | color
-  guppieColor :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  guppieColor :: (GHC.Internal.Maybe.Maybe Data.Text.Internal.Text)
   -- | fishType
   , guppieFishType :: Data.Text.Internal.Text
-  } deriving (GHC.Show.Show
+  } deriving (GHC.Internal.Show.Show
   , GHC.Classes.Eq)
 instance Data.Aeson.Types.ToJSON.ToJSON Guppie
-    where {toJSON obj = Data.Aeson.Types.Internal.object (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (guppieColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= guppieFishType obj] : GHC.Base.mempty));
-           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Base.mconcat (Data.Foldable.concat (Data.Maybe.maybe GHC.Base.mempty (GHC.Base.pure GHC.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (guppieColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= guppieFishType obj] : GHC.Base.mempty)))}
+    where {toJSON obj = Data.Aeson.Types.Internal.object (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (guppieColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= guppieFishType obj] : GHC.Internal.Base.mempty));
+           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (GHC.Internal.Base.mconcat (GHC.Internal.Data.Foldable.concat (GHC.Internal.Data.Maybe.maybe GHC.Internal.Base.mempty (GHC.Internal.Base.pure GHC.Internal.Base.. ("color" Data.Aeson.Types.ToJSON..=)) (guppieColor obj) : ["fishType" Data.Aeson.Types.ToJSON..= guppieFishType obj] : GHC.Internal.Base.mempty)))}
 instance Data.Aeson.Types.FromJSON.FromJSON Guppie
-    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Guppie" (\obj -> (GHC.Base.pure Guppie GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "color")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType"))}
+    where {parseJSON = Data.Aeson.Types.FromJSON.withObject "Guppie" (\obj -> (GHC.Internal.Base.pure Guppie GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..:! "color")) GHC.Internal.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fishType"))}
 -- | Create a new 'Guppie' with all required fields.
 mkGuppie :: Data.Text.Internal.Text -- ^ 'guppieFishType'
   -> Guppie
-mkGuppie guppieFishType = Guppie{guppieColor = GHC.Maybe.Nothing,
+mkGuppie guppieFishType = Guppie{guppieColor = GHC.Internal.Maybe.Nothing,
                                  guppieFishType = guppieFishType}
