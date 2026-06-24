@@ -77,8 +77,8 @@ data ParameterCardinality
   | MultipleParameters ParameterTypeDefinition
 
 -- | Generates the parameter type for an operation. See 'ParameterCardinality' for further information.
-generateParameterTypeFromOperation :: Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
-generateParameterTypeFromOperation operationName = getParametersFromOperationConcrete >=> generateParameterType operationName
+generateParameterTypeFromOperation :: [OAT.Referencable OAT.ParameterObject] -> Text -> OAT.OperationObject -> OAM.Generator ParameterCardinality
+generateParameterTypeFromOperation pathParams operationName = getParametersFromOperationConcrete pathParams >=> generateParameterType operationName
 
 generateParameterType :: Text -> [(OAT.ParameterObject, [Text])] -> OAM.Generator ParameterCardinality
 generateParameterType operationName parameters = OAM.nested "parameters" $ do
@@ -152,12 +152,24 @@ getParameterLocationPrefix =
   )
     . OAT.parameterObjectIn
 
--- | Extracts all parameters of an operation
---
--- Concrete objects are always added. References try to get resolved to a concrete object.
--- If this fails, the parameter is skipped and a warning gets produced.
-getParametersFromOperationConcrete :: OAT.OperationObject -> OAM.Generator [(OAT.ParameterObject, [Text])]
-getParametersFromOperationConcrete =
+-- | Override parameters defined at path level with parameters which are defined at operation level
+overrideParameters :: [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])] -> [(OAT.ParameterObject, [Text])]
+overrideParameters pathParams operationParams =
+  -- According to OpenAPI specification, the unique parameter is identified by a combination of name and location.
+  -- So, we are using (name, in') as key.
+  -- We emit all the path parameters that were not overridden, and then all the
+  -- operation parameters. (Note, we use lists to keep the original parameter
+  -- order for generating code).
+  let getKey :: (OAT.ParameterObject, [Text]) -> (Text, OAT.ParameterObjectLocation)
+      getKey p =
+        let po = fst p
+         in (OAT.parameterObjectName po, OAT.parameterObjectIn po)
+      opKeys = Set.fromList (map getKey operationParams)
+      pathParamsWithoutOverride = filter (\p -> Set.notMember (getKey p) opKeys) pathParams
+   in pathParamsWithoutOverride <> operationParams
+
+getConcreteParameters :: [OAT.Referencable OAT.ParameterObject] -> OAM.Generator [(OAT.ParameterObject, [Text])]
+getConcreteParameters =
   OAM.nested "parameters"
     . fmap Maybe.catMaybes
     . mapM
@@ -172,7 +184,16 @@ getParametersFromOperationConcrete =
             pure $ (,["components", "parameters", name]) <$> p
       )
     . zip ([0 ..] :: [Int])
-    . OAT.operationObjectParameters
+
+-- | Extracts all parameters of an operation
+--
+-- Concrete objects are always added. References try to get resolved to a concrete object.
+-- If this fails, the parameter is skipped and a warning gets produced.
+getParametersFromOperationConcrete :: [OAT.Referencable OAT.ParameterObject] -> OAT.OperationObject -> OAM.Generator [(OAT.ParameterObject, [Text])]
+getParametersFromOperationConcrete pathParameters operation = do
+  operationParameters <- getConcreteParameters $ OAT.operationObjectParameters operation
+  concretePathParameters <- getConcreteParameters pathParameters
+  pure $ overrideParameters concretePathParameters operationParameters
 
 getSchemaFromParameterObjectSchema :: OAT.ParameterObjectSchema -> OAM.Generator (Maybe OAS.Schema)
 getSchemaFromParameterObjectSchema (OAT.SimpleParameterObjectSchema OAT.SimpleParameterSchema {..}) = pure $ Just simpleParameterSchemaSchema
