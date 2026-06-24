@@ -419,6 +419,8 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
         let paramName = mkName "val"
             body =
               case discriminator of
+                -- When discriminator is present, we'll use it to figure out
+                -- which constructor to parse
                 Just disc -> do
                   let fnArgName = mkName "obj"
                       discriminatorPropertyName = mkName "propertyName"
@@ -426,6 +428,9 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
                         schema <- allSchemas
                         guard $ E.isLeft $ extractSchemaWithFixedValue FixedValueStrategyExclude schema
                         pure schema
+                      -- Map from refs in anyOf to schema name. We'll use this to
+                      -- discover the actual relevant constructor names (and
+                      -- their indexes which we may need if the setting is on).
                       schemaLookupFromRef = Map.fromList $ do
                         (n, schema) <- nonFixedSchemas
                         case schema of
@@ -434,6 +439,9 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
                       oneOfSchemaRefs = do
                         (ref, (_, name')) <- Map.toList schemaLookupFromRef
                         pure (name', ref)
+                      -- Per the spec: if `mapping` exists we'll use the keys
+                      -- specified there. If not, we'll use the schema component
+                      -- names.
                       propertyNamesWithReferences = maybe oneOfSchemaRefs Map.toList $ OAS.discriminatorObjectMapping disc
                   let mkMatchedCase (propName, fullRef) =
                         case Map.lookup fullRef schemaLookupFromRef of
@@ -443,9 +451,12 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
                                 parseConstructor constructorName = [|($(varE constructorName) <$> Aeson.parseJSON $(varE paramName))|]
                             [match (litP $ stringL $ T.unpack propName) (normalB [|$(parseConstructor $ haskellifyConstructor $ schemaName <> haskellifyPartialConstructor caseName <> suffix)|]) []]
                       matchedCases = propertyNamesWithReferences >>= mkMatchedCase
+                      -- Fallback. If we don't parse the property, we'll fail.
                       unmatchedCase = match (varP $ mkName "_unmatched") (normalB [|fail "No match for discriminator property"|]) []
                       propertyCases = matchedCases <> [unmatchedCase]
                       getDiscProp = [|$(varE fnArgName) Aeson..:? $(stringE $ T.unpack $ OAS.discriminatorObjectPropertyName disc)|]
+                      -- Annotate as `Text` otherwise we get ambiguity since we're
+                      -- just matching on string literals.
                       annotatedDiscriminatorPropertyName = [|$(varE discriminatorPropertyName) :: Text|]
                       withObjectLamda =
                         [|
@@ -457,6 +468,8 @@ defineOneOfSchema schemaName description allSchemas discriminator = do
                                 $(caseE annotatedDiscriminatorPropertyName propertyCases)
                           |]
                   [|Aeson.withObject $(stringE $ T.unpack schemaName) $(lam1E (varP fnArgName) withObjectLamda) $(varE paramName)|]
+                -- When there's no discriminator, we'll just try to parse the
+                -- different variants, in the order they're defined.
                 Nothing -> do
                   constructorNames' <- sequence constructorNames
                   let resultExpr =

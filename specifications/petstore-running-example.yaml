@@ -610,6 +610,46 @@ paths:
               "$ref": "#/components/schemas/NullableAndOptionalTest"
         description: Nullable and optional values as input
         required: true
+  "/discriminator/fish/{fishType}":
+    get:
+      summary: Get a fish by discriminator type
+      operationId: getFishByType
+      parameters:
+        - name: fishType
+          in: path
+          required: true
+          description: The fish type (guppie, minnow, shark)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fish"
+        '400':
+          description: Invalid fish type
+  "/discriminator/lizard/{lizardType}":
+    get:
+      summary: Get a lizard by discriminator type
+      operationId: getLizardByType
+      parameters:
+        - name: lizardType
+          in: path
+          required: true
+          description: The lizard type (gecko, gilaMonster)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lizard"
+        '400':
+          description: Invalid lizard type
   /query/array/form:
     get:
       operationId: queryArrayForm
@@ -836,6 +876,70 @@ components:
           type: number
         B:
           type: number
+    Fish:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/Guppie'
+        - $ref: '#/components/schemas/Minnow'
+        - $ref: '#/components/schemas/Shark'
+      discriminator:
+        propertyName: fishType
+        mapping:
+          guppie: '#/components/schemas/Guppie'
+          minnow: '#/components/schemas/Minnow'
+          shark: '#/components/schemas/Shark'
+    Guppie:
+      type: object
+      properties:
+        color:
+          type: string
+        fishType:
+          type: string
+      required:
+        - fishType
+    Minnow:
+      type: object
+      properties:
+        color:
+          type: string
+        fishType:
+          type: string
+      required:
+        - fishType
+    Shark:
+      type: object
+      properties:
+        teethRemaining:
+          type: integer
+        fishType:
+          type: string
+      required:
+        - fishType
+    Lizard:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/Gecko'
+        - $ref: '#/components/schemas/GilaMonster'
+      discriminator:
+        propertyName: discriminatorTag
+    Gecko:
+      type: object
+      properties:
+        hasTail:
+          type: boolean
+        discriminatorTag:
+          type: string
+      required:
+        - discriminatorTag
+    GilaMonster:
+      type: object
+      properties:
+        hasTail:
+          type: boolean
+        discriminatorTag:
+          type: string
+      required:
+        - discriminatorTag
   requestBodies:
     Pet:
       content:
